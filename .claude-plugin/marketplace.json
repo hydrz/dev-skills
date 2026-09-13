@@ -8,7 +8,7 @@
     {
       "name": "dev-skills",
       "source": "./",
-      "description": "面向真实软件工程的中文 agent skills（拷问、规格与工单流程、TDD、代码评审、领域建模、子代理驱动实现等）。",
+      "description": "面向真实软件工程的中文 agent skills（方案追问、规格与任务拆分、TDD、代码评审、领域建模、子代理并行实现等）。",
       "category": "engineering",
       "keywords": [
         "engineering",
