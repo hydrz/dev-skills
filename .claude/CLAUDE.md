@@ -1,38 +1,39 @@
-本仓库是一套中文 agent skills。领域词汇见 [CONTEXT.md](../CONTEXT.md)，写任何 skill 或文档都用其中的术语。
+本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](../CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](../docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
 
 ## 目录
 
-Skill 按桶放在 `skills/` 下：
+skill 按分类放在 `skills/` 下：
 
-- `engineering/`：日常写代码
-- `productivity/`：日常非代码工作流
+- `engineering/`：工程 skill，用于需求澄清、实现、调试、评审和交付
+- `productivity/`：协作与思考 skill，用于方案澄清、交接、学习等非代码工作流
 
-每个 skill 一个目录，`SKILL.md` 必需，参考文件放在同目录，按需拆出（渐进披露）。
+每个 skill 一个目录，`SKILL.md` 必需。参考文件放在同一目录，只有部分分支需要的内容才拆出去（渐进披露）。
 
 ## 登记
 
-新增、改名、删除或改变 skill 的用法时，同步四处：
+新增、改名、删除 skill，或改变 skill 的用法、触发方式时，同步以下位置：
 
 1. `.claude-plugin/plugin.json` 的 `skills` 数组
-2. 顶层 `README.md` 的清单（skill 名链接到其 `SKILL.md`）
-3. 所在桶的 `README.md`
-4. `skills/engineering/guide/SKILL.md`（路由必须覆盖每个用户可达的 skill，不然就是会撒谎的路由）
+2. 所在分类的 `README.md`：完整清单，skill 名链接到其 `SKILL.md`，附中文显示名和一句话定位
+3. `skills/engineering/guide/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
+4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
 
-改完清单后运行 `claude plugin validate . --strict`。
+改完后运行 `claude plugin validate . --strict`。
 
-## 调用方式
+## 触发方式
 
 每个 `SKILL.md` 二选一，规则见 [docs/invocation.md](../docs/invocation.md)：
 
-- **用户调用**：frontmatter 写 `disable-model-invocation: true`，description 是给人看的一句话摘要。
-- **模型调用**：不写该字段，description 面向模型，写清触发分支，中英文触发词都给。
+- **仅用户触发**（user-invoked）：frontmatter 写 `disable-model-invocation: true`。description 是给人看的一句话摘要，说明使用场景、产出结果，以及与最相近 skill 的区别。
+- **可自动触发**（model-invoked）：不写该字段。description 面向 agent，写清触发分支，并同时给出中英文触发词；触发范围保持足够窄。
 
-Skill 之间的依赖写成"调用 Skill 工具，参数为 `grilling`"，一次调用一个 skill。前置条件是用户调用 skill 时，写成"告诉用户运行 `/setup-dev-skills`"。
+skill 之间的依赖写成“调用 Skill 工具，参数为 `grilling`”。需要多个 skill 时逐个写明，例如“调用 Skill 工具两次，分别为 `grilling` 和 `domain-modeling`”。可自动触发的 skill 不调用仅用户触发的 skill；需要用户运行某个入口时，写成“告诉用户运行 `/setup-dev-skills`”。
 
 ## 写作规范
 
 - `name` 用英文 kebab-case；正文与 description 用中文。
-- 先导词首次出现时附英文原词，例如"接缝（seam）"，之后只用中文。
-- 用正向表述写目标行为；禁令只留给无法正向表述的硬护栏，并配上正向目标。
-- 标点用逗号、冒号、句号、括号，不用破折号。
-- 中英文、中文与数字之间加空格。
+- 先导词首次出现时附英文原词，例如“接缝（seam）”，之后只用中文。优先使用中国开发者熟悉的说法，不为统一而沿用难懂的直译或隐喻。
+- 用正向表述写目标行为；禁令只留给无法正向表述的硬性护栏，并配上正向目标。
+- 标点用逗号、冒号、句号、括号，不用破折号；中文引语用全角引号“”。
+- 中文与英文单词、数字之间加空格；中文与行内代码之间不强制加空格，同一文档保持一致。
+- 改写已有 skill 时，先列出原有的触发条件、必需动作、边界、错误处理和完成条件，改写后逐项核对没有丢失。
