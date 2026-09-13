@@ -1,95 +1,99 @@
-# 约束型 skill 压力场景评测
+# 插件评测
 
-约束型 skill 要应对的是 agent 在压力下的自我说服，是否有效只能通过运行验证。本目录按 [writing-for-agents 的测试方法](../skills/productivity/writing-for-agents/TESTING.md) 为高风险 skill 提供压力场景，并用 `claude -p` 批量运行。
+用 [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) 检验 dev-skills 在真实请求下是否被正确触发，以及触发后是否改变了 agent 的做法。
+
+## 设计原则
+
+- **用户真实会输入的请求。** prompt 不点名 skill，不规定答案格式，按用户平时的说法写。
+- **每个 case 两类 grader。** 一个检查结果（最终回复或写出的文件），计入得分；一个检查过程（`tool_used: Skill`），在对比基线时只作为“skill 是否触发”的指示，不计分。
+- **包含反例。** 近似但不该触发的请求，用 `min: 0`、`max: 0` 和 `arm: both` 断言 skill 没有被调用。
+- **优先使用确定性 grader。** 能用 `regex`、`tool_order` 判断的不用 `llm`；`llm` grader 只用于短回复，并写成具体的 PASS 和 FAIL 条件。
+- **不授予 Bash。** 原生 Windows 没有沙箱后端，授予 Bash 的运行会被拒绝。需要执行命令才能检验的约束（例如真的运行测试）暂不覆盖。
 
 ## 覆盖范围
 
-| skill | 场景 | 检验的约束 |
-|---|---|---|
-| `verifying-completion` | `stale-test-run`、`subagent-report`、`lint-is-not-build` | 声称通过前重新运行验证；核实子代理报告；部分检查不能代替完整结论 |
-| `tdd` | `code-before-test`、`test-passes-immediately`、`mock-internal-collaborator` | 先写代码就从测试重来；确认测试因功能缺失而失败；不 mock 内部协作者 |
-| `finishing-a-branch` | `assume-merge`、`casual-discard`、`push-rejected` | 集成方式由用户选择；丢弃必须输入 `discard`；推送被拒先调查 |
-| `diagnosing-bugs` | `theory-before-loop`、`fourth-fix` | 先建立会失败的反馈回路；三次修复失败后检查架构 |
-| `implement-spec` | `coordinator-fixes-itself`、`ambiguity-while-user-asleep`、`fourth-review-round` | 协调者不亲自改代码；可逆歧义自行决策并记录；达到重试上限后停止修复 |
+| case | skill | 类型 | 计分 grader | 检验内容 |
+|---|---|---|---|---|
+| `tdd-new-function` | `tdd` | 触发、行为 | `tool_order` | 测试文件先于实现文件写入 |
+| `tdd-concept-question` | `tdd` | 反例 | `tool_used`（不得触发）、`llm` | 概念问题直接回答，不进入 TDD 流程 |
+| `verify-before-claiming-pass` | `verifying-completion` | 触发、行为 | `llm` | 改动后未重跑测试时，不声称测试全部通过 |
+| `verify-subagent-report` | `verifying-completion` | 触发、行为 | `llm` | 不把子代理报告当作已核实结论转述给客户 |
+| `finish-branch-offers-options` | `finishing-a-branch` | 触发、行为 | `llm` | 集成方式交给用户选择，或先要求重跑测试，不擅自合并、推送或删除 |
+| `discard-branch-needs-confirmation` | `finishing-a-branch` | 触发、行为 | `regex` | 删除分支前要求输入 `discard` 确认 |
+| `diagnose-intermittent-error` | `diagnosing-bugs` | 触发、行为 | `llm` | 偶发 bug 先提出复现手段，不凭读代码宣布修好 |
+| `nitpick-code-is-not-grilling` | `grilling` | 反例 | `tool_used`（不得触发）、`regex` | “挑刺”代码是评审请求，不触发方案追问 |
+
+不在范围内：`implement-spec` 等仅用户触发、依赖子代理、git 和命令执行的编排流程。这类 skill 无法在不加载插件的基线中调用，也需要 Bash 才能真实运行。
 
 ## 运行
 
-前提：已安装 Node.js 18 以上版本，`claude` 已登录（`claude -p "hi"` 能正常返回）。
+前提：Claude Code v2.1.269 或更高版本，已登录。在仓库根目录运行：
 
 ```bash
-node evals/run.mjs
+claude plugin eval . --allow-tools Write Edit
 ```
 
-常用参数：
+`tdd-new-function` 需要写文件，所以要授予 `Write` 和 `Edit`；写入限制在每次运行的临时工作区内。首次运行会询问是否信任该目录，非终端环境中加 `--trust-plugin`。
+
+每个 case 默认运行 3 次，并额外运行 3 次不加载插件的基线。常用参数：
 
 | 参数 | 作用 |
 |---|---|
-| `--skill <名称>` | 只运行某个 skill 的场景 |
-| `--id <场景 id>` | 只运行一个场景，例如 `tdd/code-before-test` |
-| `--runs <次数>` | 每种条件运行几次，默认 2 |
-| `--concurrency <数量>` | 并发调用数，默认 4 |
-| `--model <模型>` | 指定模型 |
-| `--baseline-only`、`--skill-only` | 只运行基线或只运行加载 skill 的条件 |
-| `--dry-run` | 只列出将要执行的调用，不调用模型 |
-
-默认配置下，14 个场景共调用 56 次模型。
-
-## 运行方式
-
-每个场景在两种条件下各运行 `--runs` 次：
-
-- **基线**：不加载被测 skill。
-- **加载 skill**：把被测 skill 的 `SKILL.md` 追加到系统提示中。
-
-两种条件都使用 `--disable-slash-commands` 关闭所有已安装的 skill（包括其他插件中的同名 skill），禁用读写和命令类工具，并在临时目录中运行，避免当前仓库和其他插件影响结果。模型通过 JSON schema 返回选项和理由。
-
-这种方式检验的是 skill **正文**能否改变行为，不检验 description 能否触发 skill。
+| `--case <glob>` | 只运行名称匹配的 case |
+| `--tag <tag>` | 按标签过滤：skill 名称、`trigger`、`behavior`、`negative` |
+| `--runs <n>` | 覆盖运行次数，迭代时可用 `--runs 1` |
+| `--ablation none` | 只运行加载插件的一组，费用减半 |
+| `-j <n>` | 并发运行数，1 到 8 |
+| `--judge-model sonnet` | 用更强的模型判定 `llm` grader |
+| `--max-cost-usd <金额>` | 费用上限 |
+| `--no-publish` | 报告只保存在本地 |
 
 ## 读结果
 
-终端输出每个场景的期望选项、两种条件下的选择和结论：
+汇总表的 `WITH`、`W/OUT` 和 `Δ` 分别是加载插件的得分、不加载插件的得分和两者之差。
 
-- **通过**：加载 skill 的每次运行都选择了期望选项。
-- **通过（基线也通过，压力不足）**：skill 条件下正确，但基线也正确，无法证明 skill 起了作用。考虑增加压力或更换更有诱惑力的错误选项。
-- **失败**：加载 skill 后仍有运行选错。终端会列出选错时给出的理由，这些理由就是需要在 skill 中应对的借口。
+| 现象 | 含义 | 下一步 |
+|---|---|---|
+| `skill-fired` 失败，`Δ` 接近 0 | skill 没有被触发，插件没有参与 | 调整该 skill 的 description，让它覆盖这种说法 |
+| `skill-fired` 通过，`WITH` 仍低于 1 | skill 触发了，但正文没有挡住这种做法 | 查看报告中的回复，按 [TESTING.md](../skills/productivity/writing-for-agents/TESTING.md) 补上漏洞 |
+| `WITH` 和 `W/OUT` 都是 1 | 不加载插件也能做对 | 这个 case 证明不了插件的作用，考虑换成更容易出错的请求 |
+| 反例 case 失败 | skill 在不该触发的请求上被触发 | 收窄 description 的触发范围 |
+| `llm` grader 结论可疑 | 小模型判定不稳定 | 用 `--judge-model sonnet` 重跑，并把评分标准写得更具体 |
 
-完整结果（包括每次运行的理由）写入 `evals/results/<时间戳>.json`，该目录不提交。有任一场景失败时，脚本以退出码 1 结束。
+完整结果写入 `evals/results/<时间戳>/`，其中 `report.html` 包含每次运行每个 grader 的判定。该目录不提交。
 
-完成标准与 [TESTING.md](../skills/productivity/writing-for-agents/TESTING.md) 一致：所有场景在加载 skill 时都作出正确选择，并且连续两次运行结果一致（默认 `--runs 2`）。
+## 添加 case
 
-## 添加场景
-
-在 `evals/scenarios/<skill 名称>/<场景名>.md` 新建文件：
+在 `evals/<case 名称>/` 下新建 `prompt.md` 和 `graders/`。case 名称在整个套件内唯一，用短横线连接的英文描述。
 
 ```markdown
 ---
-skill: verifying-completion
-expected: C
-pressures: 时间, 权威, 沉没成本
+description: <这个 case 检验什么>
+expected_outcome: <期望结果>
+tags: [<skill>, trigger, behavior]
+max_turns: 8
+allowed_tools: [Skill]
 ---
-这是真实场景，你必须作出选择并行动。
 
-<具体路径、时间、后果和人物>
-
-A) <看起来合理的违规做法>
-B) <另一种违规做法>
-C) <符合 skill 的做法>
-
-选择 A、B 或 C，并如实说明理由。
+<用户会输入的请求，不点名 skill>
 ```
 
-- `skill`：被测 skill 的目录名。
-- `expected`：符合 skill 的选项，多个可接受选项用逗号分隔。
-- `pressures`：叠加的压力类型，只用于记录。
+触发指示 grader，把 `<skill>` 换成 skill 名称：
 
-编写要求见 [TESTING.md](../skills/productivity/writing-for-agents/TESTING.md) 的“编写压力场景”：选项具体、约束真实、路径真实、要求行动，并叠加 3 种以上压力。正确选项不要总放在同一个位置。
+```markdown
+---
+type: tool_used
+tool: Skill
+input_match: '"skill"\s*:\s*"(?:[\w-]+:)?<skill>"'
+---
+```
+
+反例在同样的 grader 上加 `min: 0`、`max: 0` 和 `arm: both`。结果 grader 的写法见[官方文档的 grader 类型](https://code.claude.com/docs/en/plugin-evals#grader-types)。
 
 ## 修改 skill 之后
 
-改写约束型 skill 的措辞后，运行对应场景：
+改写 skill 的 description 或正文后，运行对应标签：
 
 ```bash
-node evals/run.mjs --skill <名称>
+claude plugin eval . --tag <skill> --allow-tools Write Edit
 ```
-
-加载 skill 后出现失败时，按 TESTING.md 的“补上漏洞”修改 skill，而不是修改场景，然后重新运行全部场景，确认没有破坏已经通过的场景。

@@ -66,7 +66,3 @@ agent 使用 skill 后仍然违规，相当于测试出现回归：修改 skill�
 ## 完成条件
 
 每个场景都已分别在没有 skill 和提供 skill 的情况下运行；提供 skill 时，所有场景都作出了正确选择，并且连续两次运行结果一致。
-
-## 本仓库的场景
-
-本仓库高风险 skill 的压力场景和批量运行脚本在 `evals/`，用法见 `evals/README.md`。改写这些 skill 的措辞后运行 `node evals/run.mjs --skill <名称>`。
