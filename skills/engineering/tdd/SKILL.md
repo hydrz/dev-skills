@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: 测试驱动开发。用于测试先行地构建功能或修 bug、提到"红-绿-重构 / red-green-refactor / TDD / 先写测试"、或需要集成测试时。
+description: 使用测试先失败、再通过、最后重构的循环实现功能或修复 bug。用于“TDD、测试驱动、先写测试、red-green-refactor”等请求，不因普通的集成测试请求单独触发。
 ---
 
 # 测试驱动开发

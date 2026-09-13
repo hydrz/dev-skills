@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: 把计划、规格或当前对话拆成一组曳光弹式工单，每张声明自己的阻塞边，发布到已配置的追踪器（本地每张一个文件，或真实追踪器上的原生阻塞链接）。
+description: 将计划、规格或当前对话拆成端到端最小闭环任务，明确每项任务的前置依赖，并发布到已配置的 issue 追踪器。
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: guide
-description: 问一问你现在的情况该用哪个 skill、走哪条流程。本仓库所有 skill 的路由。
+description: 不确定下一步该使用哪个 skill 时，说明当前情况并获得工作流建议。本仓库所有 skill 的导航入口。
 disable-model-invocation: true
 ---
 

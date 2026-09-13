@@ -1,6 +1,6 @@
 ---
 name: teach
-description: 以当前目录为有状态的教学工作区，分多次会话教用户一项新技能或概念。
+description: 将当前目录作为可持续记录进度的学习工作区，通过多次会话帮助用户掌握一项技术或概念。
 argument-hint: "你想学什么？"
 disable-model-invocation: true
 ---

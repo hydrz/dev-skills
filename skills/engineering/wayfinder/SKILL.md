@@ -1,6 +1,6 @@
 ---
 name: wayfinder
-description: 把一大块工作（一个 agent 会话装不下）规划成 issue 追踪器上一张共享的决策工单地图，逐张解决，直到通往目的地的路清晰可见。
+description: 将单个 agent 会话无法理清的大型工作拆成一组相互关联的决策问题，并通过 issue 追踪器逐步解决，直到后续执行路径明确。
 disable-model-invocation: true
 ---
 

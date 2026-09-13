@@ -1,6 +1,6 @@
 ---
 name: research
-description: 对照高可信的一手资料调查一个问题，把结论写成仓库里一份带引用的 Markdown 文件。用于用户想调研某个主题、收集文档或 API 事实、说"调研一下 / 查一下官方文档 / research"，或想把阅读跑腿活交给后台 agent 时。
+description: 对照高可信一手资料调查技术问题，并在仓库中写入带引用的 Markdown 报告。用于“技术调研、查官方文档、research、核实 API 行为”等请求。
 ---
 
 派一个**后台 agent** 去做调研，你继续干别的。

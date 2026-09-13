@@ -1,6 +1,6 @@
 ---
 name: setup-dev-skills
-description: 为本仓库配置工程类 skill：issue 追踪器、分诊标签词汇、领域文档布局。每个仓库在首次使用其他工程 skill 前运行一次。
+description: 首次在仓库中使用工程 skill 前，配置 issue 追踪器、分流标签和领域文档布局。每个仓库通常只需运行一次。
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: implement
-description: 在当前会话里，按一份规格、一张或几张工单实现工作。
+description: 在当前会话实现一项或少量已明确的开发任务。整份规格需要由多个子代理并行交付时使用 implement-spec。
 disable-model-invocation: true
 ---
 

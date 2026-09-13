@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: 把当前对话压缩成一份交接文档，交给另一个 agent 继续。
+description: 将当前对话中的背景、决定、证据和后续动作整理成交接文档，供另一个 agent 继续工作。
 argument-hint: "下一个会话要用来做什么？"
 disable-model-invocation: true
 ---

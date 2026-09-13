@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: 把当前对话综合成一份规格并发布到项目的 issue 追踪器：不再访谈，只综合已经讨论过的内容。
+description: 将已经完成的讨论整理成可实施规格，并发布到项目的 issue 追踪器。只综合现有信息，不再追加访谈。
 disable-model-invocation: true
 ---
 

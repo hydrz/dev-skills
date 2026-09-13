@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: 为 agent 写文档：skill、AGENTS.md / CLAUDE.md，以及任何 agent 通过指针读到的文档。用于创建、编辑或测试 skill，修改 AGENTS.md / CLAUDE.md 时，也用于"写个 skill / write a skill / 优化提示词"。
+description: 编写、修改和测试供 agent 使用的文档，包括 skill、`AGENTS.md`、`CLAUDE.md` 和上下文指针指向的材料。用于“写 skill、write a skill、优化 agent 指令”等请求。
 ---
 
 为 agent 写任何文档的参考：skill、`AGENTS.md` / `CLAUDE.md`、被指针指向的文档。包装不同，写法相同：同一组杠杆让文档变得可预测，也就是 agent 每次走同样的*过程*，而不是每次产出同样的结果。

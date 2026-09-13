@@ -1,6 +1,6 @@
 ---
 name: implement-spec
-description: 用子代理把一整份规格及其工单实现到一个分支上：按工单图的前沿并发推进，每张工单独立评审，台账扛过上下文压缩，最后以一个 PR 交付。
+description: 由多个子代理并行完成整份规格，在磁盘记录进度并逐项评审，最后通过一个 PR 交付。少量任务在当前会话完成时使用 implement。
 disable-model-invocation: true
 ---
 

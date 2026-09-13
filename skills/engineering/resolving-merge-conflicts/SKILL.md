@@ -1,6 +1,6 @@
 ---
 name: resolving-merge-conflicts
-description: 解决进行中的 git merge / rebase 冲突。用于合并或变基遇到冲突、用户说"解决冲突 / resolve conflicts"时。
+description: 根据冲突两侧的改动意图解决正在进行的 Git merge 或 rebase。用于“解决合并冲突、resolve conflicts、继续 rebase”等请求。
 ---
 
 1. **看清现状。** 查看 merge / rebase 的当前状态、git 历史和冲突文件。

@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: 无情拷问以打磨计划或设计，同时沉淀文档（术语表 CONTEXT.md 与 ADR）。
+description: 在仓库中逐轮澄清并压力测试计划或设计，同时更新 `CONTEXT.md` 和 ADR。无需写入项目文件时使用 grill-me。
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: triage
-description: 让 issue 和外部 PR 在分诊角色状态机中流转：分类、核实、必要时拷问，并写出可交给 agent 的简报。
+description: 对外部 issue 和 PR 进行分类、核实和必要的追问，补齐复现证据与验收条件，并整理成可由 agent 执行的说明。
 disable-model-invocation: true
 ---
 

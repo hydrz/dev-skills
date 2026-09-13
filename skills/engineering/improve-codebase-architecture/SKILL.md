@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: 扫描代码库找出加深机会，以可视化 HTML 报告呈现，再就你挑中的那个展开拷问。
+description: 扫描代码库中接口复杂、职责分散或边界不清的位置，生成可视化 HTML 审查报告，再与用户深入讨论选中的改进项。
 disable-model-invocation: true
 ---
 

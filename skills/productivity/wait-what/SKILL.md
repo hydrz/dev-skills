@@ -1,6 +1,6 @@
 ---
 name: wait-what
-description: 停。刚才那段没看懂，请重新讲一遍。
+description: 当上一段说明难懂、术语过多或前提跳跃时，用更平实的语言和更少的假设重新解释。
 disable-model-invocation: true
 ---
 

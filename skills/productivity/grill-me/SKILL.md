@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: 被无情拷问一个计划或设计，直到每个分支都想清楚。无状态，不写文件。
+description: 逐轮澄清并压力测试一个计划或设计，直到关键决策达成共识。无状态，不写入本地文件。
 disable-model-invocation: true
 ---
 

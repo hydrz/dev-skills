@@ -1,35 +1,35 @@
-# 工程
+# 工程 skill
 
-日常写代码用的 skill。
+用于需求澄清、计划、实现、调试、评审和交付的软件工程工作流。
 
-## 用户调用
+## 仅用户触发
 
-只有你键入名字才会触发（Claude Code：`disable-model-invocation: true`）。
+只有用户显式输入名称才会运行。
 
-- **[guide](./guide/SKILL.md)**：问该用哪个 skill、走哪条流程。所有 skill 的路由。
-- **[setup-dev-skills](./setup-dev-skills/SKILL.md)**：为仓库配置 issue 追踪器、分诊标签和领域文档布局。每个仓库运行一次。
-- **[grill-with-docs](./grill-with-docs/SKILL.md)**：拷问的同时构建领域模型，就地更新 `CONTEXT.md` 和 ADR。
-- **[to-spec](./to-spec/SKILL.md)**：把当前对话综合成规格并发布到 issue 追踪器。
-- **[to-tickets](./to-tickets/SKILL.md)**：把规格或计划拆成曳光弹工单，每张声明阻塞边与接口。
-- **[implement](./implement/SKILL.md)**：在当前会话里实现一份规格或几张工单。
-- **[implement-spec](./implement-spec/SKILL.md)**：用子代理按工单图前沿并发实现整份规格，交付一个 PR。
-- **[wayfinder](./wayfinder/SKILL.md)**：把一个会话装不下的庞大工作绘成决策工单地图，逐张解决。
-- **[triage](./triage/SKILL.md)**：让 issue 和外部 PR 在分诊状态机中流转。
-- **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)**：扫描加深机会，出可视化报告，再拷问选中的那个。
+- **[`/guide`](./guide/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
+- **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分流标签和领域文档布局。
+- **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
+- **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，不再追加访谈。
+- **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务。
+- **[`/implement`](./implement/SKILL.md)｜当前会话实现**：在当前会话实现一项或少量已明确的任务。
+- **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，最后交付一个 PR。
+- **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题。
+- **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
+- **[`/improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化报告，找出值得进一步设计的重构机会。
 
-## 模型调用
+## 可自动触发
 
-agent 或你都能触发（description 带触发词，agent 会在合适时用上）。
+agent 会在合适场景主动使用，用户也可以显式调用。
 
-- **[tdd](./tdd/SKILL.md)**：在约定接缝上一次一个垂直切片的 红 → 绿 循环。
-- **[diagnosing-bugs](./diagnosing-bugs/SKILL.md)**：疑难 bug 与性能退化的诊断循环。
-- **[verifying-completion](./verifying-completion/SKILL.md)**：先证据后结论。
-- **[code-review](./code-review/SKILL.md)**：标准与规格双轴并行评审。
-- **[receiving-code-review](./receiving-code-review/SKILL.md)**：先核实再实现地处理评审意见。
-- **[finishing-a-branch](./finishing-a-branch/SKILL.md)**：验证测试，给出合并 / 开 PR / 保留选项，清理工作树。
-- **[domain-modeling](./domain-modeling/SKILL.md)**：主动打磨领域模型，维护 `CONTEXT.md` 和 ADR。
-- **[codebase-design](./codebase-design/SKILL.md)**：深模块的共享词汇与原则。
-- **[prototype](./prototype/SKILL.md)**：用一次性原型回答一个设计问题。
-- **[research](./research/SKILL.md)**：后台 agent 对照一手资料调研，留下带引用的文件。
-- **[resolving-merge-conflicts](./resolving-merge-conflicts/SKILL.md)**：按双方意图解决 merge / rebase 冲突。
-- **[wizard](./wizard/SKILL.md)**：生成交互式 bash 向导，带人完成只有人能做的步骤。
+- **[`tdd`](./tdd/SKILL.md)｜测试驱动开发**：通过测试先失败、再通过的短循环实现功能或修复 bug。
+- **[`diagnosing-bugs`](./diagnosing-bugs/SKILL.md)｜系统化诊断**：为疑难 bug、测试失败和性能退化建立可复现反馈，再定位根因。
+- **[`verifying-completion`](./verifying-completion/SKILL.md)｜完成验证**：在声称完成前运行对应检查并读取完整结果。
+- **[`code-review`](./code-review/SKILL.md)｜双轴代码评审**：分别检查仓库规范和需求符合度。
+- **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
+- **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
+- **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
+- **[`codebase-design`](./codebase-design/SKILL.md)｜模块设计**：设计简单接口、清晰边界和更易测试的模块。
+- **[`prototype`](./prototype/SKILL.md)｜一次性原型**：用最小原型回答一个设计问题。
+- **[`research`](./research/SKILL.md)｜技术调研**：查阅高可信一手资料，并在仓库中留下带引用的报告。
+- **[`resolving-merge-conflicts`](./resolving-merge-conflicts/SKILL.md)｜解决合并冲突**：根据双方改动意图处理 merge 或 rebase 冲突。
+- **[`wizard`](./wizard/SKILL.md)｜生成设置向导**：为必须由人完成的外部配置生成交互式 Bash 向导。

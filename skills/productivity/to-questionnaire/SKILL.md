@@ -1,6 +1,6 @@
 ---
 name: to-questionnaire
-description: 把一个你独自答不了的决策，变成一份给别人填写的问卷。
+description: 将必须由其他人提供的信息和决策整理成一份可直接发送、填写和回收的问卷。
 disable-model-invocation: true
 ---
 
