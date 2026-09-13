@@ -7,7 +7,7 @@
 只有用户显式输入名称才会运行。
 
 - **[`/guide`](./guide/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
-- **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分流标签和领域文档布局。
+- **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签和领域文档布局。
 - **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，不再追加访谈。
 - **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务。
@@ -24,7 +24,7 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`tdd`](./tdd/SKILL.md)｜测试驱动开发**：通过测试先失败、再通过的短循环实现功能或修复 bug。
 - **[`diagnosing-bugs`](./diagnosing-bugs/SKILL.md)｜系统化诊断**：为疑难 bug、测试失败和性能退化建立可复现反馈，再定位根因。
 - **[`verifying-completion`](./verifying-completion/SKILL.md)｜完成验证**：在声称完成前运行对应检查并读取完整结果。
-- **[`code-review`](./code-review/SKILL.md)｜双轴代码评审**：分别检查仓库规范和需求符合度。
+- **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范和需求规格两个维度分别检查改动。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
 - **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。

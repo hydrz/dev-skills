@@ -37,7 +37,7 @@ npx skills@latest add hydrz/dev-skills
 /setup-dev-skills
 ```
 
-它会配置 issue 追踪器、分流标签和领域文档布局。之后如果不确定该使用哪个 skill，运行：
+它会配置 issue 追踪器、分诊标签和领域文档布局。之后如果不确定该使用哪个 skill，运行：
 
 ```text
 /guide
