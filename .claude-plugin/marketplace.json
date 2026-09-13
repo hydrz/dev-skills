@@ -1,0 +1,22 @@
+{
+  "name": "hydrz",
+  "owner": {
+    "name": "hydrz"
+  },
+  "description": "hydrz 的中文工程 skills，作为 Claude Code 插件安装。",
+  "plugins": [
+    {
+      "name": "dev-skills",
+      "source": "./",
+      "description": "面向真实软件工程的中文 agent skills（拷问、规格与工单流程、TDD、代码评审、领域建模、子代理驱动实现等）。",
+      "category": "engineering",
+      "keywords": [
+        "engineering",
+        "skills",
+        "chinese",
+        "tdd",
+        "code-review"
+      ]
+    }
+  ]
+}
