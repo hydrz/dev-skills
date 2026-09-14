@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.4.0
+
+### Minor Changes
+
+- [#36](https://github.com/hydrz/dev-skills/pull/36) [`0c2121c`](https://github.com/hydrz/dev-skills/commit/0c2121ce36482e7ada0f9e745f16548b495ec08f) Thanks [@hydrz](https://github.com/hydrz)! - 新增 `writing-chinese`，用于撰写、改写、翻译和审校成篇中文内容。它按原意、结构、前提、指代、句子和书写形式分层检查，保留简繁变体与专业约束，并通过行为评测防止重要歧义被擅自消除或普通短对话被误触发。
+
 ## 0.3.0
 
 ### Minor Changes

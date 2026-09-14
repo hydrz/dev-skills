@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "dev-skills",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "面向中文开发者的软件工程 agent skills，覆盖方案澄清、规格与任务拆分、TDD、系统化调试、代码评审、并行实现和完成验证。",
   "author": {
     "name": "hydrz"
