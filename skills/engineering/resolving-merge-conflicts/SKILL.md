@@ -13,4 +13,4 @@ description: 根据冲突两侧的改动意图解决正在进行的 Git merge �
 
 5. **完成 merge 或 rebase。** 暂存全部改动并提交。rebase 时继续执行，直到所有提交都完成变基。
 
-完成之前遵循 `verifying-completion`：检查命令的输出必须来自本轮运行。
+完成之前调用 Skill 工具，参数为 `verifying-completion`：检查命令的输出必须来自本轮运行。
