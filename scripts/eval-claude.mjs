@@ -53,6 +53,8 @@ const rawArgs = process.argv.slice(2);
 const finalArgs = [];
 let hasAllowTools = false;
 let isQuick = false;
+let hasModel = false;
+let hasJudgeModel = false;
 
 for (let i = 0; i < rawArgs.length; i++) {
   const arg = rawArgs[i];
@@ -63,11 +65,25 @@ for (let i = 0; i < rawArgs.length; i++) {
   if (arg.startsWith("--allow-tools")) {
     hasAllowTools = true;
   }
+  if (arg === "--model" || arg.startsWith("--model=")) {
+    hasModel = true;
+  }
+  if (arg === "--judge-model" || arg.startsWith("--judge-model=")) {
+    hasJudgeModel = true;
+  }
   finalArgs.push(arg);
 }
 
 if (isQuick) {
   finalArgs.push("--runs", "1", "--ablation", "none", "--no-publish");
+}
+
+// 默认使用最便宜的性价比模型 (haiku)
+if (!hasModel) {
+  finalArgs.push("--model", "haiku");
+}
+if (!hasJudgeModel) {
+  finalArgs.push("--judge-model", "haiku");
 }
 
 // 默认注入必要的工具授权（tdd-new-function 需要写文件）

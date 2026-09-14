@@ -32,7 +32,7 @@ Options:
   --runs <n>             Repetitions per case and arm (default: 1)
   --arm <with|without|both>
                          Skill ablation arm (default: with)
-  --model <model>        Codex model override
+  --model <model>        Codex model override (default: gpt-4o-mini)
   --reasoning <effort>   Codex reasoning effort override
   --skip-llm-graders     Do not run rubric-based graders
   --dry-run              Print selected cases and grader compatibility
@@ -46,6 +46,7 @@ function parseArguments(argv) {
     casePattern: "*",
     runs: 1,
     arm: "with",
+    model: "gpt-4o-mini",
     codexBin: "codex",
     dryRun: false,
     skipLlmGraders: false,
