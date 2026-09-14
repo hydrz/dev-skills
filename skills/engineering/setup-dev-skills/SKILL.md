@@ -64,6 +64,8 @@ disable-model-invocation: true
 
 **第 D 节：功能清单。** 默认把功能清单放在 `docs/features/<工作-slug>.md`，设计资料放在 `docs/features/design/<工作-slug>/`，直接写入，无需询问。多上下文布局下，清单放在对应上下文的 `docs/features/` 中。只有探索发现仓库已有其他存放需求或设计资料的目录（例如 `docs/product/`）时，才确认用户想沿用哪个位置，并在写入的文档中改成对应路径。
 
+同时把本 skill 目录中的 [check-feature-coverage.mjs](./check-feature-coverage.mjs) 复制到项目的 `scripts/check-feature-coverage.mjs`。它只依赖 Node.js 标准库，`/to-tickets` 和 `/implement-spec` 用它检查当前批次的覆盖情况。`scripts/` 下已有同名文件时，先比较内容，不一致时询问用户是否覆盖。
+
 ### 3. 确认并编辑
 
 向用户展示以下内容的草稿：
@@ -117,6 +119,7 @@ disable-model-invocation: true
 - [triage-labels.md](./triage-labels.md)：标签映射（仅在安装了 `triage` 时）
 - [domain.md](./domain.md)：领域文档的读取规则和布局
 - [feature-list.md](./feature-list.md)：功能清单的位置、格式和修改规则
+- [check-feature-coverage.mjs](./check-feature-coverage.mjs)：覆盖检查脚本，复制到项目的 `scripts/`
 
 选择“其他”类追踪器时，根据用户的描述从头编写 `docs/agents/issue-tracker.md`，至少覆盖：创建 issue、读取 issue、列出 issue、评论、添加标签、关闭、表达依赖关系；并包含“当 skill 说‘发布到 issue 追踪器’时”和“当 skill 说‘拉取相关任务’时”两节。
 
