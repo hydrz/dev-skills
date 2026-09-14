@@ -1,4 +1,4 @@
-本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
+本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](CONTEXT.md)。撰写、改写、翻译或审校成篇中文内容时使用 `writing-chinese`，并遵循 [docs/chinese-writing.md](docs/chinese-writing.md)；内容是 agent 指令时，同时使用 `writing-for-agents`。
 
 ## 目录与自定义结构
 
@@ -33,9 +33,4 @@ skill 之间的依赖写成“调用 Skill 工具，参数为 `grilling`”。�
 
 ## 写作规范
 
-- `name` 用英文 kebab-case；正文与 description 用中文。
-- 先导词首次出现时附英文原词，例如“接缝（seam）”，之后只用中文。优先使用中国开发者熟悉的说法，不为统一而沿用难懂的直译或隐喻。
-- 用正向表述写目标行为；禁令只留给无法正向表述的硬性护栏，并配上正向目标。
-- 标点用逗号、冒号、句号、括号，不用破折号；中文引语用全角引号“”。
-- 中文与英文单词、数字之间加空格；中文与行内代码之间不强制加空格，同一文档保持一致。
-- 改写已有 skill 时，先列出原有的触发条件、必需动作、边界、错误处理和完成条件，改写后逐项核对没有丢失。
+仓库特有的读者、术语、格式和本地化约定见 [docs/chinese-writing.md](docs/chinese-writing.md)，不在本文件重复维护。

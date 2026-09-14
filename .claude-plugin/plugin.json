@@ -50,6 +50,7 @@
     "./skills/wayfinder",
     "./skills/wizard",
     "./skills/workflow-designer",
+    "./skills/writing-chinese",
     "./skills/writing-for-agents"
   ]
 }

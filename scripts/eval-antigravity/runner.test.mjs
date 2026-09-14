@@ -78,26 +78,58 @@ test("parseAgyOutput handles malformed non-JSON output gracefully", () => {
 test("initializeAgyWorkspace sets up .agents/skills.json for with arm", async () => {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "agy-test-workspace-"));
   const fakeSkillsDir = await mkdtemp(path.join(os.tmpdir(), "agy-fake-skills-"));
+  const fakeCaseDir = await mkdtemp(path.join(os.tmpdir(), "agy-fake-case-"));
   const fakeSkillDir = path.join(fakeSkillsDir, "tdd");
+  const helperSkillDir = path.join(fakeSkillsDir, "writing-for-agents");
   await import("node:fs/promises").then((fs) => fs.mkdir(fakeSkillDir, { recursive: true }));
+  await import("node:fs/promises").then((fs) => fs.mkdir(helperSkillDir, { recursive: true }));
   await import("node:fs/promises").then((fs) =>
     fs.writeFile(path.join(fakeSkillDir, "SKILL.md"), "# TDD\n", "utf8"),
   );
+  await import("node:fs/promises").then((fs) =>
+    fs.writeFile(path.join(helperSkillDir, "SKILL.md"), "# Writing\n", "utf8"),
+  );
+  await import("node:fs/promises").then((fs) =>
+    fs.mkdir(path.join(fakeCaseDir, "fixture"), { recursive: true }),
+  );
+  await import("node:fs/promises").then((fs) =>
+    fs.writeFile(path.join(fakeCaseDir, "fixture", "input.txt"), "fixture\n", "utf8"),
+  );
 
-  const skillsMap = new Map([["tdd", fakeSkillDir]]);
+  const skillsMap = new Map([
+    ["tdd", fakeSkillDir],
+    ["writing-for-agents", helperSkillDir],
+  ]);
   const evalCase = {
     name: "tdd-test",
-    metadata: { tags: ["tdd"] },
+    directory: fakeCaseDir,
+    metadata: {
+      tags: ["tdd"],
+      required_skills: ["writing-for-agents", "tdd"],
+    },
   };
 
   const skillName = await initializeAgyWorkspace(tempDir, evalCase, "with", skillsMap);
   assert.equal(skillName, "tdd");
+  assert.equal(await readFile(path.join(tempDir, "input.txt"), "utf8"), "fixture\n");
 
   const skillsJson = JSON.parse(
     await readFile(path.join(tempDir, ".agents", "skills.json"), "utf8"),
   );
   assert.ok(skillsJson.skills.tdd);
   assert.equal(skillsJson.skills.tdd.name, "tdd");
+  assert.equal(skillsJson.skills["writing-for-agents"].name, "writing-for-agents");
+  assert.match(
+    await readFile(path.join(tempDir, ".agents", "skills", "tdd", "SKILL.md"), "utf8"),
+    /TDD/,
+  );
+  assert.match(
+    await readFile(
+      path.join(tempDir, ".agents", "skills", "writing-for-agents", "SKILL.md"),
+      "utf8",
+    ),
+    /Writing/,
+  );
 });
 
 test("parseAgyStreamEvents extracts tool calls, text deltas and final result", async () => {

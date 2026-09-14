@@ -17,3 +17,7 @@
 ### 功能清单
 
 功能清单存放在 `docs/features/<工作-slug>.md`，设计资料存放在 `docs/features/design/<工作-slug>/`。见 `docs/agents/feature-list.md`。
+
+### 中文写作
+
+撰写、改写、翻译或审校面向中文读者的成篇内容时，使用 `writing-chinese` 并遵循 `docs/chinese-writing.md`。内容是 skill、`AGENTS.md` 或其他 agent 指令时，同时使用 `writing-for-agents`：先保证指令行为正确，再审校中文表达。

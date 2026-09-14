@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildCodexArgs,
   classifyRunInfrastructure,
+  copyRequiredSkills,
   discoverCases,
   evaluateGrader,
   extractCodexToolCalls,
@@ -17,6 +18,8 @@ import {
   generateHtmlReport,
   isGraderIndicator,
   parseJsonl,
+  primarySkillForCase,
+  requiredSkillsForCase,
   summarizeGraderResults,
   summarizeResults,
 } from "./lib.mjs";
@@ -105,7 +108,7 @@ function graderCompatibility(grader) {
 }
 
 function targetSkill(evalCase, skills) {
-  return (evalCase.metadata.tags ?? []).find((tag) => skills.has(tag)) ?? null;
+  return primarySkillForCase(evalCase, skills);
 }
 
 function dryRunReport(cases, skills) {
@@ -113,6 +116,7 @@ function dryRunReport(cases, skills) {
     cases: cases.map((evalCase) => ({
       name: evalCase.name,
       skill: targetSkill(evalCase, skills),
+      skills: requiredSkillsForCase(evalCase, skills),
       graders: evalCase.graders.map((grader) => ({
         name: grader.name,
         type: grader.type,
@@ -187,12 +191,12 @@ async function initializeWorkspace(workspace, evalCase, arm, skills) {
   const fixture = path.join(evalCase.directory, "fixture");
   if (await pathExists(fixture)) await cp(fixture, workspace, { recursive: true });
 
-  const skillName = targetSkill(evalCase, skills);
+  const skillNames = requiredSkillsForCase(evalCase, skills);
   if (arm === "with") {
-    if (!skillName) throw new Error(`${evalCase.name} has no tag matching a repository skill`);
-    const destination = path.join(workspace, ".agents", "skills", skillName);
-    await mkdir(path.dirname(destination), { recursive: true });
-    await cp(skills.get(skillName), destination, { recursive: true });
+    if (skillNames.length === 0) {
+      throw new Error(`${evalCase.name} has no tag matching a repository skill`);
+    }
+    await copyRequiredSkills(workspace, evalCase, skills);
   }
 
   for (const args of [
@@ -214,7 +218,7 @@ async function initializeWorkspace(workspace, evalCase, arm, skills) {
     if (result.code !== 0) throw new Error(`git ${args[0]} failed: ${result.stderr}`);
   }
 
-  return skillName;
+  return primarySkillForCase(evalCase, skills);
 }
 
 function sandboxFor(evalCase) {

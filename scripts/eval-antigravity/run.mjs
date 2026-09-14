@@ -15,6 +15,8 @@ import {
   initializeAgyWorkspace,
   isGraderIndicator,
   parseAgyOutput,
+  primarySkillForCase,
+  requiredSkillsForCase,
   summarizeGraderResults,
   summarizeResults,
 } from "./lib.mjs";
@@ -106,7 +108,8 @@ function dryRunReport(cases, skills, options) {
   return {
     cases: cases.map((evalCase) => ({
       name: evalCase.name,
-      skill: (evalCase.metadata.tags ?? []).find((t) => skills.has(t)) ?? null,
+      skill: primarySkillForCase(evalCase, skills),
+      skills: requiredSkillsForCase(evalCase, skills),
       graders: evalCase.graders.map((g) => ({
         name: g.name,
         type: g.type,
