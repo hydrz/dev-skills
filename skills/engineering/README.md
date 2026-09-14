@@ -28,7 +28,7 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
 - **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
-- **[`codebase-design`](./codebase-design/SKILL.md)｜模块设计**：设计简单接口、清晰边界和更易测试的模块。
+- **[`codebase-design`](./codebase-design/SKILL.md)｜模块设计**：设计简单接口、清晰边界和更易测试的模块，并按业务复杂度决定业务模块的内部结构。
 - **[`prototype`](./prototype/SKILL.md)｜一次性原型**：用最小原型回答一个设计问题。
 - **[`research`](./research/SKILL.md)｜技术调研**：查阅高可信一手资料，并在仓库中留下带引用的报告。
 - **[`resolving-merge-conflicts`](./resolving-merge-conflicts/SKILL.md)｜解决合并冲突**：根据双方改动意图处理 merge 或 rebase 冲突。
