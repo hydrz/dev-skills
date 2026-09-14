@@ -10,7 +10,7 @@ import {
   parseTaskCoverage,
   run,
   splitTopLevel,
-} from "../../skills/engineering/setup-dev-skills/check-feature-coverage.mjs";
+} from "../../skills/setup-dev-skills/check-feature-coverage.mjs";
 
 const header =
   "| 编号 | 类型 | 名称 | 角色 | 端 | 批次 | 需覆盖状态 | 设计依据 | 规格 | 任务 | 结论 |\n" +

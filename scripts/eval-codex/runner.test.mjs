@@ -214,8 +214,8 @@ test("indexes all repository skills by frontmatter name", async () => {
   const skills = await findSkills(path.resolve("skills"));
 
   assert.equal(skills.size, 33);
-  assert.match(skills.get("tdd"), /skills[\\/]engineering[\\/]tdd$/);
-  assert.match(skills.get("grilling"), /skills[\\/]productivity[\\/]grilling$/);
+  assert.match(skills.get("tdd"), /skills[\\/]tdd$/);
+  assert.match(skills.get("grilling"), /skills[\\/]grilling$/);
 });
 
 test("marks skill invocation graders unsupported", async () => {

@@ -102,7 +102,7 @@ claude plugin eval . --allow-tools Write Edit
 | 现象 | 含义 | 下一步 |
 |---|---|---|
 | `skill-fired` 失败，`Δ` 接近 0 | skill 没有被触发，插件没有参与 | 调整该 skill 的 description，让它覆盖这种说法 |
-| `skill-fired` 通过，`WITH` 仍低于 1 | skill 触发了，但正文没有挡住这种做法 | 查看报告中的回复，按 [TESTING.md](../skills/productivity/writing-for-agents/TESTING.md) 补上漏洞 |
+| `skill-fired` 通过，`WITH` 仍低于 1 | skill 触发了，但正文没有挡住这种做法 | 查看报告中的回复，按 [TESTING.md](../skills/writing-for-agents/TESTING.md) 补上漏洞 |
 | `WITH` 和 `W/OUT` 都是 1 | 不加载插件也能做对 | 这个 case 证明不了插件的作用，考虑换成更容易出错的请求 |
 | 反例 case 失败 | skill 在不该触发的请求上被触发 | 收窄 description 的触发范围 |
 | `llm` grader 结论可疑 | 小模型判定不稳定 | 用 `--judge-model sonnet` 重跑，并把评分标准写得更具体 |

@@ -4,13 +4,13 @@ import test from "node:test";
 import { buildPrompts, renderTemplate, skillBody } from "./build-prompts.mjs";
 
 test("strips frontmatter from skill bodies", () => {
-  const body = skillBody("engineering", "to-tickets");
+  const body = skillBody("to-tickets");
   assert.doesNotMatch(body, /^---/);
   assert.match(body, /^# 拆分开发任务/);
 });
 
 test("renders skill placeholders", () => {
-  const rendered = renderTemplate("前\n{{skill:engineering/to-spec}}\n后");
+  const rendered = renderTemplate("前\n{{skill:to-spec}}\n后");
   assert.match(rendered, /^前\n本 skill 根据当前对话/);
   assert.match(rendered, /\n后$/);
 });

@@ -56,7 +56,7 @@
 
 - `CONTEXT.md:86-94` 将 `ticket` 统一译为“工单”，并明确排除“任务”。
 - `README.md:82-102` 使用“曳光弹工单”“工单图前沿”等表达主流程。
-- `skills/engineering/to-tickets/SKILL.md` 和 `skills/engineering/implement-spec/SKILL.md` 将这一选择扩散到任务拆分、依赖和执行流程。
+- `skills/to-tickets/SKILL.md` 和 `skills/implement-spec/SKILL.md` 将这一选择扩散到任务拆分、依赖和执行流程。
 
 问题：中文工程语境中的“工单”通常指支持、运维、审批或服务请求。需求拆解后的工作项更常被称为“任务”“开发任务”或直接称 `issue`。禁止使用“任务”还会与 Codex 等工具的用户界面产生冲突。
 
@@ -73,7 +73,7 @@
 
 - `CONTEXT.md:13-19` 定义“用户调用”和“模型调用”。
 - `docs/invocation.md:1-13` 说明两类 skill 的实际差异是“谁能触发”。
-- `README.md:89-93`、`skills/engineering/README.md`、`skills/productivity/README.md` 重复使用现有分类名。
+- `README.md:89-93`、`skills/README.md` 重复使用现有分类名。
 
 问题：两类 skill 最终都由模型加载并执行。现有名称容易被理解为执行者不同，甚至被误解为 API 调用方式不同。
 
@@ -89,8 +89,8 @@
 证据：
 
 - `README.md:41` 将对齐方法定义为“拷问”。
-- `skills/productivity/grill-me/SKILL.md:3` 和 `skills/engineering/grill-with-docs/SKILL.md:3` 使用“无情拷问”。
-- `skills/productivity/grilling/SKILL.md` 高频使用“拷问”“设计树”“前沿”。
+- `skills/grill-me/SKILL.md:3` 和 `skills/grill-with-docs/SKILL.md:3` 使用“无情拷问”。
+- `skills/grilling/SKILL.md` 高频使用“拷问”“设计树”“前沿”。
 
 问题：“拷问”容易让协作流程显得敌意、表演化，也掩盖了实际行为：分轮提出决策问题，检验假设，直到获得实施确认。
 
@@ -132,7 +132,7 @@
 
 - `CONTEXT.md:60-73` 建议用“模块”替代组件、服务和单元，用“接口”替代 API、签名，用“接缝”替代边界。
 - `CONTEXT.md:86-88` 禁止用“任务”表达 `ticket`。
-- `skills/engineering/codebase-design/SKILL.md` 和架构审查模板进一步执行这些替换。
+- `skills/codebase-design/SKILL.md` 和架构审查模板进一步执行这些替换。
 
 问题：组件、服务、模块、API、签名和边界在工程设计中并不等价。全局替换会丢失架构信息，也会让文档偏离团队已有语言。
 
@@ -177,20 +177,20 @@
 
 典型证据与建议：
 
-| 位置                                              | 当前表达                                   | 建议方向                                                                 |
-| ------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| `docs/invocation.md:13`                           | 模型能否有用地自主伸手去用它               | 模型能否在合适场景主动调用它                                             |
-| `README.md:101`                                   | 工单图前沿并发、台账扛过压缩、上报所有裁决 | 并行执行当前可开始的任务，用持久化进度记录支持上下文恢复，并汇总代行决策 |
-| `skills/engineering/ask-dev-skills/SKILL.md:85`   | 单一真相源                                 | 唯一权威来源                                                             |
-| `skills/engineering/wayfinder/SKILL.md:84`        | 毕业成新工单                               | 转化或拆分成新的开发任务                                                 |
-| `skills/engineering/setup-dev-skills/SKILL.md:42` | 默认姿态                                   | 默认推荐、默认做法                                                       |
-| `skills/engineering/code-review/SKILL.md`         | 钉住固定点、评审包                         | 确定比较基准、评审材料                                                   |
+| 位置                                  | 当前表达                                   | 建议方向                                                                 |
+| ------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
+| `docs/invocation.md:13`               | 模型能否有用地自主伸手去用它               | 模型能否在合适场景主动调用它                                             |
+| `README.md:101`                       | 工单图前沿并发、台账扛过压缩、上报所有裁决 | 并行执行当前可开始的任务，用持久化进度记录支持上下文恢复，并汇总代行决策 |
+| `skills/ask-dev-skills/SKILL.md:85`   | 单一真相源                                 | 唯一权威来源                                                             |
+| `skills/wayfinder/SKILL.md:84`        | 毕业成新工单                               | 转化或拆分成新的开发任务                                                 |
+| `skills/setup-dev-skills/SKILL.md:42` | 默认姿态                                   | 默认推荐、默认做法                                                       |
+| `skills/code-review/SKILL.md`         | 钉住固定点、评审包                         | 确定比较基准、评审材料                                                   |
 
 迁移时不宜执行简单的全局替换。应先判断每句话要驱动的行为，再用中文重新组织。
 
 ### P1-2：隐喻密度过高
 
-`README.md` 同时使用“拷问”“盲飞”“大泥球”“曳光弹”“匝道”等隐喻；`skills/engineering/wayfinder/SKILL.md` 又连续使用“迷雾”“目的地”“地图”“道路”“毕业”等同一组延伸隐喻。
+`README.md` 同时使用“拷问”“盲飞”“大泥球”“曳光弹”“匝道”等隐喻；`skills/wayfinder/SKILL.md` 又连续使用“迷雾”“目的地”“地图”“道路”“毕业”等同一组延伸隐喻。
 
 建议：
 
@@ -202,11 +202,11 @@
 
 静态检查发现多处单行超过 180 个字符，其中包括：
 
-- `skills/productivity/writing-for-agents/SKILL-MECHANICS.md:16`：354 个字符；
-- `skills/engineering/code-review/SKILL.md:62`：307 个字符；
-- `skills/engineering/to-tickets/SKILL.md:47`：305 个字符；
-- `skills/engineering/ask-dev-skills/SKILL.md:61`：270 个字符；
-- `skills/engineering/wayfinder/SKILL.md:80`：274 个字符。
+- `skills/writing-for-agents/SKILL-MECHANICS.md:16`：354 个字符；
+- `skills/code-review/SKILL.md:62`：307 个字符；
+- `skills/to-tickets/SKILL.md:47`：305 个字符；
+- `skills/ask-dev-skills/SKILL.md:61`：270 个字符；
+- `skills/wayfinder/SKILL.md:80`：274 个字符。
 
 Markdown 源码中的长行本身不是错误，但这些位置通常也包含多个条件、例外和动作。第二阶段应以语义为单位拆分：先写判断，再写动作，最后写例外。
 
@@ -261,11 +261,11 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 
 重点问题：
 
-- `skills/engineering/implement/SKILL.md:3` 与 `skills/engineering/implement-spec/SKILL.md:3` 没有在开头突出规模和执行方式差异。
-- `skills/productivity/grill-me/SKILL.md:3` 与 `skills/engineering/grill-with-docs/SKILL.md:3` 使用语气词描述强度，却没有优先说明使用环境差异。
-- `skills/engineering/tdd/SKILL.md:3` 的“或需要集成测试时”范围过宽，可能让普通的集成测试请求触发完整 TDD 流程。
-- `skills/engineering/research/SKILL.md:3` 使用了较泛的名称，description 应更明确限定为技术调研、一手资料和落盘产物。
-- `skills/engineering/wayfinder/SKILL.md:3` 依赖内部隐喻说明用途。
+- `skills/implement/SKILL.md:3` 与 `skills/implement-spec/SKILL.md:3` 没有在开头突出规模和执行方式差异。
+- `skills/grill-me/SKILL.md:3` 与 `skills/grill-with-docs/SKILL.md:3` 使用语气词描述强度，却没有优先说明使用环境差异。
+- `skills/tdd/SKILL.md:3` 的“或需要集成测试时”范围过宽，可能让普通的集成测试请求触发完整 TDD 流程。
+- `skills/research/SKILL.md:3` 使用了较泛的名称，description 应更明确限定为技术调研、一手资料和落盘产物。
+- `skills/wayfinder/SKILL.md:3` 依赖内部隐喻说明用途。
 
 第一阶段改写 description 时，应统一回答三个问题：
 
@@ -275,7 +275,7 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 
 ### P1-7：“效率”不是合适的分类名称
 
-`skills/productivity/` 包含方案追问、教学、交接、外部问卷和重新解释。它们不都以效率为主要目标。
+`skills/` 包含方案追问、教学、交接、外部问卷和重新解释。它们不都以效率为主要目标。
 
 建议中文分类名称改为“协作与思考”。目录名 `productivity` 暂时保持不变，避免产生路径迁移。
 
@@ -283,7 +283,7 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 
 ### P2-1：易过时的模型容量被写成固定事实
 
-`skills/engineering/ask-dev-skills/SKILL.md:51` 和 `skills/engineering/ask-dev-skills/PHASE-BOUNDARIES.md:21` 将“智能区”描述为约 15 万 token。模型能力和上下文窗口会变化，也不能用固定 token 数准确表示推理质量。
+`skills/ask-dev-skills/SKILL.md:51` 和 `skills/ask-dev-skills/PHASE-BOUNDARIES.md:21` 将“智能区”描述为约 15 万 token。模型能力和上下文窗口会变化，也不能用固定 token 数准确表示推理质量。
 
 建议删除固定数字，直接描述判断信号，例如：上下文已接近上限、早期决策难以准确回忆、输出开始丢失约束。
 
@@ -332,8 +332,7 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 - `README.md`
 - `CONTEXT.md`
 - `docs/invocation.md`
-- `skills/engineering/README.md`
-- `skills/productivity/README.md`
+- `skills/README.md`
 - `.claude-plugin/plugin.json` 中的用户可见描述
 - 所有 `skills/**/SKILL.md` 的 `description`
 
