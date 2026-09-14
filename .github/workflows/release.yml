@@ -28,11 +28,10 @@ jobs:
         run: npm ci
 
       - name: Create Version Pull Request
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          version: npm run version
-          publish: npx changeset tag
-          commit: "chore: version skills"
-          title: "chore: version skills"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: npm run version
+          publish-script: npx changeset tag
+          commit-message: "chore: version skills"
+          pr-title: "chore: version skills"
