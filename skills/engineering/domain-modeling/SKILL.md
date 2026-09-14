@@ -39,6 +39,8 @@ description: 构建并维护项目的领域模型、通用语言和架构决策�
 │       └── docs/adr/
 ```
 
+`CONTEXT-MAP.md` 中的每个上下文默认对应代码中的一个业务模块。讨论上下文怎么划分、模块之间如何交互时，读取 `codebase-design` skill 目录下的 [BUSINESS-MODULES.md](../codebase-design/BUSINESS-MODULES.md)。
+
 文件按需创建，有内容要写时才创建。没有 `CONTEXT.md` 时，在第一个术语确定时创建；没有 `docs/adr/` 时，在需要第一条 ADR 时创建。
 
 ## 会话中的做法
