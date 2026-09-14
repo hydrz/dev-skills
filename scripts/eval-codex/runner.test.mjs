@@ -213,7 +213,7 @@ test("loads every existing case and grader", async () => {
 test("indexes all repository skills by frontmatter name", async () => {
   const skills = await findSkills(path.resolve("skills"));
 
-  assert.equal(skills.size, 29);
+  assert.equal(skills.size, 33);
   assert.match(skills.get("tdd"), /skills[\\/]engineering[\\/]tdd$/);
   assert.match(skills.get("grilling"), /skills[\\/]productivity[\\/]grilling$/);
 });

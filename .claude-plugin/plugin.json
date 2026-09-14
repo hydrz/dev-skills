@@ -33,6 +33,8 @@
     "./skills/engineering/research",
     "./skills/engineering/resolving-merge-conflicts",
     "./skills/engineering/setup-dev-skills",
+    "./skills/engineering/setup-pre-commit",
+    "./skills/engineering/setup-ts-deep-modules",
     "./skills/engineering/tdd",
     "./skills/engineering/to-spec",
     "./skills/engineering/to-tickets",
@@ -43,9 +45,11 @@
     "./skills/productivity/grill-me",
     "./skills/productivity/grilling",
     "./skills/productivity/handoff",
+    "./skills/productivity/retro",
     "./skills/productivity/teach",
     "./skills/productivity/to-questionnaire",
     "./skills/productivity/wait-what",
+    "./skills/productivity/workflow-designer",
     "./skills/productivity/writing-for-agents"
   ]
 }
