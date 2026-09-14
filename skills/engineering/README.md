@@ -6,7 +6,7 @@
 
 只有用户显式输入名称才会运行。
 
-- **[`/guide`](./guide/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
+- **[`/ask-dev-skills`](./ask-dev-skills/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
 - **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。
 - **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，大型工作先按业务模块和发布批次拆分，不再追加访谈。

@@ -72,7 +72,7 @@ npx skills use hydrz/dev-skills@grilling
 它会配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。之后如果不确定该使用哪个 skill，运行：
 
 ```text
-/guide
+/ask-dev-skills
 ```
 
 ## 常见使用场景

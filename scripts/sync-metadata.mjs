@@ -123,7 +123,7 @@ try {
   // .codex-plugin/plugin.json 不存在时跳过
 }
 
-// 6. 校验分类 README.md 与 guide/SKILL.md 覆盖率
+// 6. 校验分类 README.md 与 ask-dev-skills/SKILL.md 覆盖率
 function checkReadmeCoverage(category, skills) {
   const readmePath = join(repoRoot, "skills", category, "README.md");
   const content = readFileSync(readmePath, "utf8");
@@ -147,26 +147,26 @@ function checkReadmeCoverage(category, skills) {
 checkReadmeCoverage("engineering", engineeringSkills);
 checkReadmeCoverage("productivity", productivitySkills);
 
-// 7. 校验 guide 路由覆盖
-const guideSkillPath = join(repoRoot, "skills", "engineering", "guide", "SKILL.md");
-const guideContent = readFileSync(guideSkillPath, "utf8");
-const missingInGuide = [];
+// 7. 校验 ask-dev-skills 路由覆盖
+const routerSkillPath = join(repoRoot, "skills", "engineering", "ask-dev-skills", "SKILL.md");
+const routerContent = readFileSync(routerSkillPath, "utf8");
+const missingInRouter = [];
 
 for (const skill of allSkills) {
-  if (skill.name === "guide") continue;
-  // 检查 guide 中是否提及该技能名称
-  if (!guideContent.includes(skill.name)) {
-    missingInGuide.push(skill.name);
+  if (skill.name === "ask-dev-skills") continue;
+  // 检查 ask-dev-skills 中是否提及该技能名称
+  if (!routerContent.includes(skill.name)) {
+    missingInRouter.push(skill.name);
   }
 }
 
-if (missingInGuide.length > 0) {
+if (missingInRouter.length > 0) {
   hasDiscrepancy = true;
   console.error(
-    `[FAIL] skills/engineering/guide/SKILL.md 路由未覆盖以下技能：${missingInGuide.join(", ")}`,
+    `[FAIL] skills/engineering/ask-dev-skills/SKILL.md 路由未覆盖以下技能：${missingInRouter.join(", ")}`,
   );
 } else {
-  console.log(`[OK] skills/engineering/guide/SKILL.md 路由覆盖完整`);
+  console.log(`[OK] skills/engineering/ask-dev-skills/SKILL.md 路由覆盖完整`);
 }
 
 if (isCheckMode && hasDiscrepancy) {

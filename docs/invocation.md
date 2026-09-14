@@ -18,7 +18,7 @@
 - 需要两个 skill 时分别调用，例如：“分别调用 `grilling` 和 `domain-modeling`。”
 - 可自动触发的 skill 不应触发仅用户触发的 skill。如果后续流程需要用户运行某个入口，应直接告诉用户，例如：“请运行 `/setup-dev-skills`。”
 - 共享参考资料放在负责该知识的 skill 中，其他 skill 通过调用它获得，不跨目录链接内部文件。
-- 路由 `guide` 和 README 中的 `/名称` 是面向用户的入口标签，不代表 skill 之间存在自动调用。
+- 路由 `ask-dev-skills` 和 README 中的 `/名称` 是面向用户的入口标签，不代表 skill 之间存在自动调用。
 
 ## 读取术语与维护领域模型
 

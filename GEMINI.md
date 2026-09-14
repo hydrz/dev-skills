@@ -15,7 +15,7 @@ Antigravity 通过 `.agents/skills.json` 自动索引 `skills/engineering` 和 `
 
 1. `.claude-plugin/plugin.json` 的 `skills` 数组（更新版本或元数据时，同步根目录 `plugin.json` 与 `.codex-plugin/plugin.json`）
 2. 所在分类的 `README.md`：完整清单，skill 名链接到其 `SKILL.md`，附中文显示名和一句话定位
-3. `skills/engineering/guide/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
+3. `skills/engineering/ask-dev-skills/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
 4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
 
 改完后运行：
