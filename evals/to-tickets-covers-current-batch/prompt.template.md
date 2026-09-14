@@ -9,7 +9,7 @@ allowed_tools: []
 我们团队拆分开发任务的流程说明如下，请严格按它执行。issue 追踪器用本地 Markdown，项目里暂时没有 `scripts/check-feature-coverage.mjs`，也不用探索代码库。
 
 ~~~~markdown
-{{skill:engineering/to-tickets}}
+{{skill:to-tickets}}
 ~~~~
 
 下面是规格 `.scratch/monetization-mvp/spec.md` 中与拆分相关的几节。

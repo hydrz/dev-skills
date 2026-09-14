@@ -127,8 +127,7 @@ skill 按触发方式分为两类：
 
 完整列表与使用边界见：
 
-- [工程 skill](./skills/engineering/README.md)
-- [协作与思考 skill](./skills/productivity/README.md)
+- [Skill 清单](./skills/README.md)
 - [触发方式说明](./docs/invocation.md)
 
 ## 设计原则

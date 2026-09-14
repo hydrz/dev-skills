@@ -139,7 +139,10 @@ function validateManifestIdentity(root, discoveredSkillPaths, errors) {
 
   const agentsIndex = loadJson(join(root, ".agents", "skills.json"), errors, ".agents/skills.json");
   for (const entry of agentsIndex?.entries ?? []) {
-    if (typeof entry.path !== "string" || !entry.path.startsWith("skills/")) {
+    if (
+      typeof entry.path !== "string" ||
+      (entry.path !== "skills" && !entry.path.startsWith("skills/"))
+    ) {
       errors.push(".agents/skills.json 包含无效的 skill 根路径");
       continue;
     }
@@ -157,12 +160,19 @@ export function validateRepository(root = defaultRoot) {
   for (const path of tree.forbidden) errors.push(`发布内容中包含系统垃圾文件：${path}`);
 
   const skillFiles = tree.files
-    .filter(({ relPath }) => /^skills\/[^/]+\/[^/]+\/SKILL\.md$/.test(relPath))
+    .filter(({ relPath }) => /^skills\/[^/]+\/SKILL\.md$/.test(relPath))
     .sort((a, b) => a.relPath.localeCompare(b.relPath));
   const skillPaths = skillFiles.map(({ relPath }) => `./${relPath.slice(0, -"/SKILL.md".length)}`);
 
+  // Codex 的 Agent Plugins 格式只发现 skills/<name>/SKILL.md，更深的 skill 会被静默忽略
+  for (const { relPath } of tree.files) {
+    if (/^skills\/[^/]+\/.+\/SKILL\.md$/.test(relPath)) {
+      errors.push(`${relPath} 嵌套过深；skill 必须直接放在 skills/<name>/ 下`);
+    }
+  }
+
   for (const { path, relPath } of skillFiles) {
-    const expectedName = relPath.split("/")[2];
+    const expectedName = relPath.split("/")[1];
     errors.push(...validateSkillText(readFileSync(path, "utf8"), expectedName, relPath));
   }
 

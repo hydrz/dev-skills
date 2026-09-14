@@ -2,20 +2,15 @@
 
 ## 目录
 
-skill 按分类放在 `skills/` 下：
-
-- `engineering/`：工程 skill，用于需求澄清、实现、调试、评审和交付
-- `productivity/`：协作与思考 skill，用于方案澄清、交接、学习等非代码工作流
-
-每个 skill 一个目录，`SKILL.md` 必需。参考文件放在同一目录，只有部分分支需要的内容才拆出去（渐进披露）。
+每个 skill 一个目录，直接放在 `skills/<name>/` 下，`SKILL.md` 必需。Codex 只发现 `skills/<name>/SKILL.md` 这一层，不要再按分类建子目录；分类（工程 skill、协作与思考 skill）只体现在 `skills/README.md` 的分组中。参考文件放在同一目录，只有部分分支需要的内容才拆出去（渐进披露）。
 
 ## 登记
 
 新增、改名、删除 skill，或改变 skill 的用法、触发方式时，同步以下位置：
 
 1. `.claude-plugin/plugin.json` 的 `skills` 数组（发布新版本或更新元数据时，同步更新根目录 `plugin.json` 与 `.codex-plugin/plugin.json`）
-2. 所在分类的 `README.md`：完整清单，skill 名链接到其 `SKILL.md`，附中文显示名和一句话定位
-3. `skills/engineering/guide/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
+2. `skills/README.md`：完整清单，放进对应分类分组，skill 名链接到其 `SKILL.md`，附中文显示名和一句话定位
+3. `skills/ask-dev-skills/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
 4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
 
 改完后运行：

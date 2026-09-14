@@ -9,7 +9,7 @@ allowed_tools: []
 我们团队整理规格的流程说明如下，请严格按它执行。issue 追踪器用本地 Markdown，`docs/agents/feature-list.md` 已经配置好，测试方案之前也和我确认过了，这次不用再问。
 
 ~~~~markdown
-{{skill:engineering/to-spec}}
+{{skill:to-spec}}
 ~~~~
 
 下面是 `docs/features/shortdrama.md` 的全部内容。代码库还是空的，不用探索。

@@ -7,22 +7,20 @@ import { fileURLToPath } from "node:url";
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const isCheckMode = process.argv.includes("--check");
 
-// 1. 扫描 skills 目录收集权威 skill 列表
-function discoverSkills(category) {
-  const categoryDir = join(repoRoot, "skills", category);
-  const entries = readdirSync(categoryDir);
+// 1. 扫描 skills 目录收集权威 skill 列表（Codex 只发现 skills/<name>/SKILL.md 这一层）
+function discoverSkills() {
+  const skillsDir = join(repoRoot, "skills");
   const skills = [];
 
-  for (const entry of entries) {
-    const fullPath = join(categoryDir, entry);
+  for (const entry of readdirSync(skillsDir)) {
+    const fullPath = join(skillsDir, entry);
     if (!statSync(fullPath).isDirectory()) continue;
     const skillFile = join(fullPath, "SKILL.md");
     try {
       if (statSync(skillFile).isFile()) {
         skills.push({
-          category,
           name: entry,
-          relPath: `./skills/${category}/${entry}`,
+          relPath: `./skills/${entry}`,
         });
       }
     } catch {
@@ -33,9 +31,7 @@ function discoverSkills(category) {
   return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-const engineeringSkills = discoverSkills("engineering");
-const productivitySkills = discoverSkills("productivity");
-const allSkills = [...engineeringSkills, ...productivitySkills];
+const allSkills = discoverSkills();
 const expectedSkillPaths = allSkills.map((s) => s.relPath);
 
 // 2. 读取 package.json 版本号
@@ -123,9 +119,9 @@ try {
   // .codex-plugin/plugin.json 不存在时跳过
 }
 
-// 6. 校验分类 README.md 与 ask-dev-skills/SKILL.md 覆盖率
-function checkReadmeCoverage(category, skills) {
-  const readmePath = join(repoRoot, "skills", category, "README.md");
+// 6. 校验 skills/README.md 清单覆盖率
+function checkReadmeCoverage(skills) {
+  const readmePath = join(repoRoot, "skills", "README.md");
   const content = readFileSync(readmePath, "utf8");
   const missing = [];
 
@@ -138,17 +134,16 @@ function checkReadmeCoverage(category, skills) {
 
   if (missing.length > 0) {
     hasDiscrepancy = true;
-    console.error(`[FAIL] skills/${category}/README.md 缺少以下技能的条目：${missing.join(", ")}`);
+    console.error(`[FAIL] skills/README.md 缺少以下技能的条目：${missing.join(", ")}`);
   } else {
-    console.log(`[OK] skills/${category}/README.md 覆盖完整 (${skills.length} skills)`);
+    console.log(`[OK] skills/README.md 覆盖完整 (${skills.length} skills)`);
   }
 }
 
-checkReadmeCoverage("engineering", engineeringSkills);
-checkReadmeCoverage("productivity", productivitySkills);
+checkReadmeCoverage(allSkills);
 
 // 7. 校验 ask-dev-skills 路由覆盖
-const routerSkillPath = join(repoRoot, "skills", "engineering", "ask-dev-skills", "SKILL.md");
+const routerSkillPath = join(repoRoot, "skills", "ask-dev-skills", "SKILL.md");
 const routerContent = readFileSync(routerSkillPath, "utf8");
 const missingInRouter = [];
 
@@ -163,10 +158,10 @@ for (const skill of allSkills) {
 if (missingInRouter.length > 0) {
   hasDiscrepancy = true;
   console.error(
-    `[FAIL] skills/engineering/ask-dev-skills/SKILL.md 路由未覆盖以下技能：${missingInRouter.join(", ")}`,
+    `[FAIL] skills/ask-dev-skills/SKILL.md 路由未覆盖以下技能：${missingInRouter.join(", ")}`,
   );
 } else {
-  console.log(`[OK] skills/engineering/ask-dev-skills/SKILL.md 路由覆盖完整`);
+  console.log(`[OK] skills/ask-dev-skills/SKILL.md 路由覆盖完整`);
 }
 
 if (isCheckMode && hasDiscrepancy) {

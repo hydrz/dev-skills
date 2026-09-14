@@ -1,8 +1,12 @@
-# 工程 skill
+# Skill 清单
+
+每个 skill 直接放在 `skills/<name>/` 下。分类只用于本文分组，不体现为目录层级。
+
+## 工程 skill
 
 用于需求澄清、计划、实现、调试、评审和交付的软件工程工作流。
 
-## 仅用户触发
+### 仅用户触发
 
 只有用户显式输入名称才会运行。
 
@@ -19,7 +23,7 @@
 - **[`/setup-ts-deep-modules`](./setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查。
 - **[`/setup-pre-commit`](./setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存改动配置快速、可验证的 pre-commit 检查。
 
-## 可自动触发
+### 可自动触发
 
 agent 会在合适场景主动使用，用户也可以显式调用。
 
@@ -35,3 +39,26 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`research`](./research/SKILL.md)｜技术调研**：查阅高可信一手资料，并在仓库中留下带引用的报告。
 - **[`resolving-merge-conflicts`](./resolving-merge-conflicts/SKILL.md)｜解决合并冲突**：根据双方改动意图处理 merge 或 rebase 冲突。
 - **[`wizard`](./wizard/SKILL.md)｜生成设置向导**：为必须由人完成的外部配置生成交互式 Bash 向导。
+
+## 协作与思考 skill
+
+用于方案澄清、知识传递、持续学习和跨会话协作，不限于软件开发。
+
+### 仅用户触发
+
+只有用户显式输入名称才会运行。
+
+- **[`/grill-me`](./grill-me/SKILL.md)｜无状态方案追问**：逐轮澄清并压力测试计划或设计，不向本地写入文件。
+- **[`/handoff`](./handoff/SKILL.md)｜会话交接**：把当前对话整理成可供另一个 agent 继续工作的文档。
+- **[`/teach`](./teach/SKILL.md)｜持续学习**：把当前目录作为可以跨会话延续的学习工作区。
+- **[`/to-questionnaire`](./to-questionnaire/SKILL.md)｜生成外部问卷**：把必须由其他人回答的问题整理成可发送的问卷。
+- **[`/wait-what`](./wait-what/SKILL.md)｜换种方式解释**：用更平实的语言重新解释上一段内容。
+- **[`/workflow-designer`](./workflow-designer/SKILL.md)｜工作流设计**：把重复发生的团队操作、审批或发布流程整理成可实施的执行契约。
+- **[`/retro`](./retro/SKILL.md)｜会话复盘**：用真实会话证据改进自动检查、评审规则、导航和 agent 指令。
+
+### 可自动触发
+
+agent 会在合适场景主动使用，用户也可以显式调用。
+
+- **[`grilling`](./grilling/SKILL.md)｜方案追问方法**：按问题之间的依赖关系逐轮澄清决策，并在实施前获得明确确认。
+- **[`writing-for-agents`](./writing-for-agents/SKILL.md)｜agent 文档写作**：编写和测试 skill、`AGENTS.md`、`CLAUDE.md` 及其他供 agent 使用的文档。

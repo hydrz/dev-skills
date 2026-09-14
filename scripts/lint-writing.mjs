@@ -100,7 +100,7 @@ for (const filePath of mdFiles) {
   // 3. 如果是 SKILL.md，校验 frontmatter
   if (relPath.startsWith("skills/") && relPath.endsWith("/SKILL.md")) {
     const parts = relPath.split("/");
-    const expectedSkillName = parts[2]; // skills/<category>/<name>/SKILL.md
+    const expectedSkillName = parts[1]; // skills/<name>/SKILL.md
 
     const fContent = frontmatterLines.join("\n");
     const nameMatch = fContent.match(/^name:\s*([^\s\r\n]+)/m);

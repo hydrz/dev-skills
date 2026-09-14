@@ -2,7 +2,7 @@
 // 为“按正文执行”的评测生成 prompt.md。
 //
 // 仅用户触发的 skill 无法在 claude plugin eval 中通过斜杠命令调用，所以这类用例把 skill 正文嵌进 prompt。
-// 模板 evals/<case>/prompt.template.md 中的 {{skill:<分类>/<名称>}} 会被替换成对应 SKILL.md 去掉
+// 模板 evals/<case>/prompt.template.md 中的 {{skill:<名称>}} 会被替换成对应 SKILL.md 去掉
 // frontmatter 后的正文。修改 skill 正文后运行 `node scripts/eval-fixtures/build-prompts.mjs`，
 // `npm test` 会检查生成结果是否最新。
 
@@ -12,8 +12,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-export function skillBody(category, name, root = repoRoot) {
-  const source = readFileSync(path.join(root, "skills", category, name, "SKILL.md"), "utf8");
+export function skillBody(name, root = repoRoot) {
+  const source = readFileSync(path.join(root, "skills", name, "SKILL.md"), "utf8");
   return source
     .replace(/\r\n/g, "\n")
     .replace(/^---\n[\s\S]*?\n---\n+/, "")
@@ -23,9 +23,7 @@ export function skillBody(category, name, root = repoRoot) {
 export function renderTemplate(template, root = repoRoot) {
   return template
     .replace(/\r\n/g, "\n")
-    .replace(/\{\{skill:([\w-]+)\/([\w-]+)\}\}/g, (_, category, name) =>
-      skillBody(category, name, root),
-    );
+    .replace(/\{\{skill:([\w-]+)\}\}/g, (_, name) => skillBody(name, root));
 }
 
 export function buildPrompts(root = repoRoot) {
