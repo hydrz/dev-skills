@@ -16,6 +16,8 @@
 - **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立功能清单、划分发布批次、补齐设计依据。
 - **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
 - **[`/improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化报告，找出值得进一步设计的重构机会。
+- **[`/setup-ts-deep-modules`](./setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查。
+- **[`/setup-pre-commit`](./setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存改动配置快速、可验证的 pre-commit 检查。
 
 ## 可自动触发
 

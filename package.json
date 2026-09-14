@@ -13,9 +13,10 @@
   },
   "scripts": {
     "check": "npm run lint && npm test",
-    "lint": "npm run lint:writing && npm run lint:metadata && npm run lint:format",
+    "lint": "npm run lint:writing && npm run lint:metadata && npm run lint:repository && npm run lint:format",
     "lint:writing": "node scripts/lint-writing.mjs",
     "lint:metadata": "node scripts/sync-metadata.mjs --check",
+    "lint:repository": "node scripts/validate-repository.mjs",
     "lint:format": "prettier --check .",
     "format": "prettier --write .",
     "sync": "node scripts/sync-metadata.mjs",

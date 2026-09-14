@@ -11,6 +11,8 @@
 - **[`/teach`](./teach/SKILL.md)｜持续学习**：把当前目录作为可以跨会话延续的学习工作区。
 - **[`/to-questionnaire`](./to-questionnaire/SKILL.md)｜生成外部问卷**：把必须由其他人回答的问题整理成可发送的问卷。
 - **[`/wait-what`](./wait-what/SKILL.md)｜换种方式解释**：用更平实的语言重新解释上一段内容。
+- **[`/workflow-designer`](./workflow-designer/SKILL.md)｜工作流设计**：把重复发生的团队操作、审批或发布流程整理成可实施的执行契约。
+- **[`/retro`](./retro/SKILL.md)｜会话复盘**：用真实会话证据改进自动检查、评审规则、导航和 agent 指令。
 
 ## 可自动触发
 
