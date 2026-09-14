@@ -8,20 +8,30 @@
 
 ## 60 秒快速开始
 
-选择一种安装方式即可。两种方式同时安装会让每个 skill 出现两次。
+选择一种安装方式即可。多种方式同时安装会让每个 skill 出现多次。
 
 ### 作为 Claude Code 插件安装
 
-适合希望整体订阅并跟随仓库更新的用户。安装后的文件只读。
+适合希望在 Claude Code 中整体订阅并跟随仓库更新的用户。安装后的文件只读。
 
 ```bash
 claude plugin marketplace add hydrz/dev-skills
 claude plugin install dev-skills@hydrz
 ```
 
+### 作为 OpenAI Codex 插件安装
+
+适合希望在 Codex 或 ChatGPT 桌面端直接订阅并跟随仓库更新的用户。
+
+```bash
+codex plugin marketplace add hydrz/dev-skills
+```
+
+也可以在 ChatGPT 桌面端设置中的 Plugins Directory 中将本仓库作为本地或远程市场添加并启用。
+
 ### 使用 skills.sh 安装
 
-适合 Codex 等其他 agent，也适合希望把 skill 复制到项目内自行修改的 Claude Code 用户。
+适合希望把 skill 复制到项目内自行修改的开发者，通用兼容各类支持 Agent Skills 标准的宿主环境。
 
 ```bash
 npx skills@latest add hydrz/dev-skills
