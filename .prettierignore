@@ -1,0 +1,8 @@
+node_modules/
+evals/
+.scratch/
+.worktrees/
+.dev-skills/
+.git/
+package-lock.json
+CHANGELOG.md

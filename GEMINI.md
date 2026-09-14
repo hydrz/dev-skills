@@ -19,8 +19,10 @@ Antigravity 通过 `.agents/skills.json` 自动索引 `skills/engineering` 和 `
 4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
 
 改完后运行：
-- Claude Code 校验：`claude plugin validate . --strict`
-- Antigravity 校验：`agy plugin validate .`
+
+- 自动同步多端元数据：`npm run sync`
+- 综合静态检查与测试：`npm run check`
+- 多端官方 CLI 校验：`npm run validate`（或单独运行 `npm run validate:claude`、`npm run validate:agy`）
 
 ## 触发方式
 

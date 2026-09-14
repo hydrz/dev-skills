@@ -29,12 +29,12 @@ expect(result).toBeDefined();
 
 ## 常见场景
 
-| 场景 | 写法 |
-|---|---|
+| 场景     | 写法                                                                |
+| -------- | ------------------------------------------------------------------- |
 | 等待事件 | `waitFor(() => events.find((e) => e.type === "DONE"), "DONE 事件")` |
-| 等待状态 | `waitFor(() => machine.state === "ready", "进入 ready")` |
-| 等待数量 | `waitFor(() => items.length >= 5, "至少 5 项")` |
-| 等待文件 | `waitFor(() => fs.existsSync(path), "文件出现")` |
+| 等待状态 | `waitFor(() => machine.state === "ready", "进入 ready")`            |
+| 等待数量 | `waitFor(() => items.length >= 5, "至少 5 项")`                     |
+| 等待文件 | `waitFor(() => fs.existsSync(path), "文件出现")`                    |
 
 ## 实现
 
