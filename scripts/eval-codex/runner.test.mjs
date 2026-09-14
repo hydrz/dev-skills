@@ -193,8 +193,8 @@ test("loads every existing case and grader", async () => {
   const evalsDirectory = path.resolve("evals");
   const cases = await discoverCases(evalsDirectory);
 
-  assert.equal(cases.length, 16);
-  assert.equal(cases.flatMap((entry) => entry.graders).length, 35);
+  assert.equal(cases.length, 18);
+  assert.equal(cases.flatMap((entry) => entry.graders).length, 39);
   assert.deepEqual(
     Object.fromEntries(
       Object.entries(
@@ -206,7 +206,7 @@ test("loads every existing case and grader", async () => {
           }, {}),
       ).sort(),
     ),
-    { llm: 11, regex: 9, tool_order: 1, tool_used: 14 },
+    { llm: 13, regex: 9, tool_order: 1, tool_used: 16 },
   );
 });
 
@@ -239,10 +239,10 @@ test("CLI dry-run reports selected cases without invoking Codex", () => {
   const output = JSON.parse(result.stdout);
   assert.deepEqual(
     output.cases.map((entry) => entry.name),
-    ["tdd-concept-question", "tdd-new-function"],
+    ["tdd-concept-question", "tdd-new-function", "tdd-tests-after-pressure"],
   );
-  assert.equal(output.summary.cases, 2);
-  assert.equal(output.summary.graders.unsupported, 2);
+  assert.equal(output.summary.cases, 3);
+  assert.equal(output.summary.graders.unsupported, 3);
 });
 
 test("does not call an all-unsupported run perfect", () => {
