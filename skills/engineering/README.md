@@ -7,13 +7,13 @@
 只有用户显式输入名称才会运行。
 
 - **[`/guide`](./guide/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
-- **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和范围清单约定。
+- **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。
 - **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
-- **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，大型工作先拆成规格集，不再追加访谈。
-- **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，确保覆盖每个范围项的每个状态。
+- **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，大型工作先拆成规格拆分表，不再追加访谈。
+- **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，确保覆盖每个功能项的每个状态。
 - **[`/implement`](./implement/SKILL.md)｜当前会话实现**：在当前会话实现一项或少量已明确的任务。
 - **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，最后交付一个 PR。
-- **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立范围清单、补齐设计依据。
+- **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立功能清单、补齐设计依据。
 - **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
 - **[`/improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化报告，找出值得进一步设计的重构机会。
 
