@@ -20,6 +20,7 @@ import {
   summarizeGraderResults,
   summarizeResults,
 } from "./lib.mjs";
+import { spawnTarget } from "../spawn.lib.mjs";
 
 const codexDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(codexDirectory, "../..");
@@ -133,12 +134,14 @@ function runProcess(command, args, options = {}) {
     const environment = { ...process.env, ...options.env };
     delete environment.CODEX_THREAD_ID;
 
-    const child = spawn(command, args, {
+    const useShell = Boolean(options.shell) && process.platform === "win32";
+    const target = spawnTarget(command, args, useShell);
+    const child = spawn(target.command, target.args, {
       cwd: options.cwd,
       env: environment,
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
-      shell: options.shell && process.platform === "win32",
+      shell: useShell,
     });
     let stdout = "";
     let stderr = "";

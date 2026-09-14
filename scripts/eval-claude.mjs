@@ -3,6 +3,8 @@
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
+import { spawnTarget } from "./spawn.lib.mjs";
+
 // 不带取值的 claude plugin eval 选项；其余以 - 开头的选项视为可以带取值
 const BOOLEAN_FLAGS = new Set([
   "--quick",
@@ -91,12 +93,6 @@ export function buildEvalArgs(rawArgs) {
   return finalArgs;
 }
 
-// 经过 cmd.exe 启动时，给含空格或特殊字符的参数加双引号
-export function quoteForCmd(arg) {
-  if (arg !== "" && !/[\s"&|<>^()%!]/.test(arg)) return arg;
-  return `"${arg.replaceAll('"', '""')}"`;
-}
-
 function main() {
   if (!commandExists("claude")) {
     console.error("[ERROR] 未在当前环境中找到 Claude Code (claude) CLI。");
@@ -134,10 +130,8 @@ function main() {
 
   // Windows 上 claude 可能是 .cmd 脚本，需要经过 shell 启动；其他平台直接传参数数组，避免通配符被展开
   const isWindows = process.platform === "win32";
-  const result = spawnSync("claude", isWindows ? commandArgs.map(quoteForCmd) : commandArgs, {
-    stdio: "inherit",
-    shell: isWindows,
-  });
+  const target = spawnTarget("claude", commandArgs, isWindows);
+  const result = spawnSync(target.command, target.args, { stdio: "inherit", shell: isWindows });
   return result.status ?? 1;
 }
 

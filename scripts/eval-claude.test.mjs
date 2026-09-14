@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildEvalArgs, quoteForCmd } from "./eval-claude.mjs";
+import { buildEvalArgs } from "./eval-claude.mjs";
 
 test("passes filters through and appends defaults", () => {
   assert.deepEqual(buildEvalArgs(["--case", "tdd-*"]), [
@@ -57,10 +57,4 @@ test("rejects a bare case name, as left behind when PowerShell drops --", () => 
 test("rejects a positional argument after a boolean flag", () => {
   assert.throws(() => buildEvalArgs(["--quick", "tdd-new-function"]), /无法识别的参数/);
   assert.throws(() => buildEvalArgs(["--no-publish", "tdd-new-function"]), /无法识别的参数/);
-});
-
-test("quotes only arguments that cmd.exe would split or interpret", () => {
-  assert.equal(quoteForCmd("tdd-*"), "tdd-*");
-  assert.equal(quoteForCmd("Tool(pattern:*)"), '"Tool(pattern:*)"');
-  assert.equal(quoteForCmd("a b"), '"a b"');
 });
