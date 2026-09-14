@@ -26,11 +26,13 @@ description: 实现和测试完成后，让用户选择合并、创建 PR、保�
 ## 2. 识别环境
 
 ```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+GIT_DIR=$(git rev-parse --path-format=absolute --git-dir)
+GIT_COMMON=$(git rev-parse --path-format=absolute --git-common-dir)
 # 趁仍在工作区内时记录；第 5 步会切换目录，第 6 步清理时还要使用
 WORKTREE_PATH=$(git rev-parse --show-toplevel)
 ```
+
+两个路径都让 git 直接输出绝对路径（需要 git 2.31 及以上）。用 `cd` 加 `pwd -P` 自行转换时，Windows 的 Git Bash 可能把同一个目录显示成不同的挂载路径，在子目录中运行会把普通仓库误判为工作树。
 
 | 状态                                   | 选项                      | 清理                            |
 | -------------------------------------- | ------------------------- | ------------------------------- |
