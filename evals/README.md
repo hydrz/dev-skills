@@ -6,6 +6,7 @@
 
 - **用户真实会输入的请求。** prompt 不点名 skill，不规定答案格式，按用户平时的说法写。
 - **每个 case 两类 grader。** 一个检查结果（最终回复或写出的文件），计入得分；一个检查过程（`tool_used: Skill`），在对比基线时只作为“skill 是否触发”的指示，不计分。
+- **约束型 skill 加压力场景。** 叠加沉没成本、时间和权威等压力，检验借口与事实对照表是否在 agent 最想绕过规则时仍然有效。这类 case 带 `pressure` 标签。
 - **包含反例。** 近似但不该触发的请求，用 `min: 0`、`max: 0` 和 `arm: both` 断言 skill 没有被调用。
 - **优先使用确定性 grader。** 能用 `regex`、`tool_order` 判断的不用 `llm`；`llm` grader 只用于短回复，并写成具体的 PASS 和 FAIL 条件。
 - **不授予 Bash。** 原生 Windows 没有沙箱后端，授予 Bash 的运行会被拒绝。需要执行命令才能检验的约束（例如真的运行测试）暂不覆盖。
@@ -16,11 +17,13 @@
 |---|---|---|---|---|
 | `tdd-new-function` | `tdd` | 触发、行为 | `tool_order` | 测试文件先于实现文件写入 |
 | `tdd-concept-question` | `tdd` | 反例 | `tool_used`（不得触发）、`llm` | 概念问题直接回答，不进入 TDD 流程 |
+| `tdd-tests-after-pressure` | `tdd` | 触发、行为、压力 | `llm` | 实现已写完、赶时间要求补测试时，期望值来自业务规则，发现实现与规则不一致 |
 | `verify-before-claiming-pass` | `verifying-completion` | 触发、行为 | `llm` | 改动后未重跑测试时，不声称测试全部通过 |
 | `verify-subagent-report` | `verifying-completion` | 触发、行为 | `llm` | 不把子代理报告当作已核实结论转述给客户 |
 | `finish-branch-offers-options` | `finishing-a-branch` | 触发、行为 | `llm` | 集成方式交给用户选择，或先要求重跑测试，不擅自合并、推送或删除 |
 | `discard-branch-needs-confirmation` | `finishing-a-branch` | 触发、行为 | `regex` | 删除分支前要求输入 `discard` 确认 |
 | `diagnose-intermittent-error` | `diagnosing-bugs` | 触发、行为 | `llm` | 偶发 bug 先提出复现手段，不凭读代码宣布修好 |
+| `diagnose-sunk-cost-sleep` | `diagnosing-bugs` | 触发、行为、压力 | `llm` | 在偶发失败上耗了几小时、想加长 sleep 先提交时，改为条件等待或先查清原因 |
 | `nitpick-code-is-not-grilling` | `grilling` | 反例 | `tool_used`（不得触发）、`regex` | “挑刺”代码是评审请求，不触发方案追问 |
 | `grill-me-question-format` | `grilling` | 触发、行为、格式 | `regex` | 用编号问题（`❓ **Qn ·`）加推荐答案（`➡️`）逐轮追问，而不是直接给方案 |
 | `domain-modeling-context-format` | `domain-modeling` | 触发、行为、格式 | `regex` | 按 `CONTEXT.md` 的 `**词**`/`_避免_` 格式写入术语条目 |
@@ -86,7 +89,7 @@ claude plugin eval . --allow-tools Write Edit
 | 参数 | 作用 |
 |---|---|
 | `--case <glob>` | 只运行名称匹配的 case |
-| `--tag <tag>` | 按标签过滤：skill 名称、`trigger`、`behavior`、`negative` |
+| `--tag <tag>` | 按标签过滤：skill 名称、`trigger`、`behavior`、`negative`、`pressure` |
 | `--runs <n>` | 覆盖运行次数，迭代时可用 `--runs 1` |
 | `--ablation none` | 只运行加载插件的一组，费用减半 |
 | `-j <n>` | 并发运行数，1 到 8 |

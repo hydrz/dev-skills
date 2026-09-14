@@ -30,7 +30,7 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`tdd`](./tdd/SKILL.md)｜测试驱动开发**：通过测试先失败、再通过的短循环实现功能或修复 bug。
 - **[`diagnosing-bugs`](./diagnosing-bugs/SKILL.md)｜系统化诊断**：为疑难 bug、测试失败和性能退化建立可复现反馈，再定位根因。
 - **[`verifying-completion`](./verifying-completion/SKILL.md)｜完成验证**：在声称完成前运行对应检查并读取完整结果。
-- **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范和需求规格两个维度分别检查改动。
+- **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范、需求规格和上线风险三个维度分别检查改动。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
 - **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
