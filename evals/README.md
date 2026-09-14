@@ -1,6 +1,6 @@
 # 插件评测
 
-用 [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) 检验 dev-skills 在真实请求下是否被正确触发，以及触发后是否改变了 agent 的做法。
+用 Claude Code 或 Codex 检验 dev-skills 在真实请求下是否被正确触发，以及触发后是否改变了 agent 的做法。两种宿主共用 `evals/<case>/prompt.md` 和 grader 语义；Claude 使用原生 plugin eval，Codex 通过本仓库的 adapter 运行。
 
 ## 设计原则
 
@@ -30,6 +30,8 @@
 `grill-me-question-format` 和 `domain-modeling-context-format` 检验的是本仓库特有的格式约定，基线模型不太可能自发采用，是最能体现 `Δ` 的两个 case；其余大多数 case 检验的行为（先测试、不轻信未核实的结论、把决定权交给用户）本身也是 Sonnet 5 的默认倾向，`Δ` 经常接近 0——这说明触发有效，但不代表插件改变了结果，参考下方“读结果”表。
 
 ## 运行
+
+### Claude Code
 
 前提：Claude Code v2.1.269 或更高版本，已登录。在仓库根目录运行：
 
@@ -101,3 +103,61 @@ input_match: '"skill"\s*:\s*"(?:[\w-]+:)?<skill>"'
 ```bash
 claude plugin eval . --tag <skill> --allow-tools Write Edit
 ```
+
+## 在 Codex 中运行
+
+Codex 当前没有直接读取这套 Markdown case/grader 的 `codex eval` 命令。本仓库的 runner 会：
+
+1. 为每次运行创建独立临时 Git 仓库。
+2. 在 WITH 组中把受测 skill 复制到 `.agents/skills/<skill>/`；WITHOUT 组不复制。
+3. 通过 `codex exec --ephemeral --json` 捕获 JSONL trace、最终回复和工作区 diff。
+4. 在本地执行 regex/file/tool-order 检查；LLM grader 用第二次只读 `codex exec --output-schema` 判定。
+
+先查看会运行哪些 case，不调用模型：
+
+```bash
+node evals/codex/run.mjs --dry-run
+```
+
+运行单个 case：
+
+```bash
+node evals/codex/run.mjs --case grill-me-question-format
+```
+
+运行某个 skill 的全部 case，并做 WITH/WITHOUT 对照：
+
+```bash
+node evals/codex/run.mjs --tag tdd --arm both --runs 3
+```
+
+迭代确定性 grader 时，可以跳过额外的 LLM 评分调用：
+
+```bash
+node evals/codex/run.mjs --case domain-modeling-context-format --skip-llm-graders
+```
+
+常用参数：
+
+| 参数 | 作用 |
+|---|---|
+| `--case <glob>` | 只运行名称匹配的 case |
+| `--tag <tag>` | 按 tag 过滤 |
+| `--runs <n>` | 每个 case/arm 的重复次数，默认 1 |
+| `--arm with\|without\|both` | 选择加载 skill、基线或两者，默认 `with` |
+| `--model <model>` | 固定受测与评分使用的 Codex 模型 |
+| `--reasoning <effort>` | 固定 reasoning effort |
+| `--skip-llm-graders` | 跳过 rubric 模型调用 |
+| `--dry-run` | 只检查用例发现和 grader 兼容性 |
+
+结果写入 `evals/results/codex-<时间戳>/`。每次运行保存 prompt、实际命令、JSONL trace、stderr、工作区 diff/status 和 grader 结果；汇总文件还会在同时运行两组时计算 WITH、WITHOUT 与 Δ。
+
+### Codex 兼容边界
+
+- `regex` grader 会检查最终消息，或按 `target.source: file` 检查工作区文件。
+- `llm` grader 的 rubric 正文直接复用，但通过结构化 JSON 输出判分。
+- `tool_order` 会把 Claude `Write` matcher 映射到 Codex `file_change` 事件。同一个 patch 同时修改前后两个目标时，结果是 `inconclusive`，不会误报通过。
+- `tool_used: Skill` 没有公开的 Codex JSONL 等价事件，因此标为 `unsupported`、不计分。它不会被当作通过。
+- `max_turns` 和逐工具 `allowed_tools` 没有一对一等价项；runner 分别使用进程超时和 `read-only`/`workspace-write` sandbox。
+
+详细依据和后续阶段见 [`docs/codex-eval-compatibility.md`](../docs/codex-eval-compatibility.md)。
