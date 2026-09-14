@@ -25,6 +25,9 @@
 | `grill-me-question-format` | `grilling` | 触发、行为、格式 | `regex` | 用编号问题（`❓ **Qn ·`）加推荐答案（`➡️`）逐轮追问，而不是直接给方案 |
 | `domain-modeling-context-format` | `domain-modeling` | 触发、行为、格式 | `regex` | 按 `CONTEXT.md` 的 `**词**`/`_避免_` 格式写入术语条目 |
 | `codebase-design-selective-ddd` | `codebase-design` | 触发、行为 | `llm` | 简单模块加功能时新增用例文件，不默认套用聚合、仓储和分层目录 |
+| `grilling-scope-breadth` | `grilling` | 触发、行为 | `llm` | 追问面向用户的功能时，覆盖非默认状态和各端、各角色的差异 |
+| `verify-ui-states-against-design` | `verifying-completion` | 触发、行为 | `llm` | 页面任务只验证了默认状态时，不宣布完成，要求逐个状态与设计依据截图对比 |
+| `prototype-writes-back-design-basis` | `prototype` | 触发、行为 | `llm` | UI 原型选定变体后，把各状态截图写回功能项的设计依据 |
 
 不在范围内：`implement-spec` 等仅用户触发、依赖子代理、git 和命令执行的编排流程。这类 skill 无法在不加载插件的基线中调用，也需要 Bash 才能真实运行。
 

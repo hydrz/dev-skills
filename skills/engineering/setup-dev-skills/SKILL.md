@@ -1,6 +1,6 @@
 ---
 name: setup-dev-skills
-description: 首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签和领域文档布局。每个仓库通常只需运行一次。
+description: 首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。每个仓库通常只需运行一次。
 disable-model-invocation: true
 ---
 
@@ -11,6 +11,7 @@ disable-model-invocation: true
 - **Issue 追踪器**：issue 存放在哪里（默认 GitHub；GitLab 和本地 Markdown 可直接使用）
 - **分诊标签**：五个标准分诊角色对应的标签文字
 - **领域文档**：`CONTEXT.md` 和 ADR 放在哪里，以及读取它们的规则
+- **功能清单**：大型工作的功能清单和设计资料放在哪里，以及规格、任务如何引用它
 
 这是由提示驱动的 skill，不是确定性脚本。先探索，再展示发现，与用户确认后写入。
 
@@ -25,6 +26,7 @@ disable-model-invocation: true
 - 根目录的 `CONTEXT.md` 和 `CONTEXT-MAP.md`
 - `docs/adr/`，以及所有 `src/*/docs/adr/` 目录
 - `docs/agents/`：本 skill 之前的产出是否已经存在？
+- `docs/features/`：是否已有功能清单？
 - `.scratch/`：存在时，说明已经在使用本地 Markdown issue 约定
 - 是否安装了 `triage` skill？（本目录旁有 `triage` 目录，或可用 skill 列表中有 `triage`。）这决定是否执行第 B 节。
 - monorepo 信号：`pnpm-workspace.yaml`、`package.json` 中的 `workspaces` 字段，或带有独立 `src/` 的 `packages/*`。这些信号只出现在真正的大型多包仓库中；没有这些信号就按单上下文处理，绝大多数仓库都是这种情况。
@@ -60,12 +62,14 @@ disable-model-invocation: true
 
 只有探索发现 monorepo 信号时，才提供**多上下文**布局（根目录的 `CONTEXT-MAP.md` 指向各上下文的 `CONTEXT.md`），并确认用户想要哪种布局。
 
+**第 D 节：功能清单。** 默认把功能清单放在 `docs/features/<工作-slug>.md`，设计资料放在 `docs/features/design/<工作-slug>/`，直接写入，无需询问。多上下文布局下，清单放在对应上下文的 `docs/features/` 中。只有探索发现仓库已有其他存放需求或设计资料的目录（例如 `docs/product/`）时，才确认用户想沿用哪个位置，并在写入的文档中改成对应路径。
+
 ### 3. 确认并编辑
 
 向用户展示以下内容的草稿：
 
 - 要加入 `CLAUDE.md` 或 `AGENTS.md`（二选一，规则见第 4 步）的 `## Agent skills` 块
-- `docs/agents/issue-tracker.md`、`docs/agents/domain.md` 和 `docs/agents/triage-labels.md` 的内容（最后一个仅在安装了 `triage` 时写入）
+- `docs/agents/issue-tracker.md`、`docs/agents/domain.md`、`docs/agents/feature-list.md` 和 `docs/agents/triage-labels.md` 的内容（最后一个仅在安装了 `triage` 时写入）
 
 写入前允许用户修改。
 
@@ -97,6 +101,10 @@ disable-model-invocation: true
 ### 领域文档
 
 [一句话说明布局：“单上下文”或“多上下文”]。见 `docs/agents/domain.md`。
+
+### 功能清单
+
+[一句话说明功能清单和设计资料的位置]。见 `docs/agents/feature-list.md`。
 ```
 
 只有安装了 `triage` 且执行了第 B 节时，才包含 `### 分诊标签` 子块，并写入 `docs/agents/triage-labels.md`。未安装时两者都省略。
@@ -108,6 +116,7 @@ disable-model-invocation: true
 - [issue-tracker-local.md](./issue-tracker-local.md)：本地 Markdown issue 追踪器
 - [triage-labels.md](./triage-labels.md)：标签映射（仅在安装了 `triage` 时）
 - [domain.md](./domain.md)：领域文档的读取规则和布局
+- [feature-list.md](./feature-list.md)：功能清单的位置、格式和修改规则
 
 选择“其他”类追踪器时，根据用户的描述从头编写 `docs/agents/issue-tracker.md`，至少覆盖：创建 issue、读取 issue、列出 issue、评论、添加标签、关闭、表达依赖关系；并包含“当 skill 说‘发布到 issue 追踪器’时”和“当 skill 说‘拉取相关任务’时”两节。
 
