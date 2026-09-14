@@ -20,6 +20,7 @@ import {
   summarizeGraderResults,
   summarizeResults,
 } from "./lib.mjs";
+import { spawnTarget } from "../spawn.lib.mjs";
 
 const codexDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(codexDirectory, "../..");
@@ -80,7 +81,11 @@ function parseArguments(argv) {
     else if (argument === "--skip-llm-graders") options.skipLlmGraders = true;
     else if (argument === "--dry-run") options.dryRun = true;
     else if (argument === "--help" || argument === "-h") options.help = true;
-    else throw new Error(`Unknown option: ${argument}`);
+    else {
+      throw new Error(
+        `Unknown option: ${argument}. In Windows PowerShell, npm drops a bare --; use: npm run eval:codex '--' --case <name>`,
+      );
+    }
   }
 
   if (!Number.isInteger(options.runs) || options.runs < 1) {
@@ -129,12 +134,14 @@ function runProcess(command, args, options = {}) {
     const environment = { ...process.env, ...options.env };
     delete environment.CODEX_THREAD_ID;
 
-    const child = spawn(command, args, {
+    const useShell = Boolean(options.shell) && process.platform === "win32";
+    const target = spawnTarget(command, args, useShell);
+    const child = spawn(target.command, target.args, {
       cwd: options.cwd,
       env: environment,
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
-      shell: options.shell && process.platform === "win32",
+      shell: useShell,
     });
     let stdout = "";
     let stderr = "";

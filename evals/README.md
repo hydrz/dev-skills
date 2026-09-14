@@ -48,6 +48,14 @@ npm run eval:claude -- --case tdd-*
 npm run eval:claude -- --tag trigger
 ```
 
+在 Windows PowerShell 中，`npm run` 后面不带引号的 `--` 会被 PowerShell 吞掉，`--case` 随之被 npm 当成自己的配置项。这时把 `--` 写成 `'--'`，本文所有 `npm run eval:*` 示例都适用：
+
+```powershell
+npm run eval:claude '--' --case tdd-*
+```
+
+脚本收到孤立的 case 名称时会报错退出，不会悄悄运行全部 case。直接调用 `claude plugin eval` 时没有这层检查，过滤 case 一定要写 `--case`。
+
 也可直接使用 Claude Code 原生命令：
 
 ```bash
@@ -111,6 +119,8 @@ input_match: '"skill"\s*:\s*"(?:[\w-]+:)?<skill>"'
 ```
 
 反例在同样的 grader 上加 `min: 0`、`max: 0` 和 `arm: both`。结果 grader 的写法见[官方文档的 grader 类型](https://code.claude.com/docs/en/plugin-evals#grader-types)。
+
+`scripts/eval-codex/runner.test.mjs` 断言了 case 总数、grader 总数和各类型 grader 的数量。新增或删除 case 后，同步更新这些数字，再运行 `npm run check`。
 
 ## 修改 skill 之后
 

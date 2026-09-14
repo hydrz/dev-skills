@@ -20,6 +20,7 @@ skill 按分类放在 `skills/` 下：
 
 改完后运行：
 
+- 静态检查与测试：`npm run check`（写作规范、元数据同步、prettier 格式和脚本测试，与 CI 一致）
 - Claude Code 校验：`claude plugin validate . --strict`
 - Antigravity 校验：`agy plugin validate .`
 
