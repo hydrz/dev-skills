@@ -27,7 +27,7 @@ codex exec --ephemeral --json --sandbox workspace-write \
 # 结果的只读 rubric 评分
 codex exec --ephemeral --sandbox read-only \
   "<rubric prompt>" \
-  --output-schema evals/codex/rubric.schema.json \
+  --output-schema scripts/eval-codex/rubric.schema.json \
   -o artifacts/<case>.grade.json
 ```
 
@@ -71,7 +71,8 @@ evals/
 ├─ <case>/
 │  ├─ prompt.md                 # 现有：用例元数据 + 用户 prompt
 │  └─ graders/                  # 现有 Claude grader，逐步抽取通用 rubric
-├─ codex/
+scripts/
+├─ eval-codex/
 │  ├─ run.mjs                  # 枚举 case、创建临时仓库、运行、评分、聚合
 │  ├─ rubric.schema.json       # 模型 grader 的稳定输出协议
 │  └─ adapters/                # regex / command / file / rubric

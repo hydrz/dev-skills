@@ -139,7 +139,10 @@ test("discovers cases and filters them by tag and case glob", async () => {
 
   const cases = await discoverCases(root, { casePattern: "case-*", tag: "tdd" });
 
-  assert.deepEqual(cases.map((entry) => entry.name), ["case-one"]);
+  assert.deepEqual(
+    cases.map((entry) => entry.name),
+    ["case-one"],
+  );
   assert.equal(cases[0].prompt, "first");
 });
 
@@ -173,7 +176,9 @@ test("builds an isolated codex exec invocation", () => {
 });
 
 test("parses JSONL while retaining malformed-line diagnostics", () => {
-  const parsed = parseJsonl(`{"type":"turn.started"}\nnot-json\n{"type":"item.completed","item":{"type":"agent_message","text":"done"}}\n`);
+  const parsed = parseJsonl(
+    `{"type":"turn.started"}\nnot-json\n{"type":"item.completed","item":{"type":"agent_message","text":"done"}}\n`,
+  );
 
   assert.equal(parsed.events.length, 2);
   assert.equal(parsed.errors.length, 1);
@@ -222,25 +227,22 @@ test("marks skill invocation graders unsupported", async () => {
 test("CLI dry-run reports selected cases without invoking Codex", () => {
   const result = spawnSync(
     process.execPath,
-    [path.resolve("evals/codex/run.mjs"), "--dry-run", "--case", "tdd-*"],
+    [path.resolve("scripts/eval-codex/run.mjs"), "--dry-run", "--case", "tdd-*"],
     { cwd: path.resolve("."), encoding: "utf8" },
   );
 
   assert.equal(result.status, 0, result.stderr);
   const output = JSON.parse(result.stdout);
-  assert.deepEqual(output.cases.map((entry) => entry.name), [
-    "tdd-concept-question",
-    "tdd-new-function",
-  ]);
+  assert.deepEqual(
+    output.cases.map((entry) => entry.name),
+    ["tdd-concept-question", "tdd-new-function"],
+  );
   assert.equal(output.summary.cases, 2);
   assert.equal(output.summary.graders.unsupported, 2);
 });
 
 test("does not call an all-unsupported run perfect", () => {
-  const summary = summarizeGraderResults([
-    { status: "unsupported" },
-    { status: "unsupported" },
-  ]);
+  const summary = summarizeGraderResults([{ status: "unsupported" }, { status: "unsupported" }]);
 
   assert.equal(summary.score, null);
   assert.equal(summary.perfect, false);

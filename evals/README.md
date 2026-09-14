@@ -131,25 +131,25 @@ Codex 当前没有直接读取这套 Markdown case/grader 的 `codex eval` 命�
 先查看会运行哪些 case，不调用模型：
 
 ```bash
-node evals/codex/run.mjs --dry-run
+npm run eval:codex -- --dry-run
 ```
 
 运行单个 case：
 
 ```bash
-node evals/codex/run.mjs --case grill-me-question-format
+npm run eval:codex -- --case grill-me-question-format
 ```
 
 运行某个 skill 的全部 case，并做 WITH/WITHOUT 对照：
 
 ```bash
-node evals/codex/run.mjs --tag tdd --arm both --runs 3
+npm run eval:codex -- --tag tdd --arm both --runs 3
 ```
 
 迭代确定性 grader 时，可以跳过额外的 LLM 评分调用：
 
 ```bash
-node evals/codex/run.mjs --case domain-modeling-context-format --skip-llm-graders
+npm run eval:codex -- --case domain-modeling-context-format --skip-llm-graders
 ```
 
 常用参数：
