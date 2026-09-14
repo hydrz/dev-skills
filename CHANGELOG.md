@@ -1,5 +1,13 @@
 # dev-skills
 
+## 0.2.1
+
+### Patch Changes
+
+- [#32](https://github.com/hydrz/dev-skills/pull/32) [`f9c3cc2`](https://github.com/hydrz/dev-skills/commit/f9c3cc2b27107f7164cb01119b3b06acb12420cb) Thanks [@hydrz](https://github.com/hydrz)! - `implement-spec` 新增 `review-package.mjs`，把提交列表、stat 摘要和带上下文的 diff 写入一个文件，并拒绝不是祖先的 BASE 和空范围，评审和复审都用它生成材料。`diagnosing-bugs` 新增 `TEST-POLLUTION.md` 和 `scripts/find-polluter.mjs`：逐个运行测试找出留下多余文件的测试，或二分查找让另一个测试一起运行才失败的测试。两个脚本只依赖 Node.js 标准库，Windows 上可以直接运行。
+
+- [#30](https://github.com/hydrz/dev-skills/pull/30) [`3341e59`](https://github.com/hydrz/dev-skills/commit/3341e59aedc22949ced1fee8e1a5086d4bb65257) Thanks [@hydrz](https://github.com/hydrz)! - `implement` 和 `implement-spec` 新增工作树准备说明：先检测是否已在工作树中（排除子模块），优先使用运行环境自带的工具，用 git 创建时确认目录已被忽略并安装依赖，沙箱拒绝时的退路。`finishing-a-branch` 改用 `git rev-parse --path-format=absolute` 识别工作树，修复 Windows Git Bash 下在子目录中把普通仓库误判为工作树的问题。`implement-spec` 支持把同类小改动合成一个批次派发和评审。`tdd` 的测试警示信号清单补充读取源码文本、只测框架、断言 mock 和 mock 过多等情况。
+
 ## 0.2.0
 
 ### Minor Changes
