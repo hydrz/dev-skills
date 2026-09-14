@@ -160,7 +160,7 @@ npm run eval:codex -- --case domain-modeling-context-format --skip-llm-graders
 | `--tag <tag>` | 按 tag 过滤 |
 | `--runs <n>` | 每个 case/arm 的重复次数，默认 1 |
 | `--arm with\|without\|both` | 选择加载 skill、基线或两者，默认 `with` |
-| `--model <model>` | 固定受测与评分使用的 Codex 模型（默认使用最便宜的 `gpt-4o-mini`） |
+| `--model <model>` | 固定受测与评分使用的 Codex 模型（默认使用最便宜的 `gpt-5.6-luna`） |
 | `--reasoning <effort>` | 固定 reasoning effort |
 | `--skip-llm-graders` | 跳过 rubric 模型调用 |
 | `--dry-run` | 只检查用例发现和 grader 兼容性 |

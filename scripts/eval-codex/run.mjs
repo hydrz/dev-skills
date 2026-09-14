@@ -36,7 +36,7 @@ Options:
   --runs <n>             Repetitions per case and arm (default: 1)
   --arm <with|without|both>
                          Skill ablation arm (default: with)
-  --model <model>        Codex model override (default: gpt-4o-mini)
+  --model <model>        Codex model override (default: gpt-5.6-luna)
   --judge-model <model>  Model for LLM rubrics (default: matches --model)
   --reasoning <effort>   Codex reasoning effort override
   --threshold <0..1>     Pass threshold for WITH arm score (default: 1.0)
@@ -52,7 +52,7 @@ function parseArguments(argv) {
     casePattern: "*",
     runs: 1,
     arm: "with",
-    model: "gpt-4o-mini",
+    model: "gpt-5.6-luna",
     judgeModel: null,
     threshold: 1.0,
     codexBin: "codex",
@@ -134,6 +134,7 @@ function runProcess(command, args, options = {}) {
       env: environment,
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
+      shell: options.shell && process.platform === "win32",
     });
     let stdout = "";
     let stderr = "";
@@ -257,7 +258,7 @@ Return whether the rubric passes and a concise reason.`;
       reasoning: options.reasoning,
       outputSchema: rubricSchema,
     }),
-    { input: prompt, timeoutMs: options.timeoutMs },
+    { input: prompt, timeoutMs: options.timeoutMs, shell: true },
   );
 
   if (result.timedOut || result.code !== 0) {
@@ -307,6 +308,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   const processResult = await runProcess(options.codexBin, args, {
     input: evalCase.prompt,
     timeoutMs,
+    shell: true,
     onStdout: (chunk) => traceStream.write(chunk),
     onStderr: (chunk) => stderrStream.write(chunk),
   });
@@ -411,7 +413,7 @@ async function main() {
   const resultsDirectory = path.join(evalsDirectory, "results", `codex-${timestamp}`);
   const arms = options.arm === "both" ? ["with", "without"] : [options.arm];
   const results = [];
-  const versionResult = await runProcess(options.codexBin, ["--version"]);
+  const versionResult = await runProcess(options.codexBin, ["--version"], { shell: true });
   if (versionResult.code !== 0) {
     throw new Error(`Unable to read Codex version: ${versionResult.stderr}`);
   }
