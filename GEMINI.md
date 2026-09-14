@@ -23,6 +23,7 @@ Antigravity 通过 `.agents/skills.json` 自动索引 `skills/engineering` 和 `
 - 自动同步多端元数据：`npm run sync`
 - 综合静态检查与测试：`npm run check`
 - 多端官方 CLI 校验：`npm run validate`（或单独运行 `npm run validate:claude`、`npm run validate:agy`）
+- 插件行为评测：`npm run eval:claude`（或快速评测 `npm run eval:claude:quick`）
 
 ## 触发方式
 

@@ -36,6 +36,20 @@
 前提：Claude Code v2.1.269 或更高版本，已登录。在仓库根目录运行：
 
 ```bash
+# 完整评测（自动注入 Write/Edit 权限并检查环境）
+npm run eval:claude
+
+# 快速单次迭代（单次运行、关闭基线、不发布报告，节省时间和成本）
+npm run eval:claude:quick
+
+# 过滤指定用例或标签
+npm run eval:claude -- --case tdd-*
+npm run eval:claude -- --tag trigger
+```
+
+也可直接使用 Claude Code 原生命令：
+
+```bash
 claude plugin eval . --allow-tools Write Edit
 ```
 

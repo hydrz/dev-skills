@@ -24,6 +24,9 @@
     "validate:agy": "node scripts/validate-cli.mjs --tool=agy",
     "test": "npm run test:codex",
     "test:codex": "node --test evals/codex/*.test.mjs",
+    "eval": "node scripts/eval-claude.mjs",
+    "eval:claude": "node scripts/eval-claude.mjs",
+    "eval:claude:quick": "node scripts/eval-claude.mjs --quick",
     "eval:codex": "node evals/codex/run.mjs",
     "changeset": "changeset",
     "version": "changeset version && npm run sync"

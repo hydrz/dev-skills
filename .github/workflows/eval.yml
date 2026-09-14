@@ -1,0 +1,63 @@
+name: Claude Plugin Eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      case:
+        description: "Case glob to run (e.g. * or tdd-*)"
+        required: false
+        default: "*"
+      runs:
+        description: "Runs per case"
+        required: false
+        default: "3"
+      threshold:
+        description: "Pass threshold (0.0 - 1.0)"
+        required: false
+        default: "0.8"
+      max_cost_usd:
+        description: "Max cost limit in USD"
+        required: false
+        default: "20"
+
+jobs:
+  eval:
+    name: Run Plugin Evals
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run Claude plugin eval
+        run: |
+          claude plugin eval . \
+            --trust-plugin \
+            --allow-tools Write Edit \
+            --case "${{ github.event.inputs.case }}" \
+            --runs ${{ github.event.inputs.runs }} \
+            --threshold ${{ github.event.inputs.threshold }} \
+            --max-cost-usd ${{ github.event.inputs.max_cost_usd }} \
+            --no-publish \
+            --json results.json
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Upload Eval Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            results.json
+            evals/results/
