@@ -29,6 +29,16 @@ codex plugin marketplace add hydrz/dev-skills
 
 也可以在 ChatGPT 桌面端设置中的 Plugins Directory 中将本仓库作为本地或远程市场添加并启用。
 
+### 作为 Google Antigravity 插件安装
+
+适合希望在 Antigravity CLI（`agy`）、Antigravity IDE 或桌面端直接订阅并跟随仓库更新的用户。
+
+```bash
+agy plugin install https://github.com/hydrz/dev-skills
+```
+
+在 Antigravity 工作区中打开本仓库时，也会通过 `.agents/skills.json` 自动索引并激活全部 skills。
+
 ### 使用 skills.sh 安装
 
 适合希望把 skill 复制到项目内自行修改的开发者，通用兼容各类支持 Agent Skills 标准的宿主环境。
