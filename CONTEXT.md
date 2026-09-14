@@ -10,7 +10,7 @@
 
 **可自动触发**（model-invoked）：agent 可以按场景主动触发、用户也可以显式触发的 skill，通常提供可复用的方法或约束。
 
-**路由**（router）：帮助用户或 agent 判断下一步该用哪个 skill。本仓库的路由是 `guide`。
+**路由**（router）：帮助用户或 agent 判断下一步该用哪个 skill。本仓库的路由是 `ask-dev-skills`。
 
 **上下文指针**（context pointer）：留在当前上下文中的简短引用，指向需要时再读取的外部材料，并说明读取时机。
 

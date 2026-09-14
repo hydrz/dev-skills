@@ -155,7 +155,7 @@
 
 | 命令                             | 建议显示名       | 一句话定位                                           |
 | -------------------------------- | ---------------- | ---------------------------------------------------- |
-| `/guide`                         | 工作流导航       | 不确定下一步使用哪个 skill 时运行                    |
+| `/ask-dev-skills`                | 工作流导航       | 不确定下一步使用哪个 skill 时运行                    |
 | `/setup-dev-skills`              | 初始化项目约定   | 首次在仓库中使用工程 skill 前运行                    |
 | `/grill-with-docs`               | 带记录的方案追问 | 在仓库中澄清方案，同时沉淀术语和重要决策             |
 | `/to-spec`                       | 整理规格         | 把已完成的讨论整理成可实施规格，不再追加访谈         |
@@ -181,7 +181,7 @@
 | ------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
 | `docs/invocation.md:13`                           | 模型能否有用地自主伸手去用它               | 模型能否在合适场景主动调用它                                             |
 | `README.md:101`                                   | 工单图前沿并发、台账扛过压缩、上报所有裁决 | 并行执行当前可开始的任务，用持久化进度记录支持上下文恢复，并汇总代行决策 |
-| `skills/engineering/guide/SKILL.md:85`            | 单一真相源                                 | 唯一权威来源                                                             |
+| `skills/engineering/ask-dev-skills/SKILL.md:85`   | 单一真相源                                 | 唯一权威来源                                                             |
 | `skills/engineering/wayfinder/SKILL.md:84`        | 毕业成新工单                               | 转化或拆分成新的开发任务                                                 |
 | `skills/engineering/setup-dev-skills/SKILL.md:42` | 默认姿态                                   | 默认推荐、默认做法                                                       |
 | `skills/engineering/code-review/SKILL.md`         | 钉住固定点、评审包                         | 确定比较基准、评审材料                                                   |
@@ -205,7 +205,7 @@
 - `skills/productivity/writing-for-agents/SKILL-MECHANICS.md:16`：354 个字符；
 - `skills/engineering/code-review/SKILL.md:62`：307 个字符；
 - `skills/engineering/to-tickets/SKILL.md:47`：305 个字符；
-- `skills/engineering/guide/SKILL.md:61`：270 个字符；
+- `skills/engineering/ask-dev-skills/SKILL.md:61`：270 个字符；
 - `skills/engineering/wayfinder/SKILL.md:80`：274 个字符。
 
 Markdown 源码中的长行本身不是错误，但这些位置通常也包含多个条件、例外和动作。第二阶段应以语义为单位拆分：先写判断，再写动作，最后写例外。
@@ -283,20 +283,20 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 
 ### P2-1：易过时的模型容量被写成固定事实
 
-`skills/engineering/guide/SKILL.md:51` 和 `skills/engineering/guide/PHASE-BOUNDARIES.md:21` 将“智能区”描述为约 15 万 token。模型能力和上下文窗口会变化，也不能用固定 token 数准确表示推理质量。
+`skills/engineering/ask-dev-skills/SKILL.md:51` 和 `skills/engineering/ask-dev-skills/PHASE-BOUNDARIES.md:21` 将“智能区”描述为约 15 万 token。模型能力和上下文窗口会变化，也不能用固定 token 数准确表示推理质量。
 
 建议删除固定数字，直接描述判断信号，例如：上下文已接近上限、早期决策难以准确回忆、输出开始丢失约束。
 
 ### P2-2：README 与分类 README 重复维护 skill 摘要
 
-同一项 skill 的说明分散在根 README、两个分类 README、`guide` 和 frontmatter 中。重复内容已经出现细微差异。
+同一项 skill 的说明分散在根 README、两个分类 README、`ask-dev-skills` 和 frontmatter 中。重复内容已经出现细微差异。
 
 建议明确唯一权威来源：
 
 - frontmatter 负责触发条件和一句话结果；
 - 分类 README 负责面向人的完整导航；
 - 根 README 只保留典型场景和少量关键入口；
-- `guide` 负责运行时选择流程，不重复项目背景。
+- `ask-dev-skills` 负责运行时选择流程，不重复项目背景。
 
 ## 6. `docs/chinese-writing.md` 草案范围
 
@@ -353,7 +353,7 @@ Markdown 源码中的长行本身不是错误，但这些位置通常也包含�
 
 1. 方案澄清：`grill-me`、`grill-with-docs`、`grilling`；
 2. 规格与任务：`to-spec`、`to-tickets`、`implement`、`implement-spec`；
-3. 导航与大型工作：`guide`、`wayfinder`、`triage`；
+3. 导航与大型工作：`ask-dev-skills`、`wayfinder`、`triage`；
 4. 代码质量：TDD、诊断、评审、验证和分支收尾；
 5. 领域与架构：领域建模、代码库设计、架构审查和原型；
 6. 通用工作流及所有配套参考文件。
