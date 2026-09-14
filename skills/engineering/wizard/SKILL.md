@@ -47,6 +47,7 @@ description: 为必须由人完成的外部配置生成交互式 Bash 向导。�
 ### 4. 验证并交付
 
 - 运行 `bash -n <脚本>`；有 `shellcheck` 时也运行它。
+- 用户在 Windows 上时，告诉用户在 Git Bash 或 WSL 中运行脚本，不在 PowerShell 或 cmd 中运行。Claude Code 在 Windows 上本身依赖 Git Bash，通常已经安装。
 - 运行 `chmod +x <脚本>`。
 - 端到端运行交给人完成：它会打开浏览器，并阻塞等待人的输入。你负责静态检查：第 1 步列出的每个值都会被收集，并写入第 1 步指定的位置；每个 `set_secret` 的名称都与 CI 中的 `secrets.*` 引用完全一致。
 - 告诉用户如何运行。如果它是可重复执行的配置流程，提交脚本并在 README 中链接，让下一个人直接运行脚本，而不必再询问 AI。
