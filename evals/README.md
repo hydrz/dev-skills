@@ -64,7 +64,8 @@ claude plugin eval . --allow-tools Write Edit
 | `--runs <n>` | 覆盖运行次数，迭代时可用 `--runs 1` |
 | `--ablation none` | 只运行加载插件的一组，费用减半 |
 | `-j <n>` | 并发运行数，1 到 8 |
-| `--judge-model sonnet` | 用更强的模型判定 `llm` grader |
+| `--model <model>` | 指定受测模型（脚本默认使用性价比最高的 `haiku`） |
+| `--judge-model <model>` | 判定模型（默认 `haiku`；可用 `sonnet` 增强判定准确度） |
 | `--max-cost-usd <金额>` | 费用上限 |
 | `--no-publish` | 报告只保存在本地 |
 
@@ -159,7 +160,7 @@ node evals/codex/run.mjs --case domain-modeling-context-format --skip-llm-grader
 | `--tag <tag>` | 按 tag 过滤 |
 | `--runs <n>` | 每个 case/arm 的重复次数，默认 1 |
 | `--arm with\|without\|both` | 选择加载 skill、基线或两者，默认 `with` |
-| `--model <model>` | 固定受测与评分使用的 Codex 模型 |
+| `--model <model>` | 固定受测与评分使用的 Codex 模型（默认使用最便宜的 `gpt-4o-mini`） |
 | `--reasoning <effort>` | 固定 reasoning effort |
 | `--skip-llm-graders` | 跳过 rubric 模型调用 |
 | `--dry-run` | 只检查用例发现和 grader 兼容性 |
