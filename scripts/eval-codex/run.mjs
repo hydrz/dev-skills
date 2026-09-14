@@ -11,7 +11,11 @@ import {
   classifyRunInfrastructure,
   discoverCases,
   evaluateGrader,
+  extractCodexToolCalls,
   findSkills,
+  formatSummaryTable,
+  generateHtmlReport,
+  isGraderIndicator,
   parseJsonl,
   summarizeGraderResults,
   summarizeResults,
@@ -33,7 +37,9 @@ Options:
   --arm <with|without|both>
                          Skill ablation arm (default: with)
   --model <model>        Codex model override (default: gpt-4o-mini)
+  --judge-model <model>  Model for LLM rubrics (default: matches --model)
   --reasoning <effort>   Codex reasoning effort override
+  --threshold <0..1>     Pass threshold for WITH arm score (default: 1.0)
   --skip-llm-graders     Do not run rubric-based graders
   --dry-run              Print selected cases and grader compatibility
   --codex-bin <path>     Codex executable (default: codex)
@@ -47,6 +53,8 @@ function parseArguments(argv) {
     runs: 1,
     arm: "with",
     model: "gpt-4o-mini",
+    judgeModel: null,
+    threshold: 1.0,
     codexBin: "codex",
     dryRun: false,
     skipLlmGraders: false,
@@ -65,6 +73,8 @@ function parseArguments(argv) {
     else if (argument === "--runs") options.runs = Number(next());
     else if (argument === "--arm") options.arm = next();
     else if (argument === "--model") options.model = next();
+    else if (argument === "--judge-model") options.judgeModel = next();
+    else if (argument === "--threshold") options.threshold = Number(next());
     else if (argument === "--reasoning") options.reasoning = next();
     else if (argument === "--codex-bin") options.codexBin = next();
     else if (argument === "--skip-llm-graders") options.skipLlmGraders = true;
@@ -243,7 +253,7 @@ Return whether the rubric passes and a concise reason.`;
     buildCodexArgs({
       workspace: judgeWorkspace,
       sandbox: "read-only",
-      model: options.model,
+      model: options.judgeModel ?? options.model,
       reasoning: options.reasoning,
       outputSchema: rubricSchema,
     }),
@@ -287,6 +297,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     JSON.stringify([options.codexBin, ...args], null, 2),
   );
 
+  const startTime = Date.now();
   const traceStream = createWriteStream(path.join(runDirectory, "trace.jsonl"), {
     encoding: "utf8",
   });
@@ -303,6 +314,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     new Promise((resolve) => traceStream.end(resolve)),
     new Promise((resolve) => stderrStream.end(resolve)),
   ]);
+  const durationSeconds = (Date.now() - startTime) / 1000;
 
   const parsed = parseJsonl(processResult.stdout);
   await writeFile(path.join(runDirectory, "final.txt"), parsed.finalResponse, "utf8");
@@ -313,21 +325,31 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     workspace,
   };
   const infrastructure = classifyRunInfrastructure(processResult, parsed);
+  const toolCalls = extractCodexToolCalls(parsed.events);
 
+  const isTwoArm = options.arm === "both";
   const graderResults = [];
   if (infrastructure.passed) {
     for (const grader of evalCase.graders) {
+      const isIndicator = isGraderIndicator(grader, isTwoArm);
       const result = await evaluateGrader(grader, run, {
         evaluateLlm: (currentGrader, currentRun) =>
           gradeWithCodex(currentGrader, currentRun, { ...options, timeoutMs }, runDirectory),
       });
-      graderResults.push({ name: grader.name, type: grader.type, ...result });
-    }
-  } else {
-    for (const grader of evalCase.graders) {
       graderResults.push({
         name: grader.name,
         type: grader.type,
+        scored: !isIndicator,
+        ...result,
+      });
+    }
+  } else {
+    for (const grader of evalCase.graders) {
+      const isIndicator = isGraderIndicator(grader, isTwoArm);
+      graderResults.push({
+        name: grader.name,
+        type: grader.type,
+        scored: !isIndicator,
         status: "not_run",
         reason: `Main Codex run failed: ${infrastructure.reason}`,
       });
@@ -341,12 +363,16 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   await writeFile(path.join(runDirectory, "workspace.diff"), diffResult.stdout, "utf8");
   await writeFile(path.join(runDirectory, "workspace.status"), statusResult.stdout, "utf8");
 
-  const graderSummary = summarizeGraderResults(graderResults);
+  const graderSummary = summarizeGraderResults(graderResults, isTwoArm);
   const result = {
     case: evalCase.name,
     arm,
     run: runNumber,
     skill,
+    durationSeconds,
+    prompt: evalCase.prompt,
+    finalResponse: parsed.finalResponse,
+    toolCalls,
     infrastructure: {
       ...infrastructure,
       exitCode: processResult.code,
@@ -393,12 +419,32 @@ async function main() {
   for (const evalCase of cases) {
     for (const arm of arms) {
       for (let runNumber = 1; runNumber <= options.runs; runNumber += 1) {
-        process.stderr.write(`Running ${evalCase.name} [${arm}] ${runNumber}/${options.runs}\n`);
-        results.push(await runCase(evalCase, arm, runNumber, skills, options, resultsDirectory));
+        process.stderr.write(
+          `[Running] case=${evalCase.name} arm=${arm} run=${runNumber}/${options.runs}\n`,
+        );
+        const runResult = await runCase(
+          evalCase,
+          arm,
+          runNumber,
+          skills,
+          options,
+          resultsDirectory,
+        );
+        results.push(runResult);
+
+        const scoreStr = runResult.score != null ? runResult.score.toFixed(2) : "N/A";
+        const icon = runResult.perfect ? "✔" : runResult.score === 0 ? "✖" : "⚠";
+        const graderDetails = (runResult.graders ?? [])
+          .map((g) => `${g.name}: ${g.status}`)
+          .join(", ");
+        process.stderr.write(
+          `  ${icon} ${scoreStr} (${graderDetails}) · ${runResult.durationSeconds.toFixed(1)}s\n`,
+        );
       }
     }
   }
 
+  const summary = summarizeResults(results);
   const report = {
     generatedAt: new Date().toISOString(),
     codexVersion: versionResult.stdout.trim(),
@@ -408,10 +454,12 @@ async function main() {
       runs: options.runs,
       arm: options.arm,
       model: options.model ?? null,
+      judgeModel: options.judgeModel ?? options.model ?? null,
       reasoning: options.reasoning ?? null,
+      threshold: options.threshold,
       skipLlmGraders: options.skipLlmGraders,
     },
-    summary: summarizeResults(results),
+    summary,
     results,
   };
   await mkdir(resultsDirectory, { recursive: true });
@@ -419,8 +467,28 @@ async function main() {
     path.join(resultsDirectory, "aggregate-result.json"),
     JSON.stringify(report, null, 2),
   );
-  process.stdout.write(`${JSON.stringify({ resultsDirectory, results }, null, 2)}\n`);
-  if (results.some((result) => !result.perfect)) process.exitCode = 1;
+
+  const table = formatSummaryTable(summary, { threshold: options.threshold });
+  process.stdout.write(`\n${table}\n\n`);
+
+  const html = generateHtmlReport({
+    title: "Codex 插件评测报告",
+    summary,
+    runs: results,
+    options,
+  });
+  await writeFile(path.join(resultsDirectory, "report.html"), html, "utf8");
+  process.stdout.write(`Report: ${path.join(resultsDirectory, "report.html")}\n\n`);
+
+  const withScores = Object.values(summary.cases)
+    .map((c) => c.with?.meanScore)
+    .filter((s) => typeof s === "number");
+  const meanWith = withScores.length
+    ? withScores.reduce((sum, s) => sum + s, 0) / withScores.length
+    : 0;
+  if (meanWith < options.threshold) {
+    process.exitCode = 1;
+  }
 }
 
 main().catch((error) => {

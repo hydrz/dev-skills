@@ -1,5 +1,13 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  escapeHtml,
+  formatSummaryTable,
+  generateHtmlReport,
+  isGraderIndicator,
+} from "../eval-report.lib.mjs";
+
+export { escapeHtml, formatSummaryTable, generateHtmlReport, isGraderIndicator };
 
 function parseScalar(rawValue) {
   const value = rawValue.trim();
@@ -287,16 +295,59 @@ export async function evaluateGrader(grader, run, options = {}) {
   return { status: "unsupported", reason: `Unsupported grader type: ${grader.type}` };
 }
 
-export function summarizeGraderResults(graderResults) {
-  const scored = graderResults.filter((grader) => ["passed", "failed"].includes(grader.status));
+export function extractCodexToolCalls(events) {
+  const toolCalls = [];
+  for (const event of events ?? []) {
+    if (event.type === "item.completed" && event.item) {
+      const item = event.item;
+      if (item.type === "file_change") {
+        toolCalls.push({
+          name: "file_change",
+          duration: 0,
+          parameters: { changes: item.changes },
+        });
+      } else if (item.type === "command_execution") {
+        toolCalls.push({
+          name: "command_execution",
+          duration: 0,
+          parameters: { command: item.command, exitCode: item.exit_code },
+        });
+      } else if (item.type === "mcp_call") {
+        toolCalls.push({
+          name: `mcp:${item.server}/${item.method}`,
+          duration: 0,
+          parameters: item.params ?? {},
+        });
+      }
+    }
+  }
+  return toolCalls;
+}
+
+export function summarizeGraderResults(graderResults, isTwoArm = false) {
+  let resultsToScore = graderResults;
+
+  if (isTwoArm) {
+    const nonIndicators = graderResults.filter(
+      (g) => !isGraderIndicator(g, true) && g.scored !== false,
+    );
+    if (nonIndicators.length > 0) {
+      resultsToScore = nonIndicators;
+    }
+  }
+
+  const scored = resultsToScore.filter(
+    (grader) => grader.scored !== false && ["passed", "failed"].includes(grader.status),
+  );
   const passed = scored.filter((grader) => grader.status === "passed").length;
   return {
     score: scored.length ? passed / scored.length : null,
     perfect:
       scored.length > 0 &&
-      graderResults.every(
-        (grader) => grader.status === "passed" || grader.status === "unsupported",
-      ),
+      graderResults.every((grader) => {
+        if (isGraderIndicator(grader, isTwoArm) || grader.scored === false) return true;
+        return grader.status === "passed" || grader.status === "unsupported";
+      }),
   };
 }
 
@@ -315,11 +366,17 @@ export function summarizeResults(results) {
       const scores = arms[arm]
         .map((result) => result.score)
         .filter((score) => typeof score === "number");
+      const durations = arms[arm]
+        .map((result) => result.durationSeconds ?? 0)
+        .filter((d) => typeof d === "number");
       summarized[arm] = {
         runs: arms[arm].length,
         meanScore: scores.length
           ? scores.reduce((sum, score) => sum + score, 0) / scores.length
           : null,
+        meanDuration: durations.length
+          ? durations.reduce((sum, d) => sum + d, 0) / durations.length
+          : 0,
         perfectRuns: arms[arm].filter((result) => result.perfect).length,
       };
     }
@@ -327,6 +384,19 @@ export function summarizeResults(results) {
       summarized.with?.meanScore != null && summarized.without?.meanScore != null
         ? summarized.with.meanScore - summarized.without.meanScore
         : null;
+
+    let failingNote = "PASS";
+    for (const run of arms.with ?? []) {
+      const failingGrader = (run.graders ?? []).find(
+        (g) => g.status === "failed" && g.scored !== false,
+      );
+      if (failingGrader) {
+        failingNote = `${failingGrader.name}: ${failingGrader.reason}`;
+        break;
+      }
+    }
+    summarized.notes = failingNote;
+
     cases[caseName] = summarized;
   }
 
