@@ -193,8 +193,8 @@ test("loads every existing case and grader", async () => {
   const evalsDirectory = path.resolve("evals");
   const cases = await discoverCases(evalsDirectory);
 
-  assert.equal(cases.length, 14);
-  assert.equal(cases.flatMap((entry) => entry.graders).length, 31);
+  assert.equal(cases.length, 16);
+  assert.equal(cases.flatMap((entry) => entry.graders).length, 35);
   assert.deepEqual(
     Object.fromEntries(
       Object.entries(
@@ -206,7 +206,7 @@ test("loads every existing case and grader", async () => {
           }, {}),
       ).sort(),
     ),
-    { llm: 9, regex: 7, tool_order: 1, tool_used: 14 },
+    { llm: 11, regex: 9, tool_order: 1, tool_used: 14 },
   );
 });
 

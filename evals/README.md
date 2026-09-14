@@ -28,8 +28,22 @@
 | `grilling-scope-breadth` | `grilling` | 触发、行为 | `llm` | 追问面向用户的功能时，覆盖非默认状态和各端、各角色的差异 |
 | `verify-ui-states-against-design` | `verifying-completion` | 触发、行为 | `llm` | 页面任务只验证了默认状态时，不宣布完成，要求逐个状态与设计依据截图对比 |
 | `prototype-writes-back-design-basis` | `prototype` | 触发、行为 | `llm` | UI 原型选定变体后，把各状态截图写回功能项的设计依据 |
+| `to-spec-splits-by-module-and-batch` | `to-spec` | 行为（按正文执行） | `regex`、`llm` | 功能清单跨多个业务模块时，只产出当前批次的规格拆分表并停止 |
+| `to-tickets-covers-current-batch` | `to-tickets` | 行为（按正文执行） | `regex`、`llm` | 覆盖当前批次的每个状态和每条非功能需求，延后的状态不分配给本批次任务 |
 
-不在范围内：`implement-spec` 等仅用户触发、依赖子代理、git 和命令执行的编排流程。这类 skill 无法在不加载插件的基线中调用，也需要 Bash 才能真实运行。
+### 按正文执行的用例
+
+仅用户触发的 skill（`to-spec`、`to-tickets` 等）在评测中无法通过斜杠命令调用。带 `orchestrator` 标签的用例改为把 skill 正文和测试文件直接嵌进 prompt，请 agent 按正文执行，用 grader 检查结果：
+
+- 它们测的是 skill 正文能否让 agent 做对，不测触发。
+- 不加载插件的基线也能看到同样的正文，`Δ` 没有意义。运行时加 `--ablation none`（Codex 和 Antigravity 用默认的 `--arm with`）。
+- prompt 由 `prompt.template.md` 生成：模板中的 `{{skill:<分类>/<名称>}}` 会替换成对应 `SKILL.md` 去掉 frontmatter 后的正文。修改这些 skill 后运行 `node scripts/eval-fixtures/build-prompts.mjs` 重新生成；`npm test` 会检查生成结果是否最新。
+
+```bash
+npm run eval:claude -- --tag orchestrator --ablation none
+```
+
+不在范围内：`implement-spec` 等依赖子代理、git 和命令执行的编排流程。这类流程需要 Bash 和多个子会话才能真实运行。
 
 `grill-me-question-format` 和 `domain-modeling-context-format` 检验的是本仓库特有的格式约定，基线模型不太可能自发采用，是最能体现 `Δ` 的两个 case；其余大多数 case 检验的行为（先测试、不轻信未核实的结论、把决定权交给用户）本身也是 Sonnet 5 的默认倾向，`Δ` 经常接近 0——这说明触发有效，但不代表插件改变了结果，参考下方“读结果”表。
 
