@@ -1,19 +1,19 @@
-本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](../CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](../docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
+本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
 
-## 目录
+## 目录与自定义结构
 
 skill 按分类放在 `skills/` 下：
 
 - `engineering/`：工程 skill，用于需求澄清、实现、调试、评审和交付
 - `productivity/`：协作与思考 skill，用于方案澄清、交接、学习等非代码工作流
 
-每个 skill 一个目录，`SKILL.md` 必需。参考文件放在同一目录，只有部分分支需要的内容才拆出去（渐进披露）。
+Antigravity 通过 `.agents/skills.json` 自动索引 `skills/engineering` 和 `skills/productivity` 目录下的所有技能。每个 skill 一个独立目录，`SKILL.md` 必需。参考文件放在同一目录，按需拆出（渐进披露）。
 
-## 登记
+## 登记与多端同步
 
 新增、改名、删除 skill，或改变 skill 的用法、触发方式时，同步以下位置：
 
-1. `.claude-plugin/plugin.json` 的 `skills` 数组（发布新版本或更新元数据时，同步更新根目录 `plugin.json` 与 `.codex-plugin/plugin.json`）
+1. `.claude-plugin/plugin.json` 的 `skills` 数组（更新版本或元数据时，同步根目录 `plugin.json` 与 `.codex-plugin/plugin.json`）
 2. 所在分类的 `README.md`：完整清单，skill 名链接到其 `SKILL.md`，附中文显示名和一句话定位
 3. `skills/engineering/guide/SKILL.md`：路由必须覆盖每个用户可以使用的 skill，否则会给出错误建议
 4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
@@ -24,7 +24,7 @@ skill 按分类放在 `skills/` 下：
 
 ## 触发方式
 
-每个 `SKILL.md` 二选一，规则见 [docs/invocation.md](../docs/invocation.md)：
+每个 `SKILL.md` 二选一，规则见 [docs/invocation.md](docs/invocation.md)：
 
 - **仅用户触发**（user-invoked）：frontmatter 写 `disable-model-invocation: true`。description 是给人看的一句话摘要，说明使用场景、产出结果，以及与最相近 skill 的区别。
 - **可自动触发**（model-invoked）：不写该字段。description 面向 agent，写清触发分支，并同时给出中英文触发词；触发范围保持足够窄。
