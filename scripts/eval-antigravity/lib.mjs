@@ -2,10 +2,13 @@ import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
+  copyRequiredSkills,
   discoverCases,
   evaluateRegexGrader,
   findSkills,
   parseMarkdownWithFrontmatter,
+  primarySkillForCase,
+  requiredSkillsForCase,
 } from "../eval-codex/lib.mjs";
 import {
   escapeHtml,
@@ -15,6 +18,7 @@ import {
 } from "../eval-report.lib.mjs";
 
 export {
+  copyRequiredSkills,
   discoverCases,
   escapeHtml,
   evaluateRegexGrader,
@@ -23,6 +27,8 @@ export {
   generateHtmlReport,
   isGraderIndicator,
   parseMarkdownWithFrontmatter,
+  primarySkillForCase,
+  requiredSkillsForCase,
 };
 
 export function buildAgyArgs(options) {
@@ -163,27 +169,27 @@ export async function initializeAgyWorkspace(workspace, evalCase, arm, skills) {
     }
   }
 
-  const targetSkillName = (evalCase.metadata.tags ?? []).find((tag) => skills.has(tag));
-  if (!targetSkillName || arm === "without") return null;
+  const targetSkillNames = requiredSkillsForCase(evalCase, skills);
+  if (targetSkillNames.length === 0 || arm === "without") return null;
 
-  const skillPath = skills.get(targetSkillName);
-  const targetDirectory = path.join(workspace, ".agents", "skills", targetSkillName);
-  await mkdir(path.dirname(targetDirectory), { recursive: true });
-  await cp(skillPath, targetDirectory, { recursive: true });
+  await copyRequiredSkills(workspace, evalCase, skills);
 
   // 写入 .agents/skills.json 索引
   const skillsJsonPath = path.join(workspace, ".agents", "skills.json");
   const skillsJson = {
-    skills: {
-      [targetSkillName]: {
-        name: targetSkillName,
-        path: `.agents/skills/${targetSkillName}/SKILL.md`,
-      },
-    },
+    skills: Object.fromEntries(
+      targetSkillNames.map((targetSkillName) => [
+        targetSkillName,
+        {
+          name: targetSkillName,
+          path: `.agents/skills/${targetSkillName}/SKILL.md`,
+        },
+      ]),
+    ),
   };
   await writeFile(skillsJsonPath, JSON.stringify(skillsJson, null, 2), "utf8");
 
-  return targetSkillName;
+  return primarySkillForCase(evalCase, skills);
 }
 
 export function extractSkillFromGrader(grader) {

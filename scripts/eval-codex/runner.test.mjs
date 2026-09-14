@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -8,6 +8,7 @@ import test from "node:test";
 import {
   buildCodexArgs,
   classifyRunInfrastructure,
+  copyRequiredSkills,
   discoverCases,
   evaluateGrader,
   evaluateRegexGrader,
@@ -19,6 +20,8 @@ import {
   isGraderIndicator,
   parseJsonl,
   parseMarkdownWithFrontmatter,
+  primarySkillForCase,
+  requiredSkillsForCase,
   summarizeGraderResults,
   summarizeResults,
 } from "./lib.mjs";
@@ -43,6 +46,58 @@ target:
     target: { source: "file", path: "CONTEXT.md" },
   });
   assert.equal(document.body, "用户请求");
+});
+
+test("requiredSkillsForCase prefers an explicit multi-skill list", () => {
+  const skills = new Map([
+    ["writing-chinese", "skills/writing-chinese"],
+    ["writing-for-agents", "skills/writing-for-agents"],
+  ]);
+  const evalCase = {
+    name: "combined-writing",
+    metadata: {
+      tags: ["writing-chinese", "behavior"],
+      required_skills: ["writing-chinese", "writing-for-agents"],
+    },
+  };
+
+  assert.deepEqual(requiredSkillsForCase(evalCase, skills), [
+    "writing-chinese",
+    "writing-for-agents",
+  ]);
+  assert.equal(primarySkillForCase(evalCase, skills), "writing-chinese");
+});
+
+test("copyRequiredSkills installs multiple skills and keeps tag fallback", async () => {
+  const workspace = await mkdtemp(path.join(os.tmpdir(), "codex-skills-workspace-"));
+  const skillsRoot = await mkdtemp(path.join(os.tmpdir(), "codex-skills-source-"));
+  const skills = new Map();
+
+  for (const name of ["writing-chinese", "writing-for-agents"]) {
+    const directory = path.join(skillsRoot, name);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, "SKILL.md"), `# ${name}\n`, "utf8");
+    skills.set(name, directory);
+  }
+
+  const multiCase = {
+    name: "combined-writing",
+    metadata: {
+      tags: ["writing-chinese"],
+      required_skills: ["writing-for-agents", "writing-chinese"],
+    },
+  };
+  await copyRequiredSkills(workspace, multiCase, skills);
+  assert.equal(primarySkillForCase(multiCase, skills), "writing-chinese");
+  for (const name of ["writing-chinese", "writing-for-agents"]) {
+    assert.match(
+      await readFile(path.join(workspace, ".agents", "skills", name, "SKILL.md"), "utf8"),
+      new RegExp(name),
+    );
+  }
+
+  const singleCase = { name: "single-writing", metadata: { tags: ["writing-chinese"] } };
+  assert.deepEqual(requiredSkillsForCase(singleCase, skills), ["writing-chinese"]);
 });
 
 test("regex grader checks the final response", async () => {
@@ -193,8 +248,8 @@ test("loads every existing case and grader", async () => {
   const evalsDirectory = path.resolve("evals");
   const cases = await discoverCases(evalsDirectory);
 
-  assert.equal(cases.length, 18);
-  assert.equal(cases.flatMap((entry) => entry.graders).length, 39);
+  assert.equal(cases.length, 27);
+  assert.equal(cases.flatMap((entry) => entry.graders).length, 58);
   assert.deepEqual(
     Object.fromEntries(
       Object.entries(
@@ -206,14 +261,14 @@ test("loads every existing case and grader", async () => {
           }, {}),
       ).sort(),
     ),
-    { llm: 13, regex: 9, tool_order: 1, tool_used: 16 },
+    { llm: 22, regex: 9, tool_order: 1, tool_used: 26 },
   );
 });
 
 test("indexes all repository skills by frontmatter name", async () => {
   const skills = await findSkills(path.resolve("skills"));
 
-  assert.equal(skills.size, 33);
+  assert.equal(skills.size, 34);
   assert.match(skills.get("tdd"), /skills[\\/]tdd$/);
   assert.match(skills.get("grilling"), /skills[\\/]grilling$/);
 });

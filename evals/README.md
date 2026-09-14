@@ -33,6 +33,15 @@
 | `prototype-writes-back-design-basis` | `prototype` | 触发、行为 | `llm` | UI 原型选定变体后，把各状态截图写回功能项的设计依据 |
 | `to-spec-splits-by-module-and-batch` | `to-spec` | 行为（按正文执行） | `regex`、`llm` | 功能清单跨多个业务模块时，只产出当前批次的规格拆分表并停止 |
 | `to-tickets-covers-current-batch` | `to-tickets` | 行为（按正文执行） | `regex`、`llm` | 覆盖当前批次的每个状态和每条非功能需求，延后的状态不分配给本批次任务 |
+| `writing-chinese-rewrites-technical-text` | `writing-chinese` | 触发、行为 | `llm` | 清理翻译腔和信息顺序，同时保留发布比例、审批人与禁止条件 |
+| `writing-chinese-asks-about-material-ambiguity` | `writing-chinese` | 触发、行为 | `llm` | 代词会改变发布权限时先确认所指，不擅自选择解释 |
+| `writing-chinese-preserves-traditional` | `writing-chinese` | 触发、行为 | `llm` | 改写繁体中文时保持中文变体和全部业务条件 |
+| `writing-chinese-preserves-agent-instructions` | `writing-chinese` | 触发、行为 | `llm` | 改写 agent 指令时保留触发条件、停止规则和完成条件 |
+| `writing-chinese-does-not-trigger-for-short-chat` | `writing-chinese` | 反例 | `tool_used`（不得触发）、`llm` | 代写一句简单聊天回复时直接回答，不加载完整写作流程 |
+| `writing-chinese-surfaces-missing-premise` | `writing-chinese` | 触发、行为 | `llm` | 面向新人的操作说明缺少执行与完成条件时暴露信息缺口 |
+| `writing-chinese-unpacks-terms-for-reader` | `writing-chinese` | 触发、行为 | `llm` | 面向非技术读者解释术语，同时保留阈值和具体行为 |
+| `writing-chinese-resists-over-compression` | `writing-chinese` | 触发、行为、压力 | `llm` | 用户要求极短文案时仍保留制度中的条件和例外 |
+| `writing-chinese-does-not-replace-reexplanation` | `writing-chinese` | 反例 | `tool_used`（不得触发）、`llm` | 只需重新解释上一段时不进入成篇写作流程 |
 
 ### 按正文执行的用例
 
@@ -115,6 +124,8 @@ claude plugin eval . --allow-tools Write Edit
 ## 添加 case
 
 在 `evals/<case 名称>/` 下新建 `prompt.md` 和 `graders/`。case 名称在整个套件内唯一，用短横线连接的英文描述。
+
+一个用例需要同时提供多个 skill 时，在 prompt frontmatter 中写 `required_skills: [<skill>, <依赖 skill>]`，WITH 组会把列表中的 skill 全部注入隔离工作区。报告中的主 skill 仍取 `tags` 中第一个匹配的名称，不受依赖排列顺序影响。普通单 skill 用例继续通过 `tags` 中的 skill 名推断，不必添加该字段。
 
 ```markdown
 ---
@@ -247,4 +258,3 @@ npm run eval:agy -- --tag tdd --arm both --runs 3
 | `--dry-run` | 只检查用例发现和 grader 兼容性 |
 
 结果写入 `evals/results/antigravity-<时间戳>/`。
-

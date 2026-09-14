@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import {
   escapeHtml,
@@ -277,6 +277,36 @@ export async function findSkills(skillsDirectory) {
 
   await visit(skillsDirectory);
   return skills;
+}
+
+export function requiredSkillsForCase(evalCase, skills) {
+  const configured = evalCase.metadata.required_skills;
+  const names = Array.isArray(configured)
+    ? configured
+    : [(evalCase.metadata.tags ?? []).find((tag) => skills.has(tag))].filter(Boolean);
+
+  for (const name of names) {
+    if (!skills.has(name)) throw new Error(`${evalCase.name} requires unknown skill: ${name}`);
+  }
+  return [...new Set(names)];
+}
+
+export function primarySkillForCase(evalCase, skills) {
+  return (
+    (evalCase.metadata.tags ?? []).find((tag) => skills.has(tag)) ??
+    requiredSkillsForCase(evalCase, skills)[0] ??
+    null
+  );
+}
+
+export async function copyRequiredSkills(workspace, evalCase, skills) {
+  const names = requiredSkillsForCase(evalCase, skills);
+  for (const name of names) {
+    const destination = path.join(workspace, ".agents", "skills", name);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await cp(skills.get(name), destination, { recursive: true });
+  }
+  return names;
 }
 
 export async function evaluateGrader(grader, run, options = {}) {
