@@ -12,7 +12,11 @@ import {
   evaluateGrader,
   evaluateRegexGrader,
   evaluateToolOrderGrader,
+  extractCodexToolCalls,
   findSkills,
+  formatSummaryTable,
+  generateHtmlReport,
+  isGraderIndicator,
   parseJsonl,
   parseMarkdownWithFrontmatter,
   summarizeGraderResults,
@@ -250,17 +254,102 @@ test("does not call an all-unsupported run perfect", () => {
 
 test("summarizes WITH/WITHOUT scores and their delta", () => {
   const summary = summarizeResults([
-    { case: "example", arm: "with", score: 1, perfect: true },
-    { case: "example", arm: "with", score: 0.5, perfect: false },
-    { case: "example", arm: "without", score: 0.25, perfect: false },
-    { case: "example", arm: "without", score: 0.5, perfect: false },
+    { case: "example", arm: "with", score: 1, perfect: true, durationSeconds: 2.0 },
+    { case: "example", arm: "with", score: 0.5, perfect: false, durationSeconds: 4.0 },
+    { case: "example", arm: "without", score: 0.25, perfect: false, durationSeconds: 1.0 },
+    { case: "example", arm: "without", score: 0.5, perfect: false, durationSeconds: 3.0 },
   ]);
 
   assert.deepEqual(summary.cases.example, {
-    with: { runs: 2, meanScore: 0.75, perfectRuns: 1 },
-    without: { runs: 2, meanScore: 0.375, perfectRuns: 0 },
+    with: { runs: 2, meanScore: 0.75, meanDuration: 3.0, perfectRuns: 1 },
+    without: { runs: 2, meanScore: 0.375, meanDuration: 2.0, perfectRuns: 0 },
     delta: 0.375,
+    notes: "PASS",
   });
+});
+
+test("extractCodexToolCalls converts file_change and command_execution items", () => {
+  const events = [
+    {
+      type: "item.completed",
+      item: {
+        type: "file_change",
+        changes: [{ path: "src/foo.ts", kind: "add" }],
+      },
+    },
+    {
+      type: "item.completed",
+      item: {
+        type: "command_execution",
+        command: "npm test",
+        exit_code: 0,
+      },
+    },
+  ];
+
+  const tools = extractCodexToolCalls(events);
+  assert.equal(tools.length, 2);
+  assert.equal(tools[0].name, "file_change");
+  assert.equal(tools[1].name, "command_execution");
+  assert.equal(tools[1].parameters.command, "npm test");
+});
+
+test("formatSummaryTable outputs standard table with delta and metrics for codex", () => {
+  const summary = {
+    cases: {
+      "codex-demo": {
+        with: { runs: 1, meanScore: 1.0, meanDuration: 5.2 },
+        without: { runs: 1, meanScore: 0.5, meanDuration: 4.0 },
+        delta: 0.5,
+        notes: "PASS",
+      },
+    },
+  };
+
+  const table = formatSummaryTable(summary);
+  assert.ok(table.includes("codex-demo"));
+  assert.ok(table.includes("1.00"));
+  assert.ok(table.includes("+0.50"));
+});
+
+test("generateHtmlReport generates standalone HTML document for codex", () => {
+  const data = {
+    title: "Codex 插件评测报告",
+    summary: {
+      cases: {
+        "codex-demo": {
+          with: { runs: 1, meanScore: 1.0, meanDuration: 5.2 },
+          without: { runs: 1, meanScore: 0.5, meanDuration: 4.0 },
+          delta: 0.5,
+          notes: "PASS",
+        },
+      },
+    },
+    runs: [
+      {
+        case: "codex-demo",
+        arm: "with",
+        run: 1,
+        score: 1.0,
+        perfect: true,
+        durationSeconds: 5.2,
+        prompt: "demo prompt",
+        finalResponse: "demo response",
+        toolCalls: [{ name: "file_change", duration: 0, parameters: { changes: [] } }],
+        graders: [{ name: "check", type: "regex", status: "passed", weight: 1 }],
+      },
+    ],
+    options: {
+      model: "gpt-4o-mini",
+      threshold: 1.0,
+    },
+  };
+
+  const html = generateHtmlReport(data);
+  assert.ok(html.includes("<!DOCTYPE html>"));
+  assert.ok(html.includes("Codex 插件评测报告"));
+  assert.ok(html.includes("codex-demo"));
+  assert.ok(html.includes("file_change"));
 });
 
 test("allows transient error events when the turn ultimately completes", () => {
