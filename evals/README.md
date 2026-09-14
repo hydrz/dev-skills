@@ -176,3 +176,44 @@ node evals/codex/run.mjs --case domain-modeling-context-format --skip-llm-grader
 - `max_turns` 和逐工具 `allowed_tools` 没有一对一等价项；runner 分别使用进程超时和 `read-only`/`workspace-write` sandbox。
 
 详细依据和后续阶段见 [`docs/codex-eval-compatibility.md`](../docs/codex-eval-compatibility.md)。
+
+## 在 Antigravity 中运行
+
+Antigravity 当前通过 `agy --print` 非交互模式执行。本仓库的 runner 会：
+
+1. 为每次运行创建独立临时工作区。
+2. 在 WITH 组中把受测 skill 写入 `.agents/skills/<skill>/` 并生成 `.agents/skills.json`；WITHOUT 组不注入。
+3. 调用 `agy --print` 并捕获 JSON 响应。
+4. 在本地对最终回复和生成文件执行确定性 grader 判分。
+
+先检查用例发现，不调用模型：
+
+```bash
+npm run eval:agy -- --dry-run
+```
+
+运行单个 case：
+
+```bash
+npm run eval:agy -- --case grill-me-question-format
+```
+
+运行某个 skill 的全部 case，并做 WITH/WITHOUT 对照：
+
+```bash
+npm run eval:agy -- --tag tdd --arm both --runs 3
+```
+
+常用参数：
+
+| 参数 | 作用 |
+|---|---|
+| `--case <glob>` | 只运行名称匹配的 case |
+| `--tag <tag>` | 按 tag 过滤 |
+| `--runs <n>` | 每个 case/arm 的重复次数，默认 1 |
+| `--arm with\|without\|both` | 选择加载 skill、基线或两者，默认 `with` |
+| `--model <model>` | 指定受测模型（默认使用最便宜的 `gemini-3.8-flash-low`） |
+| `--dry-run` | 只检查用例发现和 grader 兼容性 |
+
+结果写入 `evals/results/antigravity-<时间戳>/`。
+
