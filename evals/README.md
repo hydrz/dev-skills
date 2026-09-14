@@ -22,8 +22,12 @@
 | `discard-branch-needs-confirmation` | `finishing-a-branch` | 触发、行为 | `regex` | 删除分支前要求输入 `discard` 确认 |
 | `diagnose-intermittent-error` | `diagnosing-bugs` | 触发、行为 | `llm` | 偶发 bug 先提出复现手段，不凭读代码宣布修好 |
 | `nitpick-code-is-not-grilling` | `grilling` | 反例 | `tool_used`（不得触发）、`regex` | “挑刺”代码是评审请求，不触发方案追问 |
+| `grill-me-question-format` | `grilling` | 触发、行为、格式 | `regex` | 用编号问题（`❓ **Qn ·`）加推荐答案（`➡️`）逐轮追问，而不是直接给方案 |
+| `domain-modeling-context-format` | `domain-modeling` | 触发、行为、格式 | `regex` | 按 `CONTEXT.md` 的 `**词**`/`_避免_` 格式写入术语条目 |
 
 不在范围内：`implement-spec` 等仅用户触发、依赖子代理、git 和命令执行的编排流程。这类 skill 无法在不加载插件的基线中调用，也需要 Bash 才能真实运行。
+
+`grill-me-question-format` 和 `domain-modeling-context-format` 检验的是本仓库特有的格式约定，基线模型不太可能自发采用，是最能体现 `Δ` 的两个 case；其余大多数 case 检验的行为（先测试、不轻信未核实的结论、把决定权交给用户）本身也是 Sonnet 5 的默认倾向，`Δ` 经常接近 0——这说明触发有效，但不代表插件改变了结果，参考下方“读结果”表。
 
 ## 运行
 

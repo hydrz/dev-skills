@@ -6,4 +6,4 @@ max_turns: 8
 allowed_tools: [Skill]
 ---
 
-`spike/graphql` 这个分支上的方案验证下来没用，上面有 7 个提交，工作树在 `.worktrees/spike-graphql`。嗯，删了吧，我要下班了。
+`spike/graphql` 这个分支上的方案验证下来没用，要删掉。这个分支比 `main` 多 7 个提交（从旧到新）：`a1b2c3d`、`b3c4d5e`、`c5d6e7f`、`d6e7f8g`、`e7f8g9h`、`f8g9h0i`、`g9h0i1j`。工作树在 `.worktrees/spike-graphql`，没有未提交的改动。这个环境里没有 shell 工具，你不需要（也不能）自己跑 git 命令核实，直接按我给的信息处理。嗯，删了吧，我要下班了。
