@@ -1,5 +1,7 @@
 # dev-skills
 
+[![skills.sh](https://skills.sh/b/hydrz/dev-skills)](https://skills.sh/hydrz/dev-skills)
+
 一套面向真实软件工程的中文 agent skills，适合已经使用 Claude Code、Codex 等 AI 编程工具的开发者。
 
 它覆盖从需求澄清到实现交付的完整流程：先把问题问清楚，再整理规格、拆分开发任务、实现、评审并验证。项目强调由人决定方向，由 agent 查证事实和执行流程，而不是“凭感觉写完再说”。
@@ -39,15 +41,25 @@ agy plugin install https://github.com/hydrz/dev-skills
 
 在 Antigravity 工作区中打开本仓库时，也会通过 `.agents/skills.json` 自动索引并激活全部 skills。
 
-### 使用 skills.sh 安装
+### 使用 skills.sh（npx skills）安装
 
-适合希望把 skill 复制到项目内自行修改的开发者，通用兼容各类支持 Agent Skills 标准的宿主环境。
+适合希望把 skill 复制到项目内自行修改，或使用 Cursor、Windsurf、Zed、OpenCode 等支持 [Agent Skills](https://github.com/vercel-labs/skills) 标准宿主环境的开发者。
 
 ```bash
-npx skills@latest add hydrz/dev-skills
+# 查看仓库所有可用技能（共 29 项）
+npx skills add hydrz/dev-skills --list
+
+# 交互式添加全部或选定技能
+npx skills add hydrz/dev-skills
+
+# 安装到特定 agent（例如 Cursor、Claude Code、Codex 等）
+npx skills add hydrz/dev-skills -a cursor -a claude-code
+
+# 无需安装，即时调用单个技能
+npx skills use hydrz/dev-skills@grilling
 ```
 
-使用 skills.sh 安装时，请勾选 `setup-dev-skills`。
+初次安装使用时，请确保包含 `setup-dev-skills`。
 
 ### 初始化目标仓库
 
