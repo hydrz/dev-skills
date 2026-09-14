@@ -83,7 +83,10 @@ export async function evaluateRegexGrader(grader, run) {
     }
 
     try {
-      target = await readFile(new URL(grader.target.path, `file:///${run.workspace.replaceAll("\\", "/")}/`), "utf8");
+      target = await readFile(
+        new URL(grader.target.path, `file:///${run.workspace.replaceAll("\\", "/")}/`),
+        "utf8",
+      );
     } catch (error) {
       return { status: "failed", reason: `Unable to read ${grader.target.path}: ${error.message}` };
     }
@@ -170,7 +173,9 @@ export async function discoverCases(evalsDirectory, filters = {}) {
     const graders = [];
     try {
       const graderEntries = await readdir(graderDirectory, { withFileTypes: true });
-      for (const graderEntry of graderEntries.sort((left, right) => left.name.localeCompare(right.name))) {
+      for (const graderEntry of graderEntries.sort((left, right) =>
+        left.name.localeCompare(right.name),
+      )) {
         if (!graderEntry.isFile() || !graderEntry.name.endsWith(".md")) continue;
         const graderDocument = parseMarkdownWithFrontmatter(
           await readFile(path.join(graderDirectory, graderEntry.name), "utf8"),
@@ -289,7 +294,9 @@ export function summarizeGraderResults(graderResults) {
     score: scored.length ? passed / scored.length : null,
     perfect:
       scored.length > 0 &&
-      graderResults.every((grader) => grader.status === "passed" || grader.status === "unsupported"),
+      graderResults.every(
+        (grader) => grader.status === "passed" || grader.status === "unsupported",
+      ),
   };
 }
 
@@ -310,7 +317,9 @@ export function summarizeResults(results) {
         .filter((score) => typeof score === "number");
       summarized[arm] = {
         runs: arms[arm].length,
-        meanScore: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : null,
+        meanScore: scores.length
+          ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+          : null,
         perfectRuns: arms[arm].filter((result) => result.perfect).length,
       };
     }
