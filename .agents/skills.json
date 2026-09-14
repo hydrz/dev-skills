@@ -1,6 +1,3 @@
 {
-  "entries": [
-    { "path": "skills/engineering" },
-    { "path": "skills/productivity" }
-  ]
+  "entries": [{ "path": "skills/engineering" }, { "path": "skills/productivity" }]
 }

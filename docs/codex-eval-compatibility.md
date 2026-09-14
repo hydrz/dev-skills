@@ -46,19 +46,19 @@ codex exec --ephemeral --sandbox read-only \
 
 ## 与现有 `evals/` 的差距
 
-| 现有约定 | Codex 可用信号 | 兼容判定 |
-|---|---|---|
-| `prompt.md` 中的用户请求 | `codex exec` 的 prompt 参数或 stdin | 正文可复用；frontmatter 需由 runner 解析 |
-| `description` / `expected_outcome` / `tags` | 自定义 runner 元数据 | 可保留，Codex CLI 本身不读 |
-| `timeout_seconds` | runner 的子进程超时 | 可精确转换 |
-| `max_turns` | 无公开的等价 CLI 参数 | 不能直接转换；改用超时、token/命令预算或仅作 Claude 元数据 |
-| `allowed_tools` | sandbox、工作区隔离、可用依赖配置 | 没有通用的逐工具 allowlist 等价参数；需按能力改写 |
-| `regex` grader | 对最后消息或产物做本地正则 | 可直接移植语义 |
-| `llm` grader | 只读 `codex exec --output-schema` | 可移植 rubric，但输出格式要改为 JSON Schema |
-| `tool_order` + `Write` | JSONL `item.*` 事件、产物或额外仪器 | 概念可移植，原工具名和事件结构不可直译 |
-| `tool_used: Skill` | 官方未公开专用 skill-invocation JSONL 事件 | 当前不能可靠直译；显式 case 用 `$skill`，隐式 case 以结果行为作为主信号 |
-| `min/max` 反例 | runner 取反后聚合 | 可实现 |
-| `arm: both` 及 WITH/WITHOUT/Δ | 两组隔离运行 | 需自定义 ablation，Codex CLI 不自动提供 |
+| 现有约定                                    | Codex 可用信号                             | 兼容判定                                                                |
+| ------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
+| `prompt.md` 中的用户请求                    | `codex exec` 的 prompt 参数或 stdin        | 正文可复用；frontmatter 需由 runner 解析                                |
+| `description` / `expected_outcome` / `tags` | 自定义 runner 元数据                       | 可保留，Codex CLI 本身不读                                              |
+| `timeout_seconds`                           | runner 的子进程超时                        | 可精确转换                                                              |
+| `max_turns`                                 | 无公开的等价 CLI 参数                      | 不能直接转换；改用超时、token/命令预算或仅作 Claude 元数据              |
+| `allowed_tools`                             | sandbox、工作区隔离、可用依赖配置          | 没有通用的逐工具 allowlist 等价参数；需按能力改写                       |
+| `regex` grader                              | 对最后消息或产物做本地正则                 | 可直接移植语义                                                          |
+| `llm` grader                                | 只读 `codex exec --output-schema`          | 可移植 rubric，但输出格式要改为 JSON Schema                             |
+| `tool_order` + `Write`                      | JSONL `item.*` 事件、产物或额外仪器        | 概念可移植，原工具名和事件结构不可直译                                  |
+| `tool_used: Skill`                          | 官方未公开专用 skill-invocation JSONL 事件 | 当前不能可靠直译；显式 case 用 `$skill`，隐式 case 以结果行为作为主信号 |
+| `min/max` 反例                              | runner 取反后聚合                          | 可实现                                                                  |
+| `arm: both` 及 WITH/WITHOUT/Δ               | 两组隔离运行                               | 需自定义 ablation，Codex CLI 不自动提供                                 |
 
 仓库当前 10 个 case 的结果 grader 大部分可以迁移：`regex` 可做本地确定性检查，`llm` 可转成带 schema 的第二次 Codex 评分。两类过程 grader 需要特别处理：所有 `skill-fired.md` 暂时只能降级为非计分诊断；`tdd-new-function` 的 `tool_order` 不能依赖 Claude 的 `Write` 工具名，应改为验证 Codex JSONL 实际 file-change 事件，或用一个可观测的测试先行证据替代。
 

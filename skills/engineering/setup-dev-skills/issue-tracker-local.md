@@ -22,12 +22,12 @@ Assignee: none
 Blocked by: none
 ```
 
-| 字段 | 取值 | 对应 GitHub 概念 |
-|---|---|---|
-| `Labels` | 分诊角色（见 `triage-labels.md`）、类别（`bug`、`enhancement`）或 `wayfinder:*` 标签，逗号分隔；没有时写 `none` | 标签 |
-| `State` | `open` 或 `closed` | 打开、关闭 |
-| `Assignee` | 认领者名称；未认领时写 `none` | 指派人 |
-| `Blocked by` | 同一目录下前置 issue 的编号，逗号分隔；没有时写 `none` | 依赖关系 |
+| 字段         | 取值                                                                                                            | 对应 GitHub 概念 |
+| ------------ | --------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `Labels`     | 分诊角色（见 `triage-labels.md`）、类别（`bug`、`enhancement`）或 `wayfinder:*` 标签，逗号分隔；没有时写 `none` | 标签             |
+| `State`      | `open` 或 `closed`                                                                                              | 打开、关闭       |
+| `Assignee`   | 认领者名称；未认领时写 `none`                                                                                   | 指派人           |
+| `Blocked by` | 同一目录下前置 issue 的编号，逗号分隔；没有时写 `none`                                                          | 依赖关系         |
 
 字段行之后是正文。评论和讨论记录追加到文件末尾的 `## 评论` 标题下，每条评论以日期开头。
 

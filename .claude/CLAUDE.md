@@ -19,6 +19,7 @@ skill 按分类放在 `skills/` 下：
 4. 顶层 `README.md`：只保留典型场景和主工作流，不维护完整清单；只有改动影响这两部分时才更新
 
 改完后运行：
+
 - Claude Code 校验：`claude plugin validate . --strict`
 - Antigravity 校验：`agy plugin validate .`
 
