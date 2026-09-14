@@ -44,7 +44,7 @@ GitHub 的 issue 和 PR 共用一套编号，裸编号 `#42` 可能是其中任�
 供 `/wayfinder` 使用。**地图**是一个汇总 issue，它的子 issue 是决策项。
 
 - **地图**：带 `wayfinder:map` 标签的 issue，正文包含目标、备注、已做决策、尚未明确、不在范围内。创建命令：`gh issue create --label wayfinder:map`。
-- **决策项**：以 GitHub sub-issue 关联到地图的 issue（通过 sub-issues 接口 `gh api` 关联）。未启用 sub-issues 时，把决策项加到地图正文的任务列表中，并在决策项正文顶部写 `Part of #<地图>`。标签：`wayfinder:<类型>`（`research`、`prototype`、`grilling`、`task`）。认领后指派给推进地图的开发者。
+- **决策项**：以 GitHub sub-issue 关联到地图的 issue（通过 sub-issues 接口 `gh api` 关联）。未启用 sub-issues 时，把决策项加到地图正文的任务列表中，并在决策项正文顶部写 `Part of #<地图>`。标签：`wayfinder:<类型>`（`research`、`prototype`、`design`、`grilling`、`task`）。认领后指派给推进地图的开发者。
 - **依赖**：见上文“依赖关系”。
 - **查询可领取决策项**：列出地图下未关闭的子 issue，排除仍有未关闭前置 issue 的，以及已有指派人的；按地图顺序选第一个。
 - **认领**：`gh issue edit <n> --add-assignee @me`，这是会话中的第一个写操作。

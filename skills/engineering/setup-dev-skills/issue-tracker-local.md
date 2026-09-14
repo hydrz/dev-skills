@@ -57,7 +57,7 @@ Blocked by: none
 供 `/wayfinder` 使用。每张地图一个目录：`.scratch/wayfinder/<工作-slug>/`。它与功能目录分开，避免决策项和开发任务混在同一个 `issues/` 目录中。
 
 - **地图**：`.scratch/wayfinder/<工作-slug>/map.md`，`Labels: wayfinder:map`，正文包含目标、备注、已做决策、尚未明确、不在范围内。
-- **决策项**：`.scratch/wayfinder/<工作-slug>/issues/NN-<slug>.md`，从 `01` 编号，正文是问题。`Labels` 写 `wayfinder:<类型>`（`research`、`prototype`、`grilling`、`task` 之一）。
+- **决策项**：`.scratch/wayfinder/<工作-slug>/issues/NN-<slug>.md`，从 `01` 编号，正文是问题。`Labels` 写 `wayfinder:<类型>`（`research`、`prototype`、`design`、`grilling`、`task` 之一）。
 - **依赖**：`Blocked by` 行，编号指同一地图下的决策项。
 - **查询可领取决策项**：扫描 `issues/`，找出 `State: open`、已解除阻塞且 `Assignee: none` 的文件；选编号最小的。
 - **认领**：把 `Assignee` 改为推进地图的开发者并保存，这是会话中的第一个写操作。
