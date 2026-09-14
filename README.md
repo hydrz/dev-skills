@@ -27,6 +27,7 @@ claude plugin install dev-skills@hydrz
 
 ```bash
 codex plugin marketplace add hydrz/dev-skills
+codex plugin add dev-skills@hydrz
 ```
 
 也可以在 ChatGPT 桌面端设置中的 Plugins Directory 中将本仓库作为本地或远程市场添加并启用。
