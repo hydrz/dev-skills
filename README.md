@@ -8,6 +8,84 @@
 
 项目思想主要来自 [mattpocock/skills](https://github.com/mattpocock/skills)，并吸收了 [obra/superpowers](https://github.com/obra/superpowers) 中关于调试、评审、验证和分支收尾的实践。所有内容都根据中文开发语境重新组织。
 
+## 为什么需要 Agent Skills？
+
+Skills 是为 coding agent 设计的轻量、精准的工作流指令，让 agent 像资深工程师一样思考和交付。
+
+| 维度     | 核心逻辑                                                                                                                 |
+| :------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **痛点** | agent 的交付上限取决于你给它的工程流程。如果任由它自由发挥，往往会写出表面上能跑、实则悄悄腐化代码库的代码。             |
+| **解法** | 每个 skill 固化一个资深工程师的工程习惯（方案盘问、明确规格、测试先行、多维交叉评审），让 agent 始终遵循统一的质量标准。 |
+| **复利** | 多个 skill 相互咬合形成流水线：上一步的产出直接作为下一步的输入。持续调优某个环节时，整条交付链的质量都会获得复合提升。  |
+
+## 技能全景速览
+
+涵盖从环境初始化到最终交付的 34 项核心能力，按使用场景划分为 6 大模块：
+
+### 1. 入门与导航（Getting Started）
+
+- **[`/setup-dev-skills`](./skills/setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用，配置 issue 追踪器、分诊标签、领域文档与功能清单约定。
+- **[`/ask-dev-skills`](./skills/ask-dev-skills/SKILL.md)｜工作流导航**：不确定当前场景该用哪个 skill 时运行，获取针对性路由建议。
+
+### 2. 核心交付主干（The Main Flow）
+
+从需求澄清到上线交付的端到端主工作流：
+
+- **[`/grill-with-docs`](./skills/grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，记录关键决策并写入 `CONTEXT.md` 与 ADR。
+- **[`/to-spec`](./skills/to-spec/SKILL.md)｜整理规格**：将讨论成果转化为可实施规格并划分发布批次，不留未决歧义。
+- **[`/to-tickets`](./skills/to-tickets/SKILL.md)｜拆分开发任务**：将规格拆解为带前置依赖的端到端最小闭环开发任务。
+- **[`/implement`](./skills/implement/SKILL.md)｜当前会话实现**：在当前会话通过测试先行实现单项或少量明确任务。
+- **[`/implement-spec`](./skills/implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，并统一交付 PR。
+- **[`code-review`](./skills/code-review/SKILL.md)｜代码评审**：从仓库规范、需求规格和上线风险三个维度对 diff 展开严格审查。
+
+### 3. 需求定义与探索（Shaping）
+
+在正式编码前探索开放问题并沉淀决策：
+
+- **[`/wayfinder`](./skills/wayfinder/SKILL.md)｜大型工作决策规划**：为大型复杂工作绘制决策地图与批次规划，建立清晰的功能清单。
+- **[`prototype`](./skills/prototype/SKILL.md)｜一次性原型**：通过一次性原型代码快速验证设计猜想，验证完毕后清理。
+- **[`research`](./skills/research/SKILL.md)｜技术调研**：查阅第一手权威资料，并在仓库中沉淀带完整引用的调研报告。
+
+### 4. 工程维护与保障（Upkeep）
+
+保持代码库和 issue 列表健康可持续：
+
+- **[`/improve-codebase-architecture`](./skills/improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化重构报告，找出值得改进的高耦合模块。
+- **[`diagnosing-bugs`](./skills/diagnosing-bugs/SKILL.md)｜系统化诊断**：从编写失败复现用例开始，系统化定位疑难 bug 根因。
+- **[`resolving-merge-conflicts`](./skills/resolving-merge-conflicts/SKILL.md)｜解决合并冲突**：根据双方改动意图，稳步处理 merge 与 rebase 冲突。
+- **[`/triage`](./skills/triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 与 PR，使其达到可执行状态。
+- **[`wizard`](./skills/wizard/SKILL.md)｜生成设置向导**：针对必须由人工完成的外部配置与鉴权，生成交互式向导脚本。
+- **[`/setup-ts-deep-modules`](./skills/setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：将公开接口与依赖方向配置为可执行的静态检查规则。
+- **[`/setup-pre-commit`](./skills/setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存区改动配置快速、可验证的预提交检查。
+
+### 5. 效能与协作（Productivity）
+
+提升人机协同效率的独立工作流：
+
+- **[`/grill-me`](./skills/grill-me/SKILL.md)｜无状态方案追问**：纯对话追问，在正式开始前压力测试你的想法，不向本地写入文件。
+- **[`/handoff`](./skills/handoff/SKILL.md)｜会话交接**：将当前长会话状态精准打包，方便其他 agent 或新会话接力。
+- **[`/to-questionnaire`](./skills/to-questionnaire/SKILL.md)｜生成外部问卷**：把需要其他人回答的问题整理成清晰易答的结构化问卷。
+- **[`/teach`](./skills/teach/SKILL.md)｜持续学习**：把当前目录作为可跨会话延续的学习工作区。
+- **[`/wait-what`](./skills/wait-what/SKILL.md)｜换种方式解释**：要求 agent 抛开晦涩术语，用平实语言重新解释方案。
+- **[`/workflow-designer`](./skills/workflow-designer/SKILL.md)｜工作流设计**：把日常重复的团队操作梳理为清晰严谨的执行契约。
+- **[`/retro`](./skills/retro/SKILL.md)｜会话复盘**：基于真实会话沉淀复盘经验，改进规则门禁与指令质量。
+
+### 6. 底层复用规范（Reference Skills）
+
+供其他工作流在后台主动调用的工程基础：
+
+- **[`codebase-design`](./skills/codebase-design/SKILL.md)｜模块设计**：遵循深模块与清晰边界设计理念，提供模块化设计的原则指导。
+- **[`domain-modeling`](./skills/domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言与 ADR。
+- **[`grilling`](./skills/grilling/SKILL.md)｜方案追问方法**：按依赖关系逐轮追问的通用问答方法论。
+- **[`tdd`](./skills/tdd/SKILL.md)｜测试驱动开发**：红-绿-重构循环测试驱动开发标准。
+- **[`verifying-completion`](./skills/verifying-completion/SKILL.md)｜完成验证**：在声称完成前运行检查并在当前状态下阅读完整测试产出。
+- **[`receiving-code-review`](./skills/receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码，杜绝盲目修改。
+- **[`finishing-a-branch`](./skills/finishing-a-branch/SKILL.md)｜分支收尾**：完成后标准收尾流程，提供合并、PR、清理工作树选项。
+- **[`writing-chinese`](./skills/writing-chinese/SKILL.md)｜中文写作与审校**：保障产出中文内容自然、地道、清晰的技术写作指南。
+- **[`writing-for-agents`](./skills/writing-for-agents/SKILL.md)｜agent 文档写作**：高质量 agent 规则与文档编写规范。
+
+> 完整分类规则与触发机制详见 [Skill 清单](./skills/README.md) 与 [触发方式说明](./docs/invocation.md)。
+
 ## 60 秒快速开始
 
 选择一种安装方式即可。多种方式同时安装会让每个 skill 出现多次。
