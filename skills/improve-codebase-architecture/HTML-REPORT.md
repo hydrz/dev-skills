@@ -32,6 +32,7 @@
     <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
       <header>...</header>
       <section id="candidates" class="space-y-10">...</section>
+      <section id="excluded">...</section>
       <section id="top-recommendation">...</section>
     </main>
   </body>
@@ -103,6 +104,10 @@
 - 图高约 320px，让改造前后对比图可以并排显示而无需滚动。
 - 图内模块标签使用 `text-xs uppercase tracking-wider`，让它看起来像示意图而不是 UI。
 - 只引入 Tailwind CDN 和 Mermaid ESM 两个脚本。报告其余部分是静态的：没有应用代码，除 Mermaid 自身渲染外没有交互。
+
+## 已排除项
+
+放在候选项卡片之后、首要推荐之前。用一张紧凑的列表卡片，而不是完整的 `<article>`——它证明筛选过，不需要图示。每条一行：**位置**（等宽字体）、**为什么没入选**（一句话，点名具体标准：杠杆太低、已被某条 ADR 排除、影响面太局部）。石板灰底色，与候选项卡片的强调色区分开，标题旁不加徽章。
 
 ## 首要推荐
 
