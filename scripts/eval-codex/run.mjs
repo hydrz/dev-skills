@@ -7,15 +7,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  buildAggregateResult,
   applyQuickShortcut,
-  createInterruptController,
-  exitCodeFor,
+  buildDryRunReport,
+  commonAggregateOptions,
   parseOptionsFromSpec,
-  runWithConcurrency,
-  summarizeResults as summarizeCaseResults,
   validateCommonOptions,
 } from "../eval-cli-shared.lib.mjs";
+import { runEvalCase, runEvalSuite } from "../eval-suite-runner.lib.mjs";
 import {
   buildCodexArgs,
   classifyRunInfrastructure,
@@ -91,28 +89,6 @@ function graderCompatibility(grader) {
   if (grader.type === "tool_order") return "adapted";
   if (grader.type === "regex" || grader.type === "llm") return "supported";
   return "unsupported";
-}
-
-function dryRunReport(cases, skills) {
-  const report = {
-    cases: cases.map((evalCase) => ({
-      name: evalCase.name,
-      skill: primarySkillForCase(evalCase, skills),
-      skills: requiredSkillsForCase(evalCase, skills),
-      graders: evalCase.graders.map((grader) => ({
-        name: grader.name,
-        type: grader.type,
-        compatibility: graderCompatibility(grader),
-      })),
-    })),
-    summary: { cases: cases.length, graders: {} },
-  };
-
-  for (const grader of report.cases.flatMap((entry) => entry.graders)) {
-    report.summary.graders[grader.compatibility] =
-      (report.summary.graders[grader.compatibility] ?? 0) + 1;
-  }
-  return report;
 }
 
 function runProcess(command, args, options = {}) {
@@ -273,121 +249,82 @@ Return whether the rubric passes and a concise reason.`;
   }
 }
 
-async function runCase(evalCase, arm, runNumber, skills, options, resultsDirectory) {
-  const runDirectory = path.join(resultsDirectory, evalCase.name, arm, `run-${runNumber}`);
-  const workspace = path.join(runDirectory, "workspace");
-  await mkdir(runDirectory, { recursive: true });
-  const skill = await initializeWorkspace(workspace, evalCase, arm, skills);
-  const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
-  // prompt 原样发送，包括 Claude 风格的 /skill-name 前缀；Codex 是否识别它是评测本身
-  // 要回答的问题，不在 runner 里做兼容翻译。
-  const effectivePrompt = evalCase.prompt;
-  const args = buildCodexArgs({
-    workspace,
-    sandbox: sandboxFor(evalCase),
-    model: options.model,
-    reasoning: options.reasoning,
-    json: true,
-  });
-
-  await writeFile(path.join(runDirectory, "prompt.txt"), effectivePrompt, "utf8");
-  await writeFile(
-    path.join(runDirectory, "command.json"),
-    JSON.stringify([options.codexBin, ...args], null, 2),
-  );
-
-  const startTime = Date.now();
-  const traceStream = createWriteStream(path.join(runDirectory, "trace.jsonl"), {
-    encoding: "utf8",
-  });
-  const stderrStream = createWriteStream(path.join(runDirectory, "stderr.txt"), {
-    encoding: "utf8",
-  });
-  const processResult = await runProcess(options.codexBin, args, {
-    input: effectivePrompt,
-    timeoutMs,
-    shell: true,
-    onStdout: (chunk) => traceStream.write(chunk),
-    onStderr: (chunk) => stderrStream.write(chunk),
-  });
-  await Promise.all([
-    new Promise((resolve) => traceStream.end(resolve)),
-    new Promise((resolve) => stderrStream.end(resolve)),
-  ]);
-  const durationSeconds = (Date.now() - startTime) / 1000;
-
-  const parsed = parseJsonl(processResult.stdout);
-  await writeFile(path.join(runDirectory, "final.txt"), parsed.finalResponse, "utf8");
-  const run = {
-    prompt: evalCase.prompt,
-    finalResponse: parsed.finalResponse,
-    events: parsed.events,
-    workspace,
-  };
-  const infrastructure = classifyRunInfrastructure(processResult, parsed);
-  const toolCalls = extractCodexToolCalls(parsed.events);
-
-  const isTwoArm = options.ablation === "with-without";
-  const graderResults = [];
-  if (infrastructure.passed) {
-    for (const grader of evalCase.graders) {
-      const isIndicator = isGraderIndicator(grader, isTwoArm);
-      const result = await evaluateGrader(grader, run, {
+function createCodexCaseAdapter(skills, options) {
+  return {
+    displayName: "Codex",
+    isGraderIndicator,
+    summarizeGraderResults,
+    initializeWorkspace: ({ workspace, evalCase, arm }) =>
+      initializeWorkspace(workspace, evalCase, arm, skills),
+    execute: async ({ evalCase, runDirectory, workspace, timeoutMs }) => {
+      const args = buildCodexArgs({
+        workspace,
+        sandbox: sandboxFor(evalCase),
+        model: options.model,
+        reasoning: options.reasoning,
+        json: true,
+      });
+      await writeFile(path.join(runDirectory, "prompt.txt"), evalCase.prompt, "utf8");
+      await writeFile(
+        path.join(runDirectory, "command.json"),
+        JSON.stringify([options.codexBin, ...args], null, 2),
+      );
+      const traceStream = createWriteStream(path.join(runDirectory, "trace.jsonl"), {
+        encoding: "utf8",
+      });
+      const stderrStream = createWriteStream(path.join(runDirectory, "stderr.txt"), {
+        encoding: "utf8",
+      });
+      const startedAt = Date.now();
+      const processResult = await runProcess(options.codexBin, args, {
+        input: evalCase.prompt,
+        timeoutMs,
+        shell: true,
+        onStdout: (chunk) => traceStream.write(chunk),
+        onStderr: (chunk) => stderrStream.write(chunk),
+      });
+      await Promise.all([
+        new Promise((resolve) => traceStream.end(resolve)),
+        new Promise((resolve) => stderrStream.end(resolve)),
+      ]);
+      const parsed = parseJsonl(processResult.stdout);
+      await writeFile(path.join(runDirectory, "final.txt"), parsed.finalResponse, "utf8");
+      const infrastructure = classifyRunInfrastructure(processResult, parsed);
+      return {
+        passed: infrastructure.passed,
+        reason: infrastructure.reason,
+        finalResponse: parsed.finalResponse,
+        toolCalls: extractCodexToolCalls(parsed.events),
+        events: parsed.events,
+        durationSeconds: (Date.now() - startedAt) / 1000,
+        usage: parsed.events.findLast((event) => event.type === "turn.completed")?.usage ?? null,
+        resultFields: {
+          infrastructure: {
+            ...infrastructure,
+            exitCode: processResult.code,
+            signal: processResult.signal,
+            timedOut: processResult.timedOut,
+            jsonlErrors: parsed.errors,
+          },
+        },
+      };
+    },
+    evaluateGrader: (grader, run, { timeoutMs, runDirectory }) =>
+      evaluateGrader(grader, run, {
         evaluateLlm: (currentGrader, currentRun) =>
           gradeWithCodex(currentGrader, currentRun, { ...options, timeoutMs }, runDirectory),
-      });
-      graderResults.push({
-        name: grader.name,
-        type: grader.type,
-        scored: !isIndicator,
-        ...result,
-      });
-    }
-  } else {
-    for (const grader of evalCase.graders) {
-      const isIndicator = isGraderIndicator(grader, isTwoArm);
-      graderResults.push({
-        name: grader.name,
-        type: grader.type,
-        scored: !isIndicator,
-        status: "not_run",
-        reason: `Main Codex run failed: ${infrastructure.reason}`,
-      });
-    }
-  }
-
-  const diffResult = await runProcess("git", ["diff", "--binary", "HEAD"], { cwd: workspace });
-  const statusResult = await runProcess("git", ["status", "--porcelain", "--untracked-files=all"], {
-    cwd: workspace,
-  });
-  await writeFile(path.join(runDirectory, "workspace.diff"), diffResult.stdout, "utf8");
-  await writeFile(path.join(runDirectory, "workspace.status"), statusResult.stdout, "utf8");
-
-  const graderSummary = summarizeGraderResults(graderResults, isTwoArm);
-  const result = {
-    case: evalCase.name,
-    arm,
-    run: runNumber,
-    skill,
-    durationSeconds,
-    prompt: evalCase.prompt,
-    finalResponse: parsed.finalResponse,
-    toolCalls,
-    error: infrastructure.passed ? null : infrastructure.reason,
-    infrastructure: {
-      ...infrastructure,
-      exitCode: processResult.code,
-      signal: processResult.signal,
-      timedOut: processResult.timedOut,
-      jsonlErrors: parsed.errors,
+      }),
+    finalize: async ({ workspace, runDirectory }) => {
+      const diffResult = await runProcess("git", ["diff", "--binary", "HEAD"], { cwd: workspace });
+      const statusResult = await runProcess(
+        "git",
+        ["status", "--porcelain", "--untracked-files=all"],
+        { cwd: workspace },
+      );
+      await writeFile(path.join(runDirectory, "workspace.diff"), diffResult.stdout, "utf8");
+      await writeFile(path.join(runDirectory, "workspace.status"), statusResult.stdout, "utf8");
     },
-    score: graderSummary.score,
-    perfect: infrastructure.passed && graderSummary.perfect,
-    graders: graderResults,
-    usage: parsed.events.findLast((event) => event.type === "turn.completed")?.usage ?? null,
   };
-  await writeFile(path.join(runDirectory, "result.json"), JSON.stringify(result, null, 2), "utf8");
-  return result;
 }
 
 async function main() {
@@ -404,125 +341,67 @@ async function main() {
   if (cases.length === 0) throw new Error("No eval cases matched the filters");
 
   if (options.dryRun) {
-    process.stdout.write(`${JSON.stringify(dryRunReport(cases, skills), null, 2)}\n`);
+    process.stdout.write(
+      `${JSON.stringify(
+        buildDryRunReport(cases, skills, {
+          primarySkillForCase,
+          requiredSkillsForCase,
+          graderCompatibility,
+        }),
+        null,
+        2,
+      )}\n`,
+    );
     return 0;
   }
 
-  const timestamp = new Date().toISOString().replaceAll(":", "-");
+  const generatedAt = new Date().toISOString();
+  const timestamp = generatedAt.replaceAll(":", "-");
   const resultsDirectory = path.join(evalsDirectory, "results", `codex-${timestamp}`);
-  const arms = options.ablation === "with-without" ? ["with", "without"] : ["with"];
   const versionResult = await runProcess(options.codexBin, ["--version"], { shell: true });
   if (versionResult.code !== 0) {
     throw new Error(`Unable to read Codex version: ${versionResult.stderr}`);
   }
-  const codexVersion = versionResult.stdout.trim();
-
-  const tasks = [];
-  for (const evalCase of cases) {
-    for (const arm of arms) {
-      for (let runNumber = 1; runNumber <= options.runs; runNumber += 1) {
-        tasks.push({ evalCase, arm, runNumber });
-      }
-    }
-  }
-
-  const interruptController = createInterruptController();
-  let crashed = false;
-
-  // runWithConcurrency 按任务原始下标写回结果，保证 aggregate-result.json 里的 case
-  // 顺序不受并发调度影响；终端进度行谁先完成谁先打印，允许交错。
-  const scheduled = await runWithConcurrency(tasks, options.concurrency, async (task) => {
-    if (interruptController.signal) return null;
-    process.stderr.write(
-      `[Running] case=${task.evalCase.name} arm=${task.arm} run=${task.runNumber}/${options.runs}\n`,
-    );
-    try {
-      const runResult = await runCase(
-        task.evalCase,
-        task.arm,
-        task.runNumber,
-        skills,
-        options,
-        resultsDirectory,
-      );
-
-      const scoreStr = runResult.score != null ? runResult.score.toFixed(2) : "N/A";
-      const icon = runResult.perfect ? "✔" : runResult.score === 0 ? "✖" : "⚠";
-      const graderDetails = (runResult.graders ?? [])
-        .map((g) => `${g.name}: ${g.status}`)
-        .join(", ");
-      process.stderr.write(
-        `  ${icon} ${scoreStr} (${graderDetails}) · ${runResult.durationSeconds.toFixed(1)}s\n`,
-      );
-      return runResult;
-    } catch (error) {
-      crashed = true;
-      process.stderr.write(
-        `[ERROR] case=${task.evalCase.name} arm=${task.arm}: ${error.message}\n`,
-      );
-      return null;
-    }
-  });
-  const results = scheduled.filter(Boolean);
-
-  const partial = crashed || Boolean(interruptController.signal);
-  const partialReason = interruptController.signal
-    ? interruptController.signal === "SIGINT"
-      ? "interrupted"
-      : "terminated"
-    : crashed
-      ? "crashed"
-      : null;
-
-  const caseSummary = summarizeCaseResults(results);
-  const table = formatSummaryTable(caseSummary, { threshold: options.threshold });
-  process.stdout.write(`\n${table}\n\n`);
-
-  const html = generateHtmlReport({
-    title: "Codex 插件评测报告",
-    summary: caseSummary,
-    runs: results,
+  const isTwoArm = options.ablation === "with-without";
+  const caseAdapter = createCodexCaseAdapter(skills, options);
+  const outcome = await runEvalSuite({
+    cases,
     options,
-  });
-  await mkdir(resultsDirectory, { recursive: true });
-  await writeFile(path.join(resultsDirectory, "report.html"), html, "utf8");
-  process.stdout.write(`Report: ${path.join(resultsDirectory, "report.html")}\n\n`);
-
-  const aggregateResult = buildAggregateResult({
-    engine: "codex",
-    engineVersion: codexVersion,
-    generatedAt: new Date().toISOString(),
-    options: {
-      casePattern: options.casePattern,
-      tag: options.tag ?? null,
-      runs: options.runs,
-      ablation: options.ablation,
-      concurrency: options.concurrency,
-      model: options.model ?? null,
-      judgeModel: options.judgeModel ?? options.model ?? null,
-      reasoning: options.reasoning ?? null,
-      threshold: options.threshold,
-      skipLlmGraders: options.skipLlmGraders,
+    resultsDirectory,
+    generatedAt,
+    engine: {
+      name: "codex",
+      version: versionResult.stdout.trim(),
+      runCase: ({ evalCase, arm, runNumber }) =>
+        runEvalCase({
+          evalCase,
+          arm,
+          runNumber,
+          resultsDirectory,
+          isTwoArm,
+          adapter: caseAdapter,
+        }),
+      formatRun: (result) => {
+        const score = result.score != null ? result.score.toFixed(2) : "N/A";
+        const icon = result.perfect ? "✔" : result.score === 0 ? "✖" : "⚠";
+        const graders = (result.graders ?? []).map((g) => `${g.name}: ${g.status}`).join(", ");
+        return `  ${icon} ${score} (${graders}) · ${result.durationSeconds.toFixed(1)}s`;
+      },
+      formatSummary: (summary) => formatSummaryTable(summary, { threshold: options.threshold }),
+      renderReport: ({ summary, results }) =>
+        generateHtmlReport({
+          title: "Codex 插件评测报告",
+          summary,
+          runs: results,
+          options,
+        }),
+      aggregateOptions: () => ({
+        ...commonAggregateOptions(options),
+        reasoning: options.reasoning ?? null,
+      }),
     },
-    results,
-    ablation: options.ablation,
-    partial,
-    partialReason,
   });
-  await writeFile(
-    path.join(resultsDirectory, "aggregate-result.json"),
-    JSON.stringify(aggregateResult, null, 2),
-  );
-
-  const belowThreshold = aggregateResult.cases.some(
-    (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
-  );
-
-  return exitCodeFor({
-    interruptSignal: interruptController.signal,
-    crashed,
-    belowThreshold,
-  });
+  return outcome.exitCode;
 }
 
 main()

@@ -9,7 +9,7 @@ import {
   parseMarkdownWithFrontmatter,
   primarySkillForCase,
   requiredSkillsForCase,
-} from "../eval-codex/lib.mjs";
+} from "../eval-core.lib.mjs";
 import {
   escapeHtml,
   formatSummaryTable,

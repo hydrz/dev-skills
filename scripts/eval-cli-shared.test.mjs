@@ -4,12 +4,38 @@ import test from "node:test";
 import {
   applyQuickShortcut,
   buildAggregateResult,
+  commonAggregateOptions,
   exitCodeFor,
   parseOptionsFromSpec,
   runWithConcurrency,
   summarizeResults,
   validateCommonOptions,
 } from "./eval-cli-shared.lib.mjs";
+
+test("commonAggregateOptions keeps the shared CLI result contract", () => {
+  assert.deepEqual(
+    commonAggregateOptions({
+      casePattern: "*",
+      runs: 1,
+      ablation: "none",
+      concurrency: 2,
+      model: "model-a",
+      threshold: 1,
+      skipLlmGraders: false,
+    }),
+    {
+      casePattern: "*",
+      tag: null,
+      runs: 1,
+      ablation: "none",
+      concurrency: 2,
+      model: "model-a",
+      judgeModel: "model-a",
+      threshold: 1,
+      skipLlmGraders: false,
+    },
+  );
+});
 
 const SPEC = {
   "--case": { key: "casePattern", type: "string", default: "*" },

@@ -1,20 +1,18 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
   applyQuickShortcut,
-  buildAggregateResult,
-  createInterruptController,
-  exitCodeFor,
+  buildDryRunReport,
+  commonAggregateOptions,
   parseOptionsFromSpec,
-  runWithConcurrency,
-  summarizeResults as summarizeCaseResults,
   validateCommonOptions,
 } from "../eval-cli-shared.lib.mjs";
+import { runEvalCase, runEvalSuite } from "../eval-suite-runner.lib.mjs";
 import { spawnTarget } from "../spawn.lib.mjs";
 
 import {
@@ -90,28 +88,6 @@ function graderCompatibility(grader, options) {
   return "unsupported";
 }
 
-function dryRunReport(cases, skills, options) {
-  const report = {
-    cases: cases.map((evalCase) => ({
-      name: evalCase.name,
-      skill: primarySkillForCase(evalCase, skills),
-      skills: requiredSkillsForCase(evalCase, skills),
-      graders: evalCase.graders.map((g) => ({
-        name: g.name,
-        type: g.type,
-        compatibility: graderCompatibility(g, options),
-      })),
-    })),
-    summary: { cases: cases.length, graders: {} },
-  };
-
-  for (const grader of report.cases.flatMap((entry) => entry.graders)) {
-    report.summary.graders[grader.compatibility] =
-      (report.summary.graders[grader.compatibility] ?? 0) + 1;
-  }
-  return report;
-}
-
 function runProcess(bin, args, options = {}) {
   return new Promise((resolve) => {
     // agy 是原生 .exe（不像 claude/codex 那样常以 .cmd 装机脚本安装），探针 case 实测过：
@@ -152,120 +128,68 @@ function runProcess(bin, args, options = {}) {
   });
 }
 
-async function runCase(evalCase, arm, runNumber, skills, options, resultsDirectory, isTwoArm) {
-  const runDirectory = path.join(resultsDirectory, evalCase.name, arm, `run-${runNumber}`);
-  const workspace = path.join(runDirectory, "workspace");
-  await mkdir(runDirectory, { recursive: true });
-  const skill = await initializeAgyWorkspace(workspace, evalCase, arm, skills);
-  const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
-  // prompt 原样发送，不做技能正文注入，也不翻译 Claude 风格的显式调用前缀——见 grill-me
-  // 决策 Q2/Q3；只读/可写沙箱分级见决策 Q7。
-  const effectivePrompt = evalCase.prompt;
-
-  const args = buildAgyArgs({
-    workspace,
-    prompt: effectivePrompt,
-    outputFormat: "stream-json",
-    model: options.model,
-    sandbox: sandboxFor(evalCase),
-    timeoutMs,
-  });
-
-  await writeFile(path.join(runDirectory, "prompt.txt"), effectivePrompt, "utf8");
-  await writeFile(
-    path.join(runDirectory, "command.json"),
-    JSON.stringify([options.agyBin, ...args], null, 2),
-  );
-
-  const processResult = await runProcess(options.agyBin, args, { cwd: workspace, timeoutMs });
-  await writeFile(path.join(runDirectory, "stdout.txt"), processResult.stdout, "utf8");
-  await writeFile(path.join(runDirectory, "stderr.txt"), processResult.stderr, "utf8");
-
-  const agyResult = parseAgyOutput(processResult.stdout);
-  const infrastructurePassed = !processResult.timedOut && processResult.code === 0;
-  const infrastructureReason = processResult.timedOut
-    ? "agy process timed out"
-    : processResult.code !== 0
-      ? `agy process exited with code ${processResult.code}`
-      : null;
-
-  const graderResults = [];
-  if (infrastructurePassed) {
-    for (const grader of evalCase.graders) {
-      const indicator = isGraderIndicator(grader, isTwoArm);
-      const evaluation = await evaluateGrader(
-        grader,
-        {
-          prompt: evalCase.prompt,
-          finalResponse: agyResult.finalResponse,
-          workspace,
-          toolCalls: agyResult.toolCalls,
-          events: agyResult.events,
-        },
-        {
-          agyBin: options.agyBin,
-          judgeModel: options.judgeModel,
-          model: options.model,
-          skipLlmGraders: options.skipLlmGraders,
-          // agy 判定一次简单 JSON 也常常要 40-100s+（探针 case 实测），judge 调用需要
-          // 一个独立于主运行剩余预算的、够用的超时，而不是共享同一个 case 超时。
-          timeoutMs: Math.max(timeoutMs, 180000),
-          runDirectory,
-          runProcess,
-        },
+function createAgyCaseAdapter(skills, options) {
+  return {
+    displayName: "agy",
+    isGraderIndicator,
+    summarizeGraderResults,
+    initializeWorkspace: ({ workspace, evalCase, arm }) =>
+      initializeAgyWorkspace(workspace, evalCase, arm, skills),
+    execute: async ({ evalCase, runDirectory, workspace, timeoutMs }) => {
+      const args = buildAgyArgs({
+        workspace,
+        prompt: evalCase.prompt,
+        outputFormat: "stream-json",
+        model: options.model,
+        sandbox: sandboxFor(evalCase),
+        timeoutMs,
+      });
+      await writeFile(path.join(runDirectory, "prompt.txt"), evalCase.prompt, "utf8");
+      await writeFile(
+        path.join(runDirectory, "command.json"),
+        JSON.stringify([options.agyBin, ...args], null, 2),
       );
-
-      graderResults.push({
-        name: grader.name,
-        type: grader.type,
-        status: evaluation.status,
-        reason: evaluation.reason,
-        weight: grader.weight ?? 1,
-        arm: grader.arm,
-        scored: !indicator,
-      });
-    }
-  } else {
-    for (const grader of evalCase.graders) {
-      const indicator = isGraderIndicator(grader, isTwoArm);
-      graderResults.push({
-        name: grader.name,
-        type: grader.type,
-        status: "not_run",
-        reason: `Main agy run failed: ${infrastructureReason}`,
-        weight: grader.weight ?? 1,
-        arm: grader.arm,
-        scored: !indicator,
-      });
-    }
-  }
-
-  const summary = summarizeGraderResults(graderResults, isTwoArm);
-  const result = {
-    case: evalCase.name,
-    skill,
-    arm,
-    run: runNumber,
-    prompt: evalCase.prompt,
-    finalResponse: agyResult.finalResponse,
-    toolCalls: agyResult.toolCalls,
-    error: infrastructurePassed ? null : infrastructureReason,
-    status: infrastructurePassed ? "completed" : "failed",
-    durationSeconds: agyResult.duration,
-    usage: agyResult.usage,
-    ...summary,
-    graders: graderResults,
+      const processResult = await runProcess(options.agyBin, args, { cwd: workspace, timeoutMs });
+      await writeFile(path.join(runDirectory, "stdout.txt"), processResult.stdout, "utf8");
+      await writeFile(path.join(runDirectory, "stderr.txt"), processResult.stderr, "utf8");
+      const parsed = parseAgyOutput(processResult.stdout);
+      const passed = !processResult.timedOut && processResult.code === 0;
+      const reason = processResult.timedOut
+        ? "agy process timed out"
+        : processResult.code !== 0
+          ? `agy process exited with code ${processResult.code}`
+          : null;
+      return {
+        passed,
+        reason,
+        finalResponse: parsed.finalResponse,
+        toolCalls: parsed.toolCalls,
+        events: parsed.events,
+        durationSeconds: parsed.duration,
+        usage: parsed.usage,
+        resultFields: { status: passed ? "completed" : "failed" },
+      };
+    },
+    evaluateGrader: (grader, run, { timeoutMs, runDirectory }) =>
+      evaluateGrader(grader, run, {
+        agyBin: options.agyBin,
+        judgeModel: options.judgeModel,
+        model: options.model,
+        skipLlmGraders: options.skipLlmGraders,
+        timeoutMs: Math.max(timeoutMs, 180000),
+        runDirectory,
+        runProcess,
+      }),
+    formatGrader: (grader, evaluation, indicator) => ({
+      name: grader.name,
+      type: grader.type,
+      status: evaluation.status,
+      reason: evaluation.reason,
+      weight: grader.weight ?? 1,
+      arm: grader.arm,
+      scored: !indicator,
+    }),
   };
-
-  await writeFile(path.join(runDirectory, "result.json"), JSON.stringify(result, null, 2));
-
-  const icon = result.perfect ? "✔" : result.score === 0 ? "✖" : "▲";
-  const graderSummary = graderResults.map((g) => `${g.name}: ${g.status}`).join(", ");
-  const scoreStr = result.score != null ? result.score.toFixed(2) : "N/A";
-  const durStr = `${(result.durationSeconds ?? 0).toFixed(1)}s`;
-  process.stderr.write(`  ${icon} ${scoreStr} (${graderSummary}) · ${durStr}\n`);
-
-  return result;
 }
 
 async function main() {
@@ -289,7 +213,17 @@ async function main() {
   });
 
   if (options.dryRun) {
-    process.stdout.write(`${JSON.stringify(dryRunReport(cases, skills, options), null, 2)}\n`);
+    process.stdout.write(
+      `${JSON.stringify(
+        buildDryRunReport(cases, skills, {
+          primarySkillForCase,
+          requiredSkillsForCase,
+          graderCompatibility: (grader) => graderCompatibility(grader, options),
+        }),
+        null,
+        2,
+      )}\n`,
+    );
     return 0;
   }
 
@@ -303,124 +237,57 @@ async function main() {
   const generatedAt = new Date().toISOString();
   const timestamp = generatedAt.replaceAll(":", "-").replaceAll(".", "-");
   const resultsDirectory = path.join(evalsDirectory, "results", `antigravity-${timestamp}`);
-  await mkdir(resultsDirectory, { recursive: true });
-
   const isTwoArm = options.ablation === "with-without";
-  const arms = isTwoArm ? ["with", "without"] : ["with"];
-  const tasks = [];
-  for (const evalCase of cases) {
-    for (const arm of arms) {
-      for (let runNumber = 1; runNumber <= options.runs; runNumber += 1) {
-        tasks.push({ evalCase, arm, runNumber });
-      }
-    }
-  }
-
-  const interruptController = createInterruptController();
-  let crashed = false;
-
-  const scheduled = await runWithConcurrency(tasks, options.concurrency, async (task) => {
-    if (interruptController.signal) return null;
-    process.stderr.write(
-      `[Running] case=${task.evalCase.name} arm=${task.arm} run=${task.runNumber}/${options.runs}\n`,
-    );
-    try {
-      return await runCase(
-        task.evalCase,
-        task.arm,
-        task.runNumber,
-        skills,
-        options,
-        resultsDirectory,
-        isTwoArm,
-      );
-    } catch (error) {
-      crashed = true;
-      process.stderr.write(
-        `[ERROR] case=${task.evalCase.name} arm=${task.arm}: ${error.message}\n`,
-      );
-      return null;
-    }
-  });
-  const results = scheduled.filter(Boolean);
-
-  const partial = crashed || Boolean(interruptController.signal);
-  const partialReason = interruptController.signal
-    ? interruptController.signal === "SIGINT"
-      ? "interrupted"
-      : "terminated"
-    : crashed
-      ? "crashed"
-      : null;
-
-  const caseSummary = summarizeCaseResults(results);
-  await writeFile(
-    path.join(resultsDirectory, "summary.json"),
-    JSON.stringify(caseSummary, null, 2),
-  );
-
-  const htmlReport = generateHtmlReport({
-    summary: caseSummary,
-    runs: results,
-    options,
-    timestamp: generatedAt,
-    resultsDirectory,
-  });
-  const htmlReportPath = path.join(resultsDirectory, "report.html");
-  await writeFile(htmlReportPath, htmlReport, "utf8");
-
-  process.stdout.write(`\n${formatSummaryTable(caseSummary)}\n`);
-  process.stdout.write(`Report: ${htmlReportPath}\n`);
-
+  const caseAdapter = createAgyCaseAdapter(skills, options);
   const versionResult = await runProcess(options.agyBin, ["--version"]);
-  const aggregateResult = buildAggregateResult({
-    engine: "antigravity",
-    engineVersion: versionResult.code === 0 ? versionResult.stdout.trim() : "unknown",
+  const outcome = await runEvalSuite({
+    cases,
+    options,
+    resultsDirectory,
     generatedAt,
-    options: {
-      casePattern: options.casePattern,
-      tag: options.tag ?? null,
-      runs: options.runs,
-      ablation: options.ablation,
-      concurrency: options.concurrency,
-      model: options.model ?? null,
-      judgeModel: options.judgeModel ?? null,
-      threshold: options.threshold,
-      skipLlmGraders: options.skipLlmGraders,
+    engine: {
+      name: "antigravity",
+      version: versionResult.code === 0 ? versionResult.stdout.trim() : "unknown",
+      runCase: ({ evalCase, arm, runNumber }) =>
+        runEvalCase({
+          evalCase,
+          arm,
+          runNumber,
+          resultsDirectory,
+          isTwoArm,
+          adapter: caseAdapter,
+        }),
+      formatRun: (result) => {
+        const icon = result.perfect ? "✔" : result.score === 0 ? "✖" : "▲";
+        const graders = result.graders.map((g) => `${g.name}: ${g.status}`).join(", ");
+        const score = result.score != null ? result.score.toFixed(2) : "N/A";
+        return `  ${icon} ${score} (${graders}) · ${(result.durationSeconds ?? 0).toFixed(1)}s`;
+      },
+      formatSummary: (summary) => formatSummaryTable(summary),
+      renderReport: ({ summary, results }) =>
+        generateHtmlReport({
+          summary,
+          runs: results,
+          options,
+          timestamp: generatedAt,
+          resultsDirectory,
+        }),
+      aggregateOptions: () => commonAggregateOptions(options),
+      reportThresholdFailure: ({ aggregateResult, threshold, io }) => {
+        const failing = aggregateResult.cases.filter(
+          (entry) => entry.aggregates.score != null && entry.aggregates.score < threshold,
+        );
+        if (!failing.length) return;
+        io.stderr.write(`\n[FAIL] 共有 ${failing.length} 个用例得分低于门禁阈值 ${threshold}：\n`);
+        for (const item of failing) {
+          io.stderr.write(
+            `  - ${item.name}: 得分 ${item.aggregates.score.toFixed(2)}（要求 >= ${threshold}）\n`,
+          );
+        }
+      },
     },
-    results,
-    ablation: options.ablation,
-    partial,
-    partialReason,
   });
-  await writeFile(
-    path.join(resultsDirectory, "aggregate-result.json"),
-    JSON.stringify(aggregateResult, null, 2),
-  );
-
-  const belowThreshold = aggregateResult.cases.some(
-    (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
-  );
-
-  if (belowThreshold) {
-    const failing = aggregateResult.cases.filter(
-      (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
-    );
-    process.stderr.write(
-      `\n[FAIL] 共有 ${failing.length} 个用例得分低于门禁阈值 ${options.threshold}：\n`,
-    );
-    for (const item of failing) {
-      process.stderr.write(
-        `  - ${item.name}: 得分 ${item.aggregates.score.toFixed(2)} (要求 >= ${options.threshold})\n`,
-      );
-    }
-  }
-
-  return exitCodeFor({
-    interruptSignal: interruptController.signal,
-    crashed,
-    belowThreshold,
-  });
+  return outcome.exitCode;
 }
 
 main()

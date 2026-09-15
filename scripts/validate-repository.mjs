@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
 import { readdirSync, readFileSync } from "node:fs";
-import { dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
+import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import {
+  loadRepositoryMetadata,
+  parseSkillMetadata,
+  validateMetadataModel,
+} from "./repository-metadata.lib.mjs";
 
 const defaultRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ignoredDirectories = new Set([".git", ".scratch", ".worktrees", "node_modules"]);
@@ -19,15 +25,6 @@ const textExtensions = new Set([
   ".yaml",
   ".yml",
 ]);
-
-function loadJson(path, errors, label) {
-  try {
-    return JSON.parse(readFileSync(path, "utf8"));
-  } catch (error) {
-    errors.push(`${label} 无法读取：${error.message}`);
-    return null;
-  }
-}
 
 function walk(root, current = root, result = { files: [], symlinks: [], forbidden: [] }) {
   for (const entry of readdirSync(current, { withFileTypes: true })) {
@@ -59,98 +56,18 @@ export function findSecretShapes(text) {
 
 export function validateSkillText(text, expectedName, relPath = "SKILL.md") {
   const errors = [];
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  if (!match) return [`${relPath} 缺少完整的 YAML frontmatter`];
+  const { validFrontmatter, name, description, body } = parseSkillMetadata(text);
+  if (!validFrontmatter) return [`\`${relPath}\` 缺少完整的 YAML frontmatter`];
 
-  const [, frontmatter, body] = match;
-  const name = frontmatter.match(/^name:\s*["']?([^\s"']+)["']?\s*$/m)?.[1];
-  const description = frontmatter
-    .match(/^description:\s*(.+)$/m)?.[1]
-    ?.trim()
-    .replace(/^(["'])(.*)\1$/, "$2");
-
-  if (!name) errors.push(`${relPath} 缺少 frontmatter name`);
+  if (!name) errors.push(`\`${relPath}\` 缺少 frontmatter \`name\``);
   else if (name !== expectedName) {
-    errors.push(`${relPath} 的 name (${name}) 与目录名 (${expectedName}) 不一致`);
+    errors.push(`\`${relPath}\` 的 \`name\`（\`${name}\`）与目录名（\`${expectedName}\`）不一致`);
   }
-  if (!description) errors.push(`${relPath} 缺少单行 description`);
-  else if (description.length > 1024) errors.push(`${relPath} 的 description 超过 1024 个字符`);
-  if (!body.trim()) errors.push(`${relPath} 的正文为空`);
+  if (!description) errors.push(`\`${relPath}\` 缺少单行 \`description\``);
+  else if (description.length > 1024)
+    errors.push(`\`${relPath}\` 的 \`description\` 超过 1024 个字符`);
+  if (!body.trim()) errors.push(`\`${relPath}\` 的正文为空`);
   return errors;
-}
-
-function validateManifestIdentity(root, discoveredSkillPaths, errors) {
-  const packageJson = loadJson(join(root, "package.json"), errors, "package.json");
-  const rootPlugin = loadJson(join(root, "plugin.json"), errors, "plugin.json");
-  const codexPlugin = loadJson(
-    join(root, ".codex-plugin", "plugin.json"),
-    errors,
-    ".codex-plugin/plugin.json",
-  );
-  const claudePlugin = loadJson(
-    join(root, ".claude-plugin", "plugin.json"),
-    errors,
-    ".claude-plugin/plugin.json",
-  );
-  if (!packageJson || !rootPlugin || !codexPlugin || !claudePlugin) return;
-
-  for (const [label, manifest] of [
-    ["plugin.json", rootPlugin],
-    [".codex-plugin/plugin.json", codexPlugin],
-    [".claude-plugin/plugin.json", claudePlugin],
-  ]) {
-    if (manifest.name !== packageJson.name) {
-      errors.push(`${label} 的 name 与 package.json 不一致`);
-    }
-    if (manifest.version !== packageJson.version) {
-      errors.push(`${label} 的 version 与 package.json 不一致`);
-    }
-  }
-
-  const rootInterface = rootPlugin.extensions?.["com.openai"]?.interface;
-  for (const [label, value] of [
-    ["plugin.json extensions.com.openai.interface", rootInterface],
-    [".codex-plugin/plugin.json interface", codexPlugin.interface],
-  ]) {
-    if (!value?.displayName || !value?.shortDescription || !value?.longDescription) {
-      errors.push(`${label} 缺少 displayName、shortDescription 或 longDescription`);
-    }
-  }
-
-  if (typeof codexPlugin.skills !== "string") {
-    errors.push(".codex-plugin/plugin.json 的 skills 必须是字符串路径");
-  } else {
-    const skillsPath = isAbsolute(codexPlugin.skills)
-      ? codexPlugin.skills
-      : resolve(root, codexPlugin.skills);
-    if (skillsPath !== resolve(root, "skills")) {
-      errors.push(".codex-plugin/plugin.json 的 skills 必须指向仓库 skills 目录");
-    }
-  }
-
-  const actualClaudeSkills = Array.isArray(claudePlugin.skills) ? claudePlugin.skills : [];
-  const actualSkillSet = new Set(actualClaudeSkills);
-  if (
-    actualSkillSet.size !== discoveredSkillPaths.length ||
-    discoveredSkillPaths.some((path) => !actualSkillSet.has(path))
-  ) {
-    errors.push(".claude-plugin/plugin.json 的 skills 清单未与实际目录同步；运行 npm run sync");
-  }
-
-  const agentsIndex = loadJson(join(root, ".agents", "skills.json"), errors, ".agents/skills.json");
-  for (const entry of agentsIndex?.entries ?? []) {
-    if (
-      typeof entry.path !== "string" ||
-      (entry.path !== "skills" && !entry.path.startsWith("skills/"))
-    ) {
-      errors.push(".agents/skills.json 包含无效的 skill 根路径");
-      continue;
-    }
-    const resolvedEntry = resolve(root, entry.path);
-    if (!discoveredSkillPaths.some((path) => resolve(root, path).startsWith(resolvedEntry))) {
-      errors.push(`.agents/skills.json 的路径没有包含任何 skill：${entry.path}`);
-    }
-  }
 }
 
 export function validateRepository(root = defaultRoot) {
@@ -162,8 +79,6 @@ export function validateRepository(root = defaultRoot) {
   const skillFiles = tree.files
     .filter(({ relPath }) => /^skills\/[^/]+\/SKILL\.md$/.test(relPath))
     .sort((a, b) => a.relPath.localeCompare(b.relPath));
-  const skillPaths = skillFiles.map(({ relPath }) => `./${relPath.slice(0, -"/SKILL.md".length)}`);
-
   // Codex 的 Agent Plugins 格式只发现 skills/<name>/SKILL.md，更深的 skill 会被静默忽略
   for (const { relPath } of tree.files) {
     if (/^skills\/[^/]+\/.+\/SKILL\.md$/.test(relPath)) {
@@ -184,7 +99,11 @@ export function validateRepository(root = defaultRoot) {
     }
   }
 
-  validateManifestIdentity(root, skillPaths, errors);
+  try {
+    errors.push(...validateMetadataModel(loadRepositoryMetadata(root)));
+  } catch (error) {
+    errors.push(`仓库元数据无法读取：${error.message}`);
+  }
   return errors;
 }
 
