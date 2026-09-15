@@ -8,6 +8,28 @@ export function escapeHtml(unsafe) {
     .replaceAll("'", "&#039;");
 }
 
+// grader 的 status 不止 passed/failed：unsupported（这个宿主没法观测）、errored（判定本身
+// 出错，比如 judge 调用超时）、not_run（主运行就没跑成功）、inconclusive（信号存在但读不出
+// 先后顺序）都不是"失败"，混进红色 ✗ 里会让人误以为技能/行为真的没达标。
+const GRADER_STATUS_PRESENTATION = {
+  passed: { chipClass: "chip-pass", label: "✓ 通过", autoOpen: false },
+  failed: { chipClass: "chip-fail", label: "✗ 未通过", autoOpen: true },
+  errored: { chipClass: "chip-neutral", label: "⚠ 判定出错", autoOpen: true },
+  unsupported: { chipClass: "chip-neutral", label: "⊘ 不支持", autoOpen: false },
+  not_run: { chipClass: "chip-neutral", label: "– 未运行", autoOpen: true },
+  inconclusive: { chipClass: "chip-neutral", label: "? 不确定", autoOpen: false },
+};
+
+export function graderStatusPresentation(status) {
+  return (
+    GRADER_STATUS_PRESENTATION[status] ?? {
+      chipClass: "chip-neutral",
+      label: `? ${status ?? "未知"}`,
+      autoOpen: true,
+    }
+  );
+}
+
 export function isGraderIndicator(grader, isTwoArm = false) {
   if (!isTwoArm) return false;
   if (grader.arm === "with-only") return true;
@@ -188,14 +210,12 @@ export function generateHtmlReport(data) {
       let gradersHtml = "";
       if (run.graders && run.graders.length > 0) {
         for (const g of run.graders) {
-          const isPassed = g.status === "passed";
-          const chipClass = isPassed ? "chip-pass" : "chip-fail";
-          const statusText = isPassed ? "✓ 通过" : "✗ 未通过";
+          const { chipClass, label: statusText, autoOpen } = graderStatusPresentation(g.status);
           const isIndicator = g.scored === false;
           const details = g.details ? JSON.stringify(g.details, null, 2) : "";
 
           gradersHtml += `
-            <details class="grader"${!isPassed ? " open" : ""}>
+            <details class="grader"${autoOpen ? " open" : ""}>
               <summary>
                 <span class="chip ${chipClass}">${statusText}</span>
                 <span class="grader-name">${escapeHtml(g.name)}</span>
@@ -499,6 +519,7 @@ details.grader>summary:focus-visible{outline:2px solid var(--accent);outline-off
 .chip-pass{color:var(--good);border:1px solid currentColor}
 .chip-fail{color:var(--critical);border:1px solid currentColor}
 .chip.chip-warn{color:var(--warning);border:1px solid currentColor}
+.chip-neutral{color:var(--ink-3);border:1px solid currentColor}
 .explanation{margin:0;font-size:13px;color:var(--ink-2);white-space:pre-wrap;overflow-wrap:break-word}
 .kv{display:flex;gap:8px;font-size:12px;color:var(--ink-3)}
 pre.evidence{margin:0;background:var(--inset);border:1px solid var(--hairline);border-radius:6px;

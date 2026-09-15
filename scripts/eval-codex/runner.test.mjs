@@ -417,6 +417,39 @@ test("generateHtmlReport generates standalone HTML document for codex", () => {
   assert.ok(html.includes("file_change"));
 });
 
+test("generateHtmlReport renders unsupported/errored graders as neutral, not a failure", () => {
+  const data = {
+    summary: {
+      cases: {
+        "codex-demo": {
+          with: { runs: 1, meanScore: 0, meanDuration: 1 },
+          delta: null,
+          notes: "skill-fired: Codex JSONL does not expose a first-class skill invocation event",
+        },
+      },
+    },
+    runs: [
+      {
+        case: "codex-demo",
+        arm: "with",
+        run: 1,
+        score: 0,
+        perfect: false,
+        durationSeconds: 1,
+        graders: [
+          { name: "skill-fired", type: "tool_used", status: "unsupported", reason: "no event" },
+        ],
+      },
+    ],
+    options: { threshold: 1.0 },
+  };
+
+  const html = generateHtmlReport(data);
+  assert.ok(html.includes("chip-neutral"));
+  assert.ok(html.includes("⊘ 不支持"));
+  assert.ok(!html.includes("✗ 未通过"), "an unsupported grader must not render as a failure chip");
+});
+
 test("allows transient error events when the turn ultimately completes", () => {
   const infrastructure = classifyRunInfrastructure(
     { code: 0, timedOut: false },
