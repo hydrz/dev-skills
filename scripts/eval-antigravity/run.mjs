@@ -9,6 +9,7 @@ import { spawnTarget } from "../spawn.lib.mjs";
 
 import {
   buildAgyArgs,
+  buildEffectivePrompt,
   discoverCases,
   evaluateGrader,
   findSkills,
@@ -154,16 +155,17 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   await mkdir(runDirectory, { recursive: true });
   const skill = await initializeAgyWorkspace(workspace, evalCase, arm, skills);
   const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
+  const effectivePrompt = await buildEffectivePrompt(evalCase, skills, arm);
 
   const args = buildAgyArgs({
     workspace,
-    prompt: evalCase.prompt,
+    prompt: effectivePrompt,
     outputFormat: "stream-json",
     model: options.model,
     timeoutMs,
   });
 
-  await writeFile(path.join(runDirectory, "prompt.txt"), evalCase.prompt, "utf8");
+  await writeFile(path.join(runDirectory, "prompt.txt"), effectivePrompt, "utf8");
   await writeFile(
     path.join(runDirectory, "command.json"),
     JSON.stringify([options.agyBin, ...args], null, 2),

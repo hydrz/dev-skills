@@ -309,6 +309,42 @@ export async function copyRequiredSkills(workspace, evalCase, skills) {
   return names;
 }
 
+function skillBody(source) {
+  return source
+    .replaceAll("\r\n", "\n")
+    .replace(/^---\n[\s\S]*?\n---\n+/, "")
+    .trimEnd();
+}
+
+// Codex/Antigravity don't understand Claude Code's slash-command dispatch, so a prompt
+// written in Claude's standard form (e.g. "/grill-me ...") would otherwise reach them as
+// plain, unresolved text. For the "with" arm, inline the required skills' bodies ahead of
+// the case's own prompt so those tools get the same instructions Claude resolves natively.
+export async function buildEffectivePrompt(evalCase, skills, arm) {
+  if (arm !== "with") return evalCase.prompt;
+
+  const names = requiredSkillsForCase(evalCase, skills);
+  if (names.length === 0) return evalCase.prompt;
+
+  const sections = [];
+  for (const name of names) {
+    const source = await readFile(path.join(skills.get(name), "SKILL.md"), "utf8");
+    sections.push(`## ${name}\n\n${skillBody(source)}`);
+  }
+
+  return [
+    "请严格按照以下技能说明行事。",
+    "",
+    sections.join("\n\n"),
+    "",
+    "---",
+    "",
+    "现在请处理下面这个请求：",
+    "",
+    evalCase.prompt,
+  ].join("\n");
+}
+
 export async function evaluateGrader(grader, run, options = {}) {
   if (grader.type === "regex") return evaluateRegexGrader(grader, run);
   if (grader.type === "tool_order") return evaluateToolOrderGrader(grader, run);

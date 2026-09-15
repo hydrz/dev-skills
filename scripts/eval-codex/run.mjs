@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildCodexArgs,
+  buildEffectivePrompt,
   classifyRunInfrastructure,
   copyRequiredSkills,
   discoverCases,
@@ -295,6 +296,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   await mkdir(runDirectory, { recursive: true });
   const skill = await initializeWorkspace(workspace, evalCase, arm, skills);
   const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
+  const effectivePrompt = await buildEffectivePrompt(evalCase, skills, arm);
   const args = buildCodexArgs({
     workspace,
     sandbox: sandboxFor(evalCase),
@@ -303,7 +305,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     json: true,
   });
 
-  await writeFile(path.join(runDirectory, "prompt.txt"), evalCase.prompt, "utf8");
+  await writeFile(path.join(runDirectory, "prompt.txt"), effectivePrompt, "utf8");
   await writeFile(
     path.join(runDirectory, "command.json"),
     JSON.stringify([options.codexBin, ...args], null, 2),
@@ -317,7 +319,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     encoding: "utf8",
   });
   const processResult = await runProcess(options.codexBin, args, {
-    input: evalCase.prompt,
+    input: effectivePrompt,
     timeoutMs,
     shell: true,
     onStdout: (chunk) => traceStream.write(chunk),

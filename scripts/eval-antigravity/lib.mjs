@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
+  buildEffectivePrompt,
   copyRequiredSkills,
   discoverCases,
   evaluateRegexGrader,
@@ -18,6 +19,7 @@ import {
 } from "../eval-report.lib.mjs";
 
 export {
+  buildEffectivePrompt,
   copyRequiredSkills,
   discoverCases,
   escapeHtml,
