@@ -4,4 +4,4 @@ description: 逐轮澄清并压力测试一个计划或设计，直到关键决�
 disable-model-invocation: true
 ---
 
-调用 Skill 工具，参数为 `grilling`。
+使用 `grilling` skill。

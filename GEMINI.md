@@ -18,7 +18,8 @@ Antigravity 通过 `.agents/skills.json` 自动索引 `skills` 目录下的所�
 改完后运行：
 
 - 自动同步多端元数据：`npm run sync`
-- 综合静态检查与测试：`npm run check`
+- 综合静态检查与测试：`npm run check`（含 description 预算与宿主无关措辞检查）
+- 改动 skill 正文后查看字符变化：`npm run report:size`
 - 多端官方 CLI 校验：`npm run validate`（或单独运行 `npm run validate:claude`、`npm run validate:agy`、`npm run validate:codex`）
 - 插件行为评测：`npm run eval:claude`、`npm run eval:agy`、`npm run eval:codex`
 
@@ -29,7 +30,7 @@ Antigravity 通过 `.agents/skills.json` 自动索引 `skills` 目录下的所�
 - **仅用户触发**（user-invoked）：frontmatter 写 `disable-model-invocation: true`。description 是给人看的一句话摘要，说明使用场景、产出结果，以及与最相近 skill 的区别。
 - **可自动触发**（model-invoked）：不写该字段。description 面向 agent，写清触发分支，并同时给出中英文触发词；触发范围保持足够窄。
 
-skill 之间的依赖写成“调用 Skill 工具，参数为 `grilling`”。需要多个 skill 时逐个写明，例如“调用 Skill 工具两次，分别为 `grilling` 和 `domain-modeling`”。可自动触发的 skill 不调用仅用户触发的 skill；需要用户运行某个入口时，写成“告诉用户运行 `/setup-dev-skills`”。
+skill 之间的依赖写成宿主无关的“使用 `grilling` skill”，不写某个宿主的工具协议。需要多个 skill 时逐个写明，例如“分别使用 `grilling` 和 `domain-modeling` skill”。可自动触发的 skill 不调用仅用户触发的 skill；需要用户运行某个入口时，写成“告诉用户运行 `/setup-dev-skills`”。
 
 ## 写作规范
 

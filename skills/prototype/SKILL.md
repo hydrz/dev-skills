@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: 构建一次性原型来回答一个明确的设计问题。用于验证状态模型、业务逻辑或 UI 方向，以及“做个原型、demo、prototype、spike”等请求。
+description: 用于通过一次性原型（prototype、spike）验证状态模型、业务逻辑或 UI 方向。
 ---
 
 # 原型

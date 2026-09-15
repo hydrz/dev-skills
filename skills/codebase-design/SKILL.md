@@ -1,6 +1,6 @@
 ---
 name: codebase-design
-description: 使用深模块原则设计或改进模块接口、职责和测试边界，并按业务复杂度决定业务模块的内部结构。用于“模块设计、codebase design”、降低接口复杂度、确定测试接缝、改善可测性，或讨论“要不要用 DDD、限界上下文、模块化单体、modular monolith、vertical slice、分层过度”。
+description: 用于模块设计（codebase design）、测试接缝与可测性，以及 DDD、限界上下文、模块化单体或 vertical slice 的结构取舍。
 ---
 
 # 代码库设计

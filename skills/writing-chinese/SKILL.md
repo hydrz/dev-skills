@@ -1,6 +1,6 @@
 ---
 name: writing-chinese
-description: 面向中文读者撰写、改写、翻译或审校技术文档、报告、说明和其他成篇内容。用于“中文写作、中文润色、中文改写、Chinese writing、Chinese editing”；普通短对话不触发。
+description: 用于面向中文读者撰写、改写、翻译或审校成篇内容（Chinese writing/editing）；普通短对话不触发。
 ---
 
 # 中文写作与审校
@@ -31,7 +31,7 @@ description: 面向中文读者撰写、改写、翻译或审校技术文档、�
 
 可以从上下文可靠推断时直接继续。缺失信息会显著改变术语、背景、语气或内容时，先向用户确认。没有中文变体线索时，使用中国大陆简体中文；已有原文时保持原文使用的变体。
 
-改写或翻译已有内容时，先提取必须保留的事实、条件、约束、承诺、不确定性和语气。处理 skill、`AGENTS.md`、`CLAUDE.md` 或其他 agent 指令时，调用 Skill 工具，参数为 `writing-for-agents`。先按该 skill 保证指令结构和行为正确，再审校中文表达。
+改写或翻译已有内容时，先提取必须保留的事实、条件、约束、承诺、不确定性和语气。处理 skill、`AGENTS.md`、`CLAUDE.md` 或其他 agent 指令时，先使用 `writing-for-agents` skill 保证指令结构和行为正确，再审校中文表达。
 
 ## 按请求交付
 

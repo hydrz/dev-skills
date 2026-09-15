@@ -1,7 +1,9 @@
 ---
 name: research
-description: 对照高可信一手资料调查技术问题，并在仓库中写入带引用的 Markdown 报告。用于“技术调研、查官方文档、research、核实 API 行为”等请求。
+description: 用于用户明确要求在仓库中留下带引用的技术调研报告（research report）时；一次性查文档或核实 API 行为直接回答，不触发。
 ---
+
+本 skill 只用于需要在仓库中留下调研记录的请求。只想知道一个答案时，直接查资料回答，不派 agent，也不写文件。
 
 派一个**后台 agent** 做调研，你继续处理其他工作。
 
