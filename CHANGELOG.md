@@ -1,5 +1,13 @@
 # dev-skills
 
+## 0.5.1
+
+### Patch Changes
+
+- [`411a561`](https://github.com/hydrz/dev-skills/commit/411a561ee55b9fc8b0d1f4f5d5a214f75f6fbb35) Thanks [@hydrz](https://github.com/hydrz)! - 提升跨平台与操作系统兼容性：新增 `.gitattributes` 锁定换行符为 LF；统一 CLI 入口和 shell 脚本的 POSIX 可执行权限；`eval-antigravity` 支持 Windows 下以脚本方式调起 `agy`；`lint-writing` 支持 CRLF 换行符解析。
+
+- [#41](https://github.com/hydrz/dev-skills/pull/41) [`d0ef8ee`](https://github.com/hydrz/dev-skills/commit/d0ef8ee3ba06179eaa728dcfdf193a2e3dc94c21) Thanks [@hydrz](https://github.com/hydrz)! - 重构 `lint-writing` 静态检查：移除教条的破折号封杀与冗余的 frontmatter 校验；增加半角标点误用、冒号规范、斜杠顿号替代、中文括号与机翻黑话拦截规则；支持多层嵌套代码块与局部豁免，并补充完整自动化测试套件。
+
 ## 0.5.0
 
 ### Minor Changes
