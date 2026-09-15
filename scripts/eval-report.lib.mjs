@@ -15,6 +15,33 @@ export function isGraderIndicator(grader, isTwoArm = false) {
   return false;
 }
 
+export function runTokens(run) {
+  const usage = run?.usage;
+  if (!usage) return null;
+  if (usage.total_tokens) return usage.total_tokens;
+  const input = usage.input_tokens ?? 0;
+  const output = usage.output_tokens ?? 0;
+  return input + output > 0 ? input + output : null;
+}
+
+// 每个 case 两组的平均 token 和差值，用来比较加载插件带来的额外成本
+export function caseTokenStats(caseRuns = []) {
+  const mean = (arm) => {
+    const values = caseRuns
+      .filter((run) => run.arm === arm)
+      .map(runTokens)
+      .filter((value) => value != null);
+    return values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : null;
+  };
+  const withTokens = mean("with");
+  const withoutTokens = mean("without");
+  return {
+    with: withTokens,
+    without: withoutTokens,
+    delta: withTokens != null && withoutTokens != null ? withTokens - withoutTokens : null,
+  };
+}
+
 export function formatSummaryTable(summary, options = {}) {
   const cases = summary.cases ?? {};
   const entries = Object.entries(cases);
@@ -138,6 +165,13 @@ export function generateHtmlReport(data) {
       : `<span class="badge badge-danger">FAIL</span>`;
     const runsCount = c.with?.runs ?? c.without?.runs ?? 1;
     const durationSec = ((c.with?.meanDuration ?? 0) + (c.without?.meanDuration ?? 0)).toFixed(1);
+    const tokens = caseTokenStats(runsByCase[name]);
+    const tokensHtml =
+      tokens.with == null && tokens.without == null
+        ? "N/A"
+        : `${tokens.with ?? "N/A"} / ${tokens.without ?? "N/A"}${
+            tokens.delta != null ? ` (${tokens.delta >= 0 ? "+" : ""}${tokens.delta})` : ""
+          }`;
 
     tableRowsHtml += `
       <tr>
@@ -147,6 +181,7 @@ export function generateHtmlReport(data) {
         <td>${deltaHtml}</td>
         <td>${runsCount}</td>
         <td>${durationSec}s</td>
+        <td><code>${tokensHtml}</code></td>
         <td>${statusBadge}</td>
         <td class="text-muted">${escapeHtml(c.notes ?? (isPass ? "PASS" : "FAIL"))}</td>
       </tr>
@@ -585,6 +620,7 @@ export function generateHtmlReport(data) {
             <th>Δ</th>
             <th>RUNS</th>
             <th>TIME</th>
+            <th>TOKENS (WITH / W/OUT, Δ)</th>
             <th>STATUS</th>
             <th>NOTES</th>
           </tr>

@@ -1,6 +1,6 @@
 ---
 name: wizard
-description: 为必须由人完成的外部配置生成交互式 Bash 向导。用于“设置向导、setup wizard”、开通基础设施、配置凭据或 CI 密钥，以及需要人工确认的迁移。
+description: 用于为外部配置、凭据、CI 密钥或人工迁移生成交互式设置向导（setup wizard）。
 ---
 
 # 向导

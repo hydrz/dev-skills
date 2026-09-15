@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: 先核实代码评审意见的上下文和技术正确性，再决定是否修改。用于“处理评审意见、receiving code review”，尤其是意见含糊或可能不适用于当前代码时。
+description: 用于处理代码评审意见（receiving code review），尤其是意见含糊或可能不适用于当前代码时。
 ---
 
 # 处理评审意见

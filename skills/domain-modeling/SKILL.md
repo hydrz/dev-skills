@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: 构建并维护项目的领域模型、通用语言和架构决策。用于“领域建模、domain modeling”、修改 `CONTEXT.md`，或创建和更新 ADR 等请求。
+description: 用于领域建模（domain modeling）、维护 `CONTEXT.md`，以及创建或更新 ADR。
 ---
 
 # 领域建模

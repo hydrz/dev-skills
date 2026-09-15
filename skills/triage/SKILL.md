@@ -86,7 +86,7 @@ PR 在分诊范围内时，把外部 PR 也放进这些分组，每行标注 `[P
 
    报告核实结果：已确认（附代码路径）、无法复现，或细节不足（强烈建议转为 `needs-info`）。经过核实的结论能让 agent 简报可靠得多。
 
-4. **追问（如需要）。** 请求需要补充细节时，调用 Skill 工具两次，分别为 `grilling` 和 `domain-modeling`，逐轮澄清需求。决策确定时，就地完善领域术语，更新 `CONTEXT.md` 和 ADR。
+4. **追问（如需要）。** 请求需要补充细节时，分别使用 `grilling` 和 `domain-modeling` skill，逐轮澄清需求。决策确定时，就地完善领域术语，更新 `CONTEXT.md` 和 ADR。
 
 5. **应用结果：**
    - `ready-for-agent`：发布一条 agent 简报评论（见 [AGENT-BRIEF.md](AGENT-BRIEF.md)）。

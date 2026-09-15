@@ -14,7 +14,7 @@
 
 ## 依赖关系
 
-- 仅用户触发的 skill 可以调用可自动触发的 skill。例如：“调用 `Skill` 工具，参数为 `tdd`。”
+- 仅用户触发的 skill 可以使用可自动触发的 skill。例如：“使用 `tdd` skill。”
 - 需要两个 skill 时分别调用，例如：“分别调用 `grilling` 和 `domain-modeling`。”
 - 可自动触发的 skill 不应触发仅用户触发的 skill。如果后续流程需要用户运行某个入口，应直接告诉用户，例如：“请运行 `/setup-dev-skills`。”
 - 共享参考资料放在负责该知识的 skill 中，其他 skill 通过调用它获得，不跨目录链接内部文件。

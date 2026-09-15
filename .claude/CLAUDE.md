@@ -15,7 +15,8 @@
 
 改完后运行：
 
-- 静态检查与测试：`npm run check`（写作规范、元数据同步、prettier 格式和脚本测试，与 CI 一致）
+- 静态检查与测试：`npm run check`（写作规范、元数据同步、description 预算与宿主无关措辞、prettier 格式和脚本测试，与 CI 一致）
+- 改动 skill 正文后查看字符变化：`npm run report:size`（与 `HEAD` 对比主文件和完整包）
 - Claude Code 校验：`claude plugin validate . --strict`
 - Antigravity 校验：`agy plugin validate .`
 
@@ -26,7 +27,7 @@
 - **仅用户触发**（user-invoked）：frontmatter 写 `disable-model-invocation: true`。description 是给人看的一句话摘要，说明使用场景、产出结果，以及与最相近 skill 的区别。
 - **可自动触发**（model-invoked）：不写该字段。description 面向 agent，写清触发分支，并同时给出中英文触发词；触发范围保持足够窄。
 
-skill 之间的依赖写成“调用 Skill 工具，参数为 `grilling`”。需要多个 skill 时逐个写明，例如“调用 Skill 工具两次，分别为 `grilling` 和 `domain-modeling`”。可自动触发的 skill 不调用仅用户触发的 skill；需要用户运行某个入口时，写成“告诉用户运行 `/setup-dev-skills`”。
+skill 之间的依赖写成宿主无关的“使用 `grilling` skill”，不写某个宿主的工具协议。需要多个 skill 时逐个写明，例如“分别使用 `grilling` 和 `domain-modeling` skill”。可自动触发的 skill 不调用仅用户触发的 skill；需要用户运行某个入口时，写成“告诉用户运行 `/setup-dev-skills`”。
 
 ## 写作规范
 

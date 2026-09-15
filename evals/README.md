@@ -42,6 +42,8 @@
 | `writing-chinese-unpacks-terms-for-reader` | `writing-chinese` | 触发、行为 | `llm` | 面向非技术读者解释术语，同时保留阈值和具体行为 |
 | `writing-chinese-resists-over-compression` | `writing-chinese` | 触发、行为、压力 | `llm` | 用户要求极短文案时仍保留制度中的条件和例外 |
 | `writing-chinese-does-not-replace-reexplanation` | `writing-chinese` | 反例 | `tool_used`（不得触发）、`llm` | 只需重新解释上一段时不进入成篇写作流程 |
+| `research-not-triggered-by-one-off-question` | `research` | 反例 | `tool_used`（不得触发）、`llm` | 一次性核实 API 行为时直接回答，不派后台 agent、不写报告 |
+| `research-writes-cited-report` | `research` | 触发、行为 | `llm` | 明确要求在仓库留下调研报告时，以一手资料为依据并标注来源 |
 
 ### 按正文执行的用例
 

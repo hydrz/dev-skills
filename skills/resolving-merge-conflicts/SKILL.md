@@ -1,6 +1,6 @@
 ---
 name: resolving-merge-conflicts
-description: 根据冲突两侧的改动意图解决正在进行的 Git merge 或 rebase。用于“解决合并冲突、resolve conflicts、继续 rebase”等请求。
+description: 用于解决合并冲突（resolve conflicts），或继续发生冲突的 Git merge 和 rebase。
 ---
 
 1. **了解现状。** 查看 merge 或 rebase 的当前状态、git 历史和冲突文件。
@@ -13,4 +13,4 @@ description: 根据冲突两侧的改动意图解决正在进行的 Git merge �
 
 5. **完成 merge 或 rebase。** 暂存全部改动并提交。rebase 时继续执行，直到所有提交都完成变基。
 
-完成之前调用 Skill 工具，参数为 `verifying-completion`：检查命令的输出必须来自本轮运行。
+完成之前使用 `verifying-completion` skill；检查命令的输出必须来自本轮运行。
