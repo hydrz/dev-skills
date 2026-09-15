@@ -95,6 +95,12 @@ claude plugin eval . --allow-tools Write Edit
 
 `tdd-new-function` 需要写文件，所以要授予 `Write` 和 `Edit`；写入限制在每次运行的临时工作区内。首次运行会询问是否信任该目录，非终端环境中加 `--trust-plugin`。
 
+#### 用 Ollama 模型省 token
+
+```bash
+ANTHROPIC_BASE_URL=http://localhost:11434 ANTHROPIC_AUTH_TOKEN=ollama npm run eval:claude -- --model <本地模型名>
+```
+
 每个 case 默认运行 3 次，并额外运行 3 次不加载插件的基线。常用参数：
 
 | 参数 | 作用 |
