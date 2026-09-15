@@ -6,8 +6,9 @@ import {
   generateHtmlReport,
   isGraderIndicator,
 } from "../eval-report.lib.mjs";
+import { summarizeResults } from "../eval-cli-shared.lib.mjs";
 
-export { escapeHtml, formatSummaryTable, generateHtmlReport, isGraderIndicator };
+export { escapeHtml, formatSummaryTable, generateHtmlReport, isGraderIndicator, summarizeResults };
 
 function parseScalar(rawValue) {
   const value = rawValue.trim();
@@ -379,58 +380,6 @@ export function summarizeGraderResults(graderResults, isTwoArm = false) {
         return grader.status === "passed" || grader.status === "unsupported";
       }),
   };
-}
-
-export function summarizeResults(results) {
-  const cases = {};
-
-  for (const result of results) {
-    cases[result.case] ??= { with: [], without: [] };
-    cases[result.case][result.arm].push(result);
-  }
-
-  for (const [caseName, arms] of Object.entries(cases)) {
-    const summarized = {};
-    for (const arm of ["with", "without"]) {
-      if (arms[arm].length === 0) continue;
-      const scores = arms[arm]
-        .map((result) => result.score)
-        .filter((score) => typeof score === "number");
-      const durations = arms[arm]
-        .map((result) => result.durationSeconds ?? 0)
-        .filter((d) => typeof d === "number");
-      summarized[arm] = {
-        runs: arms[arm].length,
-        meanScore: scores.length
-          ? scores.reduce((sum, score) => sum + score, 0) / scores.length
-          : null,
-        meanDuration: durations.length
-          ? durations.reduce((sum, d) => sum + d, 0) / durations.length
-          : 0,
-        perfectRuns: arms[arm].filter((result) => result.perfect).length,
-      };
-    }
-    summarized.delta =
-      summarized.with?.meanScore != null && summarized.without?.meanScore != null
-        ? summarized.with.meanScore - summarized.without.meanScore
-        : null;
-
-    let failingNote = "PASS";
-    for (const run of arms.with ?? []) {
-      const failingGrader = (run.graders ?? []).find(
-        (g) => g.status === "failed" && g.scored !== false,
-      );
-      if (failingGrader) {
-        failingNote = `${failingGrader.name}: ${failingGrader.reason}`;
-        break;
-      }
-    }
-    summarized.notes = failingNote;
-
-    cases[caseName] = summarized;
-  }
-
-  return { cases };
 }
 
 export function classifyRunInfrastructure(processResult, parsed) {

@@ -244,25 +244,28 @@ test("parses JSONL while retaining malformed-line diagnostics", () => {
   assert.equal(parsed.finalResponse, "done");
 });
 
+// 只断言发现/解析逻辑的行为不变量，不快照 evals/ 目录里现有多少个 case 或 grader——
+// 那是内容维护，不是这份代码要保证的事，snapshot 式断言只会让每次加减 case 都要改测试。
+const KNOWN_GRADER_TYPES = new Set(["regex", "llm", "tool_used", "tool_order", "file_exists"]);
+
 test("loads every existing case and grader", async () => {
   const evalsDirectory = path.resolve("evals");
   const cases = await discoverCases(evalsDirectory);
 
-  assert.equal(cases.length, 29);
-  assert.equal(cases.flatMap((entry) => entry.graders).length, 62);
-  assert.deepEqual(
-    Object.fromEntries(
-      Object.entries(
-        cases
-          .flatMap((entry) => entry.graders)
-          .reduce((counts, grader) => {
-            counts[grader.type] = (counts[grader.type] ?? 0) + 1;
-            return counts;
-          }, {}),
-      ).sort(),
-    ),
-    { llm: 24, regex: 9, tool_order: 1, tool_used: 28 },
-  );
+  assert.ok(cases.length > 0, "评测套件里应该至少有一个 case");
+
+  const names = cases.map((entry) => entry.name);
+  assert.equal(new Set(names).size, names.length, "case 名称不应该重复");
+
+  for (const evalCase of cases) {
+    assert.ok(evalCase.graders.length > 0, `${evalCase.name} 应该至少有一个 grader`);
+    for (const grader of evalCase.graders) {
+      assert.ok(
+        KNOWN_GRADER_TYPES.has(grader.type),
+        `${evalCase.name}/${grader.name} 的 grader type "${grader.type}" 不是已知类型`,
+      );
+    }
+  }
 });
 
 test("indexes all repository skills by frontmatter name", async () => {
@@ -283,21 +286,28 @@ test("marks skill invocation graders unsupported", async () => {
   assert.match(result.reason, /skill invocation/i);
 });
 
-test("CLI dry-run reports selected cases without invoking Codex", () => {
+test("CLI dry-run reports selected cases without invoking Codex", async () => {
+  const expectedCases = await discoverCases(path.resolve("evals"), { tag: "grilling" });
+  assert.ok(expectedCases.length > 0, "至少应该有一个带 grilling 标签的 case 用来验证过滤");
+
   const result = spawnSync(
     process.execPath,
-    [path.resolve("scripts/eval-codex/run.mjs"), "--dry-run", "--case", "tdd-*"],
+    [path.resolve("scripts/eval-codex/run.mjs"), "--dry-run", "--tag", "grilling"],
     { cwd: path.resolve("."), encoding: "utf8" },
   );
 
   assert.equal(result.status, 0, result.stderr);
   const output = JSON.parse(result.stdout);
   assert.deepEqual(
-    output.cases.map((entry) => entry.name),
-    ["tdd-concept-question", "tdd-new-function", "tdd-tests-after-pressure"],
+    output.cases.map((entry) => entry.name).sort(),
+    expectedCases.map((entry) => entry.name).sort(),
   );
-  assert.equal(output.summary.cases, 3);
-  assert.equal(output.summary.graders.unsupported, 3);
+  assert.equal(output.summary.cases, expectedCases.length);
+  // 这批 case 全部依赖 tool_used: Skill 判定是否触发，目前对 Codex 不可观测。
+  const skillGraderCount = expectedCases
+    .flatMap((entry) => entry.graders)
+    .filter((grader) => grader.type === "tool_used" && grader.tool === "Skill").length;
+  assert.equal(output.summary.graders.unsupported, skillGraderCount);
 });
 
 test("does not call an all-unsupported run perfect", () => {
@@ -405,6 +415,39 @@ test("generateHtmlReport generates standalone HTML document for codex", () => {
   assert.ok(html.includes("Codex 插件评测报告"));
   assert.ok(html.includes("codex-demo"));
   assert.ok(html.includes("file_change"));
+});
+
+test("generateHtmlReport renders unsupported/errored graders as neutral, not a failure", () => {
+  const data = {
+    summary: {
+      cases: {
+        "codex-demo": {
+          with: { runs: 1, meanScore: 0, meanDuration: 1 },
+          delta: null,
+          notes: "skill-fired: Codex JSONL does not expose a first-class skill invocation event",
+        },
+      },
+    },
+    runs: [
+      {
+        case: "codex-demo",
+        arm: "with",
+        run: 1,
+        score: 0,
+        perfect: false,
+        durationSeconds: 1,
+        graders: [
+          { name: "skill-fired", type: "tool_used", status: "unsupported", reason: "no event" },
+        ],
+      },
+    ],
+    options: { threshold: 1.0 },
+  };
+
+  const html = generateHtmlReport(data);
+  assert.ok(html.includes("chip-neutral"));
+  assert.ok(html.includes("⊘ 不支持"));
+  assert.ok(!html.includes("✗ 未通过"), "an unsupported grader must not render as a failure chip");
 });
 
 test("allows transient error events when the turn ultimately completes", () => {

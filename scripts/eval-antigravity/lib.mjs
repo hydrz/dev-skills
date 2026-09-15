@@ -16,6 +16,7 @@ import {
   generateHtmlReport,
   isGraderIndicator,
 } from "../eval-report.lib.mjs";
+import { summarizeResults } from "../eval-cli-shared.lib.mjs";
 
 export {
   copyRequiredSkills,
@@ -29,7 +30,34 @@ export {
   parseMarkdownWithFrontmatter,
   primarySkillForCase,
   requiredSkillsForCase,
+  summarizeResults,
 };
+
+// 用探针 case 实测过 `agy --help`：--sandbox 是不取值的布尔开关（"Run in a sandbox
+// with terminal restrictions enabled"），不是 Codex 那种 readonly/workspace-write 取值
+// 参数——最初按 Codex 的形状实现是错的，传 `--sandbox readonly` 会被 agy 直接拒绝。
+// 只读 case 只加 --sandbox（终端级限制，不跳过权限确认）；需要写权限的 case 才加
+// --dangerously-skip-permissions 一起用 --sandbox。
+//
+// "unrestricted" 是第三种模式，只给 judge 调用用：探针实测发现 --sandbox 和
+// --dangerously-skip-permissions 叠加会挡掉 agy 产出结构化 JSON 输出所需的一个内部
+// "command" 调用（即使已经 skip permissions），报 "headless mode cannot prompt" 直接
+// 判失败。judge 只在一次性的临时目录里跑、不碰真实工作区，OS 级沙箱在这里不提供实质
+// 保护，所以只跳过权限确认，不加 --sandbox。
+function sandboxArgsFor(mode) {
+  if (mode === "workspace-write") {
+    return ["--dangerously-skip-permissions", "--sandbox"];
+  }
+  if (mode === "unrestricted") {
+    return ["--dangerously-skip-permissions"];
+  }
+  return ["--sandbox"];
+}
+
+export function sandboxFor(evalCase) {
+  const tools = evalCase.metadata?.allowed_tools ?? [];
+  return tools.some((tool) => tool === "Write" || tool === "Edit") ? "workspace-write" : "readonly";
+}
 
 export function buildAgyArgs(options) {
   const args = [];
@@ -38,15 +66,9 @@ export function buildAgyArgs(options) {
     args.push("--add-dir", options.workspace);
   }
 
-  args.push(
-    "--print",
-    options.prompt,
-    "--output-format",
-    options.outputFormat ?? "json",
-    "--dangerously-skip-permissions",
-    "--model",
-    options.model ?? "gemini-3.8-flash-low",
-  );
+  args.push("--print", options.prompt, "--output-format", options.outputFormat ?? "json");
+  args.push(...sandboxArgsFor(options.sandbox ?? "workspace-write"));
+  args.push("--model", options.model ?? "gemini-3.8-flash-low");
 
   if (options.jsonSchema) {
     args.push("--json-schema", options.jsonSchema);
@@ -335,6 +357,7 @@ Return whether the rubric passes and a concise reason.`;
     outputFormat: "json",
     jsonSchema: rubricSchema,
     model: options.judgeModel ?? options.model ?? "gemini-3.8-flash-low",
+    sandbox: "unrestricted",
     timeoutMs: options.timeoutMs ?? 120000,
   });
 
@@ -404,55 +427,4 @@ export function summarizeGraderResults(graderResults, isTwoArm = false) {
         (grader) => grader.status === "passed" || grader.status === "unsupported",
       ),
   };
-}
-
-export function summarizeResults(results, isTwoArm = false) {
-  const cases = {};
-
-  for (const result of results) {
-    cases[result.case] ??= { with: [], without: [] };
-    cases[result.case][result.arm].push(result);
-  }
-
-  for (const [caseName, arms] of Object.entries(cases)) {
-    const summarized = {};
-    for (const arm of ["with", "without"]) {
-      if (arms[arm].length === 0) continue;
-      const scores = arms[arm]
-        .map((result) => result.score)
-        .filter((score) => typeof score === "number");
-      const durations = arms[arm].map((result) => result.durationSeconds ?? 0);
-      summarized[arm] = {
-        runs: arms[arm].length,
-        meanScore: scores.length ? scores.reduce((sum, s) => sum + s, 0) / scores.length : null,
-        perfectRuns: arms[arm].filter((result) => result.perfect).length,
-        meanDuration: durations.length
-          ? durations.reduce((sum, d) => sum + d, 0) / durations.length
-          : 0,
-      };
-    }
-
-    summarized.delta =
-      summarized.with?.meanScore != null && summarized.without?.meanScore != null
-        ? summarized.with.meanScore - summarized.without.meanScore
-        : null;
-
-    // 提取失败原因或错误信息
-    const withRuns = arms.with ?? [];
-    let failingNote = "PASS";
-    for (const run of withRuns) {
-      const failingGrader = (run.graders ?? []).find(
-        (g) => g.status === "failed" && g.scored !== false,
-      );
-      if (failingGrader) {
-        failingNote = `${failingGrader.name}: ${failingGrader.reason}`;
-        break;
-      }
-    }
-    summarized.notes = failingNote;
-
-    cases[caseName] = summarized;
-  }
-
-  return { cases };
 }

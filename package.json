@@ -33,7 +33,9 @@
     "eval:claude": "node scripts/eval-claude.mjs",
     "eval:claude:quick": "node scripts/eval-claude.mjs --quick",
     "eval:codex": "node scripts/eval-codex/run.mjs",
+    "eval:codex:quick": "node scripts/eval-codex/run.mjs --quick",
     "eval:agy": "node scripts/eval-antigravity/run.mjs",
+    "eval:agy:quick": "node scripts/eval-antigravity/run.mjs --quick",
     "changeset": "changeset",
     "version": "changeset version && npm run sync"
   },
