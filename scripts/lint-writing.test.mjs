@@ -33,20 +33,6 @@ test("detects half-width colon in Chinese explanations", () => {
   assert.equal(lintWritingText(techNotation).length, 0);
 });
 
-test("detects slash with spaces used instead of Chinese dunhao", () => {
-  const bad = "依赖 / 提供，或输入 / 输出。";
-  const errors = lintWritingText(bad);
-  assert.equal(errors.length, 2);
-  assert.equal(errors[0].rule, "slash-as-dunhao");
-
-  const good = "依赖或提供，或输入、输出。";
-  assert.equal(lintWritingText(good).length, 0);
-
-  // 行内代码之间的斜杠不应误报
-  const codeSlash = "通过 `model` / `effort` 指定参数。";
-  assert.equal(lintWritingText(codeSlash).length, 0);
-});
-
 test("detects half-width parentheses used for Chinese explanations", () => {
   const bad = "检查核心模块(包含前置依赖)的状态。";
   const errors = lintWritingText(bad);
@@ -82,6 +68,15 @@ test("detects non-recommended machine-translation and slop phrases", () => {
 
   const good = "逐轮压力测试并澄清方案，明确各项任务的前置依赖。";
   assert.equal(lintWritingText(good).length, 0);
+});
+
+test("allows slashes with spaces between Chinese words without false alarm", () => {
+  // 斜杠技术项或并列项（如“技能 / 命令”、“输入 / 输出”）不应报错
+  const slashPhrase = "依赖 / 提供，或输入 / 输出。";
+  assert.equal(lintWritingText(slashPhrase).length, 0);
+
+  const header = "| 技能 / 命令 | 说明 |";
+  assert.equal(lintWritingText(header).length, 0);
 });
 
 test("allows legal Chinese dashes and hyphenated arguments without false alarm", () => {
