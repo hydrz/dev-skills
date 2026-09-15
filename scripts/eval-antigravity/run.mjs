@@ -5,11 +5,20 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  applyQuickShortcut,
+  buildAggregateResult,
+  createInterruptController,
+  exitCodeFor,
+  parseOptionsFromSpec,
+  runWithConcurrency,
+  summarizeResults as summarizeCaseResults,
+  validateCommonOptions,
+} from "../eval-cli-shared.lib.mjs";
 import { spawnTarget } from "../spawn.lib.mjs";
 
 import {
   buildAgyArgs,
-  buildEffectivePrompt,
   discoverCases,
   evaluateGrader,
   findSkills,
@@ -20,8 +29,8 @@ import {
   parseAgyOutput,
   primarySkillForCase,
   requiredSkillsForCase,
+  sandboxFor,
   summarizeGraderResults,
-  summarizeResults,
 } from "./lib.mjs";
 
 const agyDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -33,70 +42,44 @@ function usage() {
   return `Usage: node scripts/eval-antigravity/run.mjs [options]
 
 Options:
-  --case <glob>          Run matching case names (default: *)
-  --tag <tag>            Run cases containing this tag
-  --runs <n>             Repetitions per case and arm (default: 1)
-  --arm <with|without|both>
-                         Skill ablation arm (default: with)
-  --model <model>        Antigravity model override (default: gemini-3.8-flash-low)
-  --judge-model <model>  Model for LLM rubrics (default: gemini-3.8-flash-low)
-  --skip-llm-graders     Skip calling LLM judge for rubrics
-  --threshold <0..1>     Pass threshold for WITH arm score (default: 1.0)
-  --dry-run              Print selected cases and grader compatibility
-  --agy-bin <path>       Antigravity executable (default: agy)
-  --help                 Show this help
+  --case <glob>           Run matching case names (default: *)
+  --tag <tag>             Run cases containing this tag
+  --runs <n>              Repetitions per case and arm (default: 1)
+  --ablation <mode>       none | with-without (default: with-without)
+  --concurrency, -j <n>   Concurrent runs, 1-8 (default: 1)
+  --model <model>         Antigravity model override (default: gemini-3.8-flash-low)
+  --judge-model <model>   Model for LLM rubrics (default: gemini-3.8-flash-low)
+  --skip-llm-graders      Skip calling LLM judge for rubrics
+  --threshold <0..1>      Pass threshold for WITH arm score (default: 1.0)
+  --quick                 Shorthand for --runs 1 --ablation none
+  --dry-run               Print selected cases and grader compatibility
+  --agy-bin <path>        Antigravity executable (default: agy)
+  --help                  Show this help
 `;
 }
 
+const OPTION_SPEC = {
+  "--case": { key: "casePattern", type: "string", default: "*" },
+  "--tag": { key: "tag", type: "string" },
+  "--runs": { key: "runs", type: "number", default: 1 },
+  "--ablation": { key: "ablation", type: "string", default: "with-without" },
+  "--concurrency": { key: "concurrency", type: "number", default: 1 },
+  "-j": { key: "concurrency", type: "number" },
+  "--model": { key: "model", type: "string", default: "gemini-3.8-flash-low" },
+  "--judge-model": { key: "judgeModel", type: "string", default: "gemini-3.8-flash-low" },
+  "--skip-llm-graders": { key: "skipLlmGraders", type: "boolean", default: false },
+  "--threshold": { key: "threshold", type: "number", default: 1.0 },
+  "--quick": { key: "quick", type: "boolean", default: false },
+  "--dry-run": { key: "dryRun", type: "boolean", default: false },
+  "--agy-bin": { key: "agyBin", type: "string", default: "agy" },
+  "--help": { key: "help", type: "boolean", default: false },
+  "-h": { key: "help", type: "boolean" },
+};
+
 function parseArguments(argv) {
-  const options = {
-    casePattern: "*",
-    runs: 1,
-    arm: "with",
-    model: "gemini-3.8-flash-low",
-    judgeModel: "gemini-3.8-flash-low",
-    skipLlmGraders: false,
-    threshold: 1.0,
-    agyBin: "agy",
-    dryRun: false,
-  };
-
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    const next = () => {
-      index += 1;
-      if (index >= argv.length) throw new Error(`${argument} requires a value`);
-      return argv[index];
-    };
-
-    if (argument === "--case") options.casePattern = next();
-    else if (argument === "--tag") options.tag = next();
-    else if (argument === "--runs") options.runs = Number(next());
-    else if (argument === "--arm") options.arm = next();
-    else if (argument === "--model") options.model = next();
-    else if (argument === "--judge-model") options.judgeModel = next();
-    else if (argument === "--skip-llm-graders") options.skipLlmGraders = true;
-    else if (argument === "--threshold") options.threshold = Number(next());
-    else if (argument === "--agy-bin") options.agyBin = next();
-    else if (argument === "--dry-run") options.dryRun = true;
-    else if (argument === "--help" || argument === "-h") options.help = true;
-    else {
-      throw new Error(
-        `Unknown option: ${argument}. In Windows PowerShell, npm drops a bare --; use: npm run eval:agy '--' --case <name>`,
-      );
-    }
-  }
-
-  if (!Number.isInteger(options.runs) || options.runs < 1) {
-    throw new Error("--runs must be a positive integer");
-  }
-  if (!["with", "without", "both"].includes(options.arm)) {
-    throw new Error("--arm must be with, without, or both");
-  }
-  if (Number.isNaN(options.threshold) || options.threshold < 0 || options.threshold > 1) {
-    throw new Error("--threshold must be a number between 0 and 1");
-  }
-  return options;
+  const options = applyQuickShortcut(parseOptionsFromSpec(argv, OPTION_SPEC));
+  if (options.help) return options;
+  return validateCommonOptions(options);
 }
 
 function graderCompatibility(grader, options) {
@@ -108,7 +91,7 @@ function graderCompatibility(grader, options) {
 }
 
 function dryRunReport(cases, skills, options) {
-  return {
+  const report = {
     cases: cases.map((evalCase) => ({
       name: evalCase.name,
       skill: primarySkillForCase(evalCase, skills),
@@ -119,12 +102,23 @@ function dryRunReport(cases, skills, options) {
         compatibility: graderCompatibility(g, options),
       })),
     })),
+    summary: { cases: cases.length, graders: {} },
   };
+
+  for (const grader of report.cases.flatMap((entry) => entry.graders)) {
+    report.summary.graders[grader.compatibility] =
+      (report.summary.graders[grader.compatibility] ?? 0) + 1;
+  }
+  return report;
 }
 
 function runProcess(bin, args, options = {}) {
   return new Promise((resolve) => {
-    const useShell = Boolean(options.shell ?? process.platform === "win32");
+    // agy 是原生 .exe（不像 claude/codex 那样常以 .cmd 装机脚本安装），探针 case 实测过：
+    // 经 cmd.exe（shell: true）转发时，多行/带引号的长 prompt 会被 cmd 的行式解析打散成
+    // 错误的参数，agy 收到的内容跟发出去的完全不一样。默认不走 shell，直接传参数数组，
+    // 让 Windows CreateProcess 原样处理每个参数。
+    const useShell = Boolean(options.shell);
     const target = spawnTarget(bin, args, useShell);
     const child = spawn(target.command, target.args, {
       cwd: options.cwd,
@@ -135,6 +129,7 @@ function runProcess(bin, args, options = {}) {
 
     let stdout = "";
     let stderr = "";
+    let timedOut = false;
 
     child.stdout.on("data", (chunk) => {
       stdout += chunk.toString("utf8");
@@ -143,8 +138,16 @@ function runProcess(bin, args, options = {}) {
       stderr += chunk.toString("utf8");
     });
 
+    const timer = options.timeoutMs
+      ? setTimeout(() => {
+          timedOut = true;
+          child.kill();
+        }, options.timeoutMs)
+      : null;
+
     child.on("close", (code) => {
-      resolve({ code, stdout, stderr });
+      if (timer) clearTimeout(timer);
+      resolve({ code, stdout, stderr, timedOut });
     });
   });
 }
@@ -155,13 +158,16 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   await mkdir(runDirectory, { recursive: true });
   const skill = await initializeAgyWorkspace(workspace, evalCase, arm, skills);
   const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
-  const effectivePrompt = await buildEffectivePrompt(evalCase, skills, arm);
+  // prompt 原样发送，不做技能正文注入，也不翻译 Claude 风格的显式调用前缀——见 grill-me
+  // 决策 Q2/Q3；只读/可写沙箱分级见决策 Q7。
+  const effectivePrompt = evalCase.prompt;
 
   const args = buildAgyArgs({
     workspace,
     prompt: effectivePrompt,
     outputFormat: "stream-json",
     model: options.model,
+    sandbox: sandboxFor(evalCase),
     timeoutMs,
   });
 
@@ -171,43 +177,67 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     JSON.stringify([options.agyBin, ...args], null, 2),
   );
 
-  const processResult = await runProcess(options.agyBin, args, { cwd: workspace });
+  const processResult = await runProcess(options.agyBin, args, { cwd: workspace, timeoutMs });
   await writeFile(path.join(runDirectory, "stdout.txt"), processResult.stdout, "utf8");
   await writeFile(path.join(runDirectory, "stderr.txt"), processResult.stderr, "utf8");
 
   const agyResult = parseAgyOutput(processResult.stdout);
+  const infrastructurePassed = !processResult.timedOut && processResult.code === 0;
+  const infrastructureReason = processResult.timedOut
+    ? "agy process timed out"
+    : processResult.code !== 0
+      ? `agy process exited with code ${processResult.code}`
+      : null;
+
   const graderResults = [];
+  if (infrastructurePassed) {
+    for (const grader of evalCase.graders) {
+      const indicator = isGraderIndicator(grader, isTwoArm);
+      const evaluation = await evaluateGrader(
+        grader,
+        {
+          prompt: evalCase.prompt,
+          finalResponse: agyResult.finalResponse,
+          workspace,
+          toolCalls: agyResult.toolCalls,
+          events: agyResult.events,
+        },
+        {
+          agyBin: options.agyBin,
+          judgeModel: options.judgeModel,
+          model: options.model,
+          skipLlmGraders: options.skipLlmGraders,
+          // agy 判定一次简单 JSON 也常常要 40-100s+（探针 case 实测），judge 调用需要
+          // 一个独立于主运行剩余预算的、够用的超时，而不是共享同一个 case 超时。
+          timeoutMs: Math.max(timeoutMs, 180000),
+          runDirectory,
+          runProcess,
+        },
+      );
 
-  for (const grader of evalCase.graders) {
-    const indicator = isGraderIndicator(grader, isTwoArm);
-    const evaluation = await evaluateGrader(
-      grader,
-      {
-        prompt: evalCase.prompt,
-        finalResponse: agyResult.finalResponse,
-        workspace,
-        toolCalls: agyResult.toolCalls,
-        events: agyResult.events,
-      },
-      {
-        agyBin: options.agyBin,
-        judgeModel: options.judgeModel,
-        model: options.model,
-        skipLlmGraders: options.skipLlmGraders,
-        runDirectory,
-        runProcess,
-      },
-    );
-
-    graderResults.push({
-      name: grader.name,
-      type: grader.type,
-      status: evaluation.status,
-      reason: evaluation.reason,
-      weight: grader.weight ?? 1,
-      arm: grader.arm,
-      scored: !indicator,
-    });
+      graderResults.push({
+        name: grader.name,
+        type: grader.type,
+        status: evaluation.status,
+        reason: evaluation.reason,
+        weight: grader.weight ?? 1,
+        arm: grader.arm,
+        scored: !indicator,
+      });
+    }
+  } else {
+    for (const grader of evalCase.graders) {
+      const indicator = isGraderIndicator(grader, isTwoArm);
+      graderResults.push({
+        name: grader.name,
+        type: grader.type,
+        status: "not_run",
+        reason: `Main agy run failed: ${infrastructureReason}`,
+        weight: grader.weight ?? 1,
+        arm: grader.arm,
+        scored: !indicator,
+      });
+    }
   }
 
   const summary = summarizeGraderResults(graderResults, isTwoArm);
@@ -219,7 +249,8 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     prompt: evalCase.prompt,
     finalResponse: agyResult.finalResponse,
     toolCalls: agyResult.toolCalls,
-    status: processResult.code === 0 ? "completed" : "failed",
+    error: infrastructurePassed ? null : infrastructureReason,
+    status: infrastructurePassed ? "completed" : "failed",
     durationSeconds: agyResult.duration,
     usage: agyResult.usage,
     ...summary,
@@ -232,7 +263,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   const graderSummary = graderResults.map((g) => `${g.name}: ${g.status}`).join(", ");
   const scoreStr = result.score != null ? result.score.toFixed(2) : "N/A";
   const durStr = `${(result.durationSeconds ?? 0).toFixed(1)}s`;
-  console.log(`  ${icon} ${scoreStr} (${graderSummary}) · ${durStr}`);
+  process.stderr.write(`  ${icon} ${scoreStr} (${graderSummary}) · ${durStr}\n`);
 
   return result;
 }
@@ -242,14 +273,13 @@ async function main() {
   try {
     options = parseArguments(process.argv.slice(2));
   } catch (error) {
-    console.error(error.message);
-    console.error(usage());
-    process.exit(1);
+    process.stderr.write(`${error.message}\n${usage()}\n`);
+    return 1;
   }
 
   if (options.help) {
-    console.log(usage());
-    process.exit(0);
+    process.stdout.write(`${usage()}\n`);
+    return 0;
   }
 
   const skills = await findSkills(skillsDirectory);
@@ -259,82 +289,145 @@ async function main() {
   });
 
   if (options.dryRun) {
-    console.log(JSON.stringify(dryRunReport(cases, skills, options), null, 2));
-    process.exit(0);
+    process.stdout.write(`${JSON.stringify(dryRunReport(cases, skills, options), null, 2)}\n`);
+    return 0;
   }
 
   if (cases.length === 0) {
-    console.error("No eval cases matched the requested filter.");
-    process.exit(1);
+    process.stderr.write("No eval cases matched the requested filter.\n");
+    return 1;
   }
 
-  const timestamp = new Date().toISOString().replaceAll(":", "-").replaceAll(".", "-");
+  // 目录名要用文件系统安全的版本（冒号/点换成短横线），但那串就不再是能被 Date 解析回去
+  // 的合法 ISO 字符串了——generateHtmlReport 需要的是原始 ISO 字符串，不是目录名。
+  const generatedAt = new Date().toISOString();
+  const timestamp = generatedAt.replaceAll(":", "-").replaceAll(".", "-");
   const resultsDirectory = path.join(evalsDirectory, "results", `antigravity-${timestamp}`);
   await mkdir(resultsDirectory, { recursive: true });
 
-  const isTwoArm = options.arm === "both";
-  const arms = isTwoArm ? ["with", "without"] : [options.arm];
-  const runs = [];
-
+  const isTwoArm = options.ablation === "with-without";
+  const arms = isTwoArm ? ["with", "without"] : ["with"];
+  const tasks = [];
   for (const evalCase of cases) {
     for (const arm of arms) {
       for (let runNumber = 1; runNumber <= options.runs; runNumber += 1) {
-        console.log(`[Running] case=${evalCase.name} arm=${arm} run=${runNumber}/${options.runs}`);
-        const result = await runCase(
-          evalCase,
-          arm,
-          runNumber,
-          skills,
-          options,
-          resultsDirectory,
-          isTwoArm,
-        );
-        runs.push(result);
+        tasks.push({ evalCase, arm, runNumber });
       }
     }
   }
 
-  const summary = summarizeResults(runs, isTwoArm);
-  await writeFile(path.join(resultsDirectory, "summary.json"), JSON.stringify(summary, null, 2));
+  const interruptController = createInterruptController();
+  let crashed = false;
+
+  const scheduled = await runWithConcurrency(tasks, options.concurrency, async (task) => {
+    if (interruptController.signal) return null;
+    process.stderr.write(
+      `[Running] case=${task.evalCase.name} arm=${task.arm} run=${task.runNumber}/${options.runs}\n`,
+    );
+    try {
+      return await runCase(
+        task.evalCase,
+        task.arm,
+        task.runNumber,
+        skills,
+        options,
+        resultsDirectory,
+        isTwoArm,
+      );
+    } catch (error) {
+      crashed = true;
+      process.stderr.write(
+        `[ERROR] case=${task.evalCase.name} arm=${task.arm}: ${error.message}\n`,
+      );
+      return null;
+    }
+  });
+  const results = scheduled.filter(Boolean);
+
+  const partial = crashed || Boolean(interruptController.signal);
+  const partialReason = interruptController.signal
+    ? interruptController.signal === "SIGINT"
+      ? "interrupted"
+      : "terminated"
+    : crashed
+      ? "crashed"
+      : null;
+
+  const caseSummary = summarizeCaseResults(results);
+  await writeFile(
+    path.join(resultsDirectory, "summary.json"),
+    JSON.stringify(caseSummary, null, 2),
+  );
 
   const htmlReport = generateHtmlReport({
-    summary,
-    runs,
+    summary: caseSummary,
+    runs: results,
     options,
-    timestamp,
+    timestamp: generatedAt,
     resultsDirectory,
   });
   const htmlReportPath = path.join(resultsDirectory, "report.html");
   await writeFile(htmlReportPath, htmlReport, "utf8");
 
-  console.log(`\n${formatSummaryTable(summary)}\n`);
-  console.log(`Report: ${htmlReportPath}`);
+  process.stdout.write(`\n${formatSummaryTable(caseSummary)}\n`);
+  process.stdout.write(`Report: ${htmlReportPath}\n`);
 
-  // 门禁判定：检查 WITH 臂得分是否达标
-  const belowThreshold = [];
-  for (const [caseName, caseSummary] of Object.entries(summary.cases)) {
-    if (caseSummary.with?.meanScore != null && caseSummary.with.meanScore < options.threshold) {
-      belowThreshold.push({
-        name: caseName,
-        score: caseSummary.with.meanScore,
-      });
-    }
-  }
+  const versionResult = await runProcess(options.agyBin, ["--version"]);
+  const aggregateResult = buildAggregateResult({
+    engine: "antigravity",
+    engineVersion: versionResult.code === 0 ? versionResult.stdout.trim() : "unknown",
+    generatedAt,
+    options: {
+      casePattern: options.casePattern,
+      tag: options.tag ?? null,
+      runs: options.runs,
+      ablation: options.ablation,
+      concurrency: options.concurrency,
+      model: options.model ?? null,
+      judgeModel: options.judgeModel ?? null,
+      threshold: options.threshold,
+      skipLlmGraders: options.skipLlmGraders,
+    },
+    results,
+    ablation: options.ablation,
+    partial,
+    partialReason,
+  });
+  await writeFile(
+    path.join(resultsDirectory, "aggregate-result.json"),
+    JSON.stringify(aggregateResult, null, 2),
+  );
 
-  if (belowThreshold.length > 0) {
-    console.error(
-      `\n[FAIL] 共有 ${belowThreshold.length} 个用例得分低于门禁阈值 ${options.threshold}：`,
+  const belowThreshold = aggregateResult.cases.some(
+    (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
+  );
+
+  if (belowThreshold) {
+    const failing = aggregateResult.cases.filter(
+      (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
     );
-    for (const item of belowThreshold) {
-      console.error(
-        `  - ${item.name}: 得分 ${item.score.toFixed(2)} (要求 >= ${options.threshold})`,
+    process.stderr.write(
+      `\n[FAIL] 共有 ${failing.length} 个用例得分低于门禁阈值 ${options.threshold}：\n`,
+    );
+    for (const item of failing) {
+      process.stderr.write(
+        `  - ${item.name}: 得分 ${item.aggregates.score.toFixed(2)} (要求 >= ${options.threshold})\n`,
       );
     }
-    process.exitCode = 1;
   }
+
+  return exitCodeFor({
+    interruptSignal: interruptController.signal,
+    crashed,
+    belowThreshold,
+  });
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+main()
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((error) => {
+    process.stderr.write(`${error.stack ?? error.message}\n`);
+    process.exitCode = 1;
+  });

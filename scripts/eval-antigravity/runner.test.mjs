@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { buildAgyArgs, initializeAgyWorkspace, parseAgyOutput } from "./lib.mjs";
+import { buildAgyArgs, initializeAgyWorkspace, parseAgyOutput, sandboxFor } from "./lib.mjs";
 
 test("buildAgyArgs constructs default flags with cheapest flash model", () => {
   const args = buildAgyArgs({
@@ -18,11 +18,24 @@ test("buildAgyArgs constructs default flags with cheapest flash model", () => {
     "--output-format",
     "json",
     "--dangerously-skip-permissions",
+    "--sandbox",
     "--model",
     "gemini-3.8-flash-low",
     "--print-timeout",
     "60s",
   ]);
+});
+
+test("buildAgyArgs uses a readonly sandbox without skipping permissions", () => {
+  // --sandbox 在真实 agy CLI 上是不取值的布尔开关（用探针 case 验证过），
+  // 只读模式只加 --sandbox，不加 --dangerously-skip-permissions。
+  const args = buildAgyArgs({
+    prompt: "Read-only test",
+    sandbox: "readonly",
+  });
+
+  assert.ok(!args.includes("--dangerously-skip-permissions"));
+  assert.ok(args.includes("--sandbox"));
 });
 
 test("buildAgyArgs supports custom model override", () => {
@@ -42,6 +55,13 @@ test("buildAgyArgs supports workspace flag", () => {
 
   assert.equal(args[0], "--add-dir");
   assert.equal(args[1], "/path/to/workspace");
+});
+
+test("sandboxFor picks workspace-write only when the case needs Write or Edit", () => {
+  assert.equal(sandboxFor({ metadata: { allowed_tools: ["Read", "Skill"] } }), "readonly");
+  assert.equal(sandboxFor({ metadata: { allowed_tools: ["Write"] } }), "workspace-write");
+  assert.equal(sandboxFor({ metadata: { allowed_tools: ["Edit", "Read"] } }), "workspace-write");
+  assert.equal(sandboxFor({ metadata: {} }), "readonly");
 });
 
 test("parseAgyOutput parses valid JSON output from agy --print", () => {

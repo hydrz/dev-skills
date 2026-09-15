@@ -7,8 +7,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  buildAggregateResult,
+  applyQuickShortcut,
+  createInterruptController,
+  exitCodeFor,
+  parseOptionsFromSpec,
+  runWithConcurrency,
+  summarizeResults as summarizeCaseResults,
+  validateCommonOptions,
+} from "../eval-cli-shared.lib.mjs";
+import {
   buildCodexArgs,
-  buildEffectivePrompt,
   classifyRunInfrastructure,
   copyRequiredSkills,
   discoverCases,
@@ -22,7 +31,6 @@ import {
   primarySkillForCase,
   requiredSkillsForCase,
   summarizeGraderResults,
-  summarizeResults,
 } from "./lib.mjs";
 import { spawnTarget } from "../spawn.lib.mjs";
 
@@ -38,67 +46,44 @@ function usage() {
 Options:
   --case <glob>          Run matching case names (default: *)
   --tag <tag>            Run cases containing this tag
-  --runs <n>             Repetitions per case and arm (default: 1)
-  --arm <with|without|both>
-                         Skill ablation arm (default: with)
-  --model <model>        Codex model override (default: gpt-5.6-luna)
-  --judge-model <model>  Model for LLM rubrics (default: matches --model)
-  --reasoning <effort>   Codex reasoning effort override
-  --threshold <0..1>     Pass threshold for WITH arm score (default: 1.0)
-  --skip-llm-graders     Do not run rubric-based graders
-  --dry-run              Print selected cases and grader compatibility
-  --codex-bin <path>     Codex executable (default: codex)
-  --help                 Show this help
+  --runs <n>              Repetitions per case and arm (default: 1)
+  --ablation <mode>       none | with-without (default: with-without)
+  --concurrency, -j <n>   Concurrent runs, 1-8 (default: 1)
+  --model <model>         Codex model override (default: gpt-5.6-luna)
+  --judge-model <model>   Model for LLM rubrics (default: matches --model)
+  --reasoning <effort>    Codex reasoning effort override
+  --threshold <0..1>      Pass threshold for WITH arm score (default: 1.0)
+  --skip-llm-graders      Do not run rubric-based graders
+  --quick                 Shorthand for --runs 1 --ablation none
+  --dry-run               Print selected cases and grader compatibility
+  --codex-bin <path>      Codex executable (default: codex)
+  --help                  Show this help
 `;
 }
 
+const OPTION_SPEC = {
+  "--case": { key: "casePattern", type: "string", default: "*" },
+  "--tag": { key: "tag", type: "string" },
+  "--runs": { key: "runs", type: "number", default: 1 },
+  "--ablation": { key: "ablation", type: "string", default: "with-without" },
+  "--concurrency": { key: "concurrency", type: "number", default: 1 },
+  "-j": { key: "concurrency", type: "number" },
+  "--model": { key: "model", type: "string", default: "gpt-5.6-luna" },
+  "--judge-model": { key: "judgeModel", type: "string" },
+  "--reasoning": { key: "reasoning", type: "string" },
+  "--threshold": { key: "threshold", type: "number", default: 1.0 },
+  "--skip-llm-graders": { key: "skipLlmGraders", type: "boolean", default: false },
+  "--quick": { key: "quick", type: "boolean", default: false },
+  "--dry-run": { key: "dryRun", type: "boolean", default: false },
+  "--codex-bin": { key: "codexBin", type: "string", default: "codex" },
+  "--help": { key: "help", type: "boolean", default: false },
+  "-h": { key: "help", type: "boolean" },
+};
+
 function parseArguments(argv) {
-  const options = {
-    casePattern: "*",
-    runs: 1,
-    arm: "with",
-    model: "gpt-5.6-luna",
-    judgeModel: null,
-    threshold: 1.0,
-    codexBin: "codex",
-    dryRun: false,
-    skipLlmGraders: false,
-  };
-
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    const next = () => {
-      index += 1;
-      if (index >= argv.length) throw new Error(`${argument} requires a value`);
-      return argv[index];
-    };
-
-    if (argument === "--case") options.casePattern = next();
-    else if (argument === "--tag") options.tag = next();
-    else if (argument === "--runs") options.runs = Number(next());
-    else if (argument === "--arm") options.arm = next();
-    else if (argument === "--model") options.model = next();
-    else if (argument === "--judge-model") options.judgeModel = next();
-    else if (argument === "--threshold") options.threshold = Number(next());
-    else if (argument === "--reasoning") options.reasoning = next();
-    else if (argument === "--codex-bin") options.codexBin = next();
-    else if (argument === "--skip-llm-graders") options.skipLlmGraders = true;
-    else if (argument === "--dry-run") options.dryRun = true;
-    else if (argument === "--help" || argument === "-h") options.help = true;
-    else {
-      throw new Error(
-        `Unknown option: ${argument}. In Windows PowerShell, npm drops a bare --; use: npm run eval:codex '--' --case <name>`,
-      );
-    }
-  }
-
-  if (!Number.isInteger(options.runs) || options.runs < 1) {
-    throw new Error("--runs must be a positive integer");
-  }
-  if (!["with", "without", "both"].includes(options.arm)) {
-    throw new Error("--arm must be with, without, or both");
-  }
-  return options;
+  const options = applyQuickShortcut(parseOptionsFromSpec(argv, OPTION_SPEC));
+  if (options.help) return options;
+  return validateCommonOptions(options);
 }
 
 function graderCompatibility(grader) {
@@ -108,15 +93,11 @@ function graderCompatibility(grader) {
   return "unsupported";
 }
 
-function targetSkill(evalCase, skills) {
-  return primarySkillForCase(evalCase, skills);
-}
-
 function dryRunReport(cases, skills) {
   const report = {
     cases: cases.map((evalCase) => ({
       name: evalCase.name,
-      skill: targetSkill(evalCase, skills),
+      skill: primarySkillForCase(evalCase, skills),
       skills: requiredSkillsForCase(evalCase, skills),
       graders: evalCase.graders.map((grader) => ({
         name: grader.name,
@@ -197,6 +178,8 @@ async function initializeWorkspace(workspace, evalCase, arm, skills) {
     if (skillNames.length === 0) {
       throw new Error(`${evalCase.name} has no tag matching a repository skill`);
     }
+    // 只把技能拷到 Codex 原生发现的 .agents/skills/<name>/，不对 prompt 做任何改写，
+    // 让 Codex 自己的隐式/显式调用机制决定要不要触发——见 grill-me 决策 Q2/Q3。
     await copyRequiredSkills(workspace, evalCase, skills);
   }
 
@@ -296,7 +279,9 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   await mkdir(runDirectory, { recursive: true });
   const skill = await initializeWorkspace(workspace, evalCase, arm, skills);
   const timeoutMs = (evalCase.metadata.timeout_seconds ?? 300) * 1000;
-  const effectivePrompt = await buildEffectivePrompt(evalCase, skills, arm);
+  // prompt 原样发送，包括 Claude 风格的 /skill-name 前缀；Codex 是否识别它是评测本身
+  // 要回答的问题，不在 runner 里做兼容翻译。
+  const effectivePrompt = evalCase.prompt;
   const args = buildCodexArgs({
     workspace,
     sandbox: sandboxFor(evalCase),
@@ -342,7 +327,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
   const infrastructure = classifyRunInfrastructure(processResult, parsed);
   const toolCalls = extractCodexToolCalls(parsed.events);
 
-  const isTwoArm = options.arm === "both";
+  const isTwoArm = options.ablation === "with-without";
   const graderResults = [];
   if (infrastructure.passed) {
     for (const grader of evalCase.graders) {
@@ -388,6 +373,7 @@ async function runCase(evalCase, arm, runNumber, skills, options, resultsDirecto
     prompt: evalCase.prompt,
     finalResponse: parsed.finalResponse,
     toolCalls,
+    error: infrastructure.passed ? null : infrastructure.reason,
     infrastructure: {
       ...infrastructure,
       exitCode: processResult.code,
@@ -408,7 +394,7 @@ async function main() {
   const options = parseArguments(process.argv.slice(2));
   if (options.help) {
     process.stdout.write(usage());
-    return;
+    return 0;
   }
 
   const [cases, skills] = await Promise.all([
@@ -419,94 +405,131 @@ async function main() {
 
   if (options.dryRun) {
     process.stdout.write(`${JSON.stringify(dryRunReport(cases, skills), null, 2)}\n`);
-    return;
+    return 0;
   }
 
   const timestamp = new Date().toISOString().replaceAll(":", "-");
   const resultsDirectory = path.join(evalsDirectory, "results", `codex-${timestamp}`);
-  const arms = options.arm === "both" ? ["with", "without"] : [options.arm];
-  const results = [];
+  const arms = options.ablation === "with-without" ? ["with", "without"] : ["with"];
   const versionResult = await runProcess(options.codexBin, ["--version"], { shell: true });
   if (versionResult.code !== 0) {
     throw new Error(`Unable to read Codex version: ${versionResult.stderr}`);
   }
+  const codexVersion = versionResult.stdout.trim();
 
+  const tasks = [];
   for (const evalCase of cases) {
     for (const arm of arms) {
       for (let runNumber = 1; runNumber <= options.runs; runNumber += 1) {
-        process.stderr.write(
-          `[Running] case=${evalCase.name} arm=${arm} run=${runNumber}/${options.runs}\n`,
-        );
-        const runResult = await runCase(
-          evalCase,
-          arm,
-          runNumber,
-          skills,
-          options,
-          resultsDirectory,
-        );
-        results.push(runResult);
-
-        const scoreStr = runResult.score != null ? runResult.score.toFixed(2) : "N/A";
-        const icon = runResult.perfect ? "✔" : runResult.score === 0 ? "✖" : "⚠";
-        const graderDetails = (runResult.graders ?? [])
-          .map((g) => `${g.name}: ${g.status}`)
-          .join(", ");
-        process.stderr.write(
-          `  ${icon} ${scoreStr} (${graderDetails}) · ${runResult.durationSeconds.toFixed(1)}s\n`,
-        );
+        tasks.push({ evalCase, arm, runNumber });
       }
     }
   }
 
-  const summary = summarizeResults(results);
-  const report = {
+  const interruptController = createInterruptController();
+  let crashed = false;
+
+  // runWithConcurrency 按任务原始下标写回结果，保证 aggregate-result.json 里的 case
+  // 顺序不受并发调度影响；终端进度行谁先完成谁先打印，允许交错。
+  const scheduled = await runWithConcurrency(tasks, options.concurrency, async (task) => {
+    if (interruptController.signal) return null;
+    process.stderr.write(
+      `[Running] case=${task.evalCase.name} arm=${task.arm} run=${task.runNumber}/${options.runs}\n`,
+    );
+    try {
+      const runResult = await runCase(
+        task.evalCase,
+        task.arm,
+        task.runNumber,
+        skills,
+        options,
+        resultsDirectory,
+      );
+
+      const scoreStr = runResult.score != null ? runResult.score.toFixed(2) : "N/A";
+      const icon = runResult.perfect ? "✔" : runResult.score === 0 ? "✖" : "⚠";
+      const graderDetails = (runResult.graders ?? [])
+        .map((g) => `${g.name}: ${g.status}`)
+        .join(", ");
+      process.stderr.write(
+        `  ${icon} ${scoreStr} (${graderDetails}) · ${runResult.durationSeconds.toFixed(1)}s\n`,
+      );
+      return runResult;
+    } catch (error) {
+      crashed = true;
+      process.stderr.write(
+        `[ERROR] case=${task.evalCase.name} arm=${task.arm}: ${error.message}\n`,
+      );
+      return null;
+    }
+  });
+  const results = scheduled.filter(Boolean);
+
+  const partial = crashed || Boolean(interruptController.signal);
+  const partialReason = interruptController.signal
+    ? interruptController.signal === "SIGINT"
+      ? "interrupted"
+      : "terminated"
+    : crashed
+      ? "crashed"
+      : null;
+
+  const caseSummary = summarizeCaseResults(results);
+  const table = formatSummaryTable(caseSummary, { threshold: options.threshold });
+  process.stdout.write(`\n${table}\n\n`);
+
+  const html = generateHtmlReport({
+    title: "Codex 插件评测报告",
+    summary: caseSummary,
+    runs: results,
+    options,
+  });
+  await mkdir(resultsDirectory, { recursive: true });
+  await writeFile(path.join(resultsDirectory, "report.html"), html, "utf8");
+  process.stdout.write(`Report: ${path.join(resultsDirectory, "report.html")}\n\n`);
+
+  const aggregateResult = buildAggregateResult({
+    engine: "codex",
+    engineVersion: codexVersion,
     generatedAt: new Date().toISOString(),
-    codexVersion: versionResult.stdout.trim(),
     options: {
       casePattern: options.casePattern,
       tag: options.tag ?? null,
       runs: options.runs,
-      arm: options.arm,
+      ablation: options.ablation,
+      concurrency: options.concurrency,
       model: options.model ?? null,
       judgeModel: options.judgeModel ?? options.model ?? null,
       reasoning: options.reasoning ?? null,
       threshold: options.threshold,
       skipLlmGraders: options.skipLlmGraders,
     },
-    summary,
     results,
-  };
-  await mkdir(resultsDirectory, { recursive: true });
+    ablation: options.ablation,
+    partial,
+    partialReason,
+  });
   await writeFile(
     path.join(resultsDirectory, "aggregate-result.json"),
-    JSON.stringify(report, null, 2),
+    JSON.stringify(aggregateResult, null, 2),
   );
 
-  const table = formatSummaryTable(summary, { threshold: options.threshold });
-  process.stdout.write(`\n${table}\n\n`);
+  const belowThreshold = aggregateResult.cases.some(
+    (c) => c.aggregates.score != null && c.aggregates.score < options.threshold,
+  );
 
-  const html = generateHtmlReport({
-    title: "Codex 插件评测报告",
-    summary,
-    runs: results,
-    options,
+  return exitCodeFor({
+    interruptSignal: interruptController.signal,
+    crashed,
+    belowThreshold,
   });
-  await writeFile(path.join(resultsDirectory, "report.html"), html, "utf8");
-  process.stdout.write(`Report: ${path.join(resultsDirectory, "report.html")}\n\n`);
-
-  const withScores = Object.values(summary.cases)
-    .map((c) => c.with?.meanScore)
-    .filter((s) => typeof s === "number");
-  const meanWith = withScores.length
-    ? withScores.reduce((sum, s) => sum + s, 0) / withScores.length
-    : 0;
-  if (meanWith < options.threshold) {
-    process.exitCode = 1;
-  }
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error.stack ?? error.message}\n`);
-  process.exitCode = 1;
-});
+main()
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((error) => {
+    process.stderr.write(`${error.stack ?? error.message}\n`);
+    process.exitCode = 1;
+  });

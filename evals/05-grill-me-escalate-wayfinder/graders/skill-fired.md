@@ -1,6 +1,6 @@
 ---
 type: tool_used
 tool: Skill
-input_match: grill-me
+input_match: '"skill"\s*:\s*"(?:[\w-]+:)?grilling"'
 min: 1
 ---
