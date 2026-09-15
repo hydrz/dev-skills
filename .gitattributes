@@ -1,0 +1,11 @@
+# 自动规范化所有文本文件换行符为 LF，避免跨平台检出时注入 CRLF
+* text=auto eol=lf
+
+# 显式锁定 shell 脚本、Node 脚本与文本文件使用 LF
+*.sh text eol=lf
+*.mjs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

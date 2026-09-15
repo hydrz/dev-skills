@@ -38,7 +38,7 @@ let totalErrors = 0;
 for (const filePath of mdFiles) {
   const relPath = relative(repoRoot, filePath).replace(/\\/g, "/");
   const content = readFileSync(filePath, "utf8");
-  const lines = content.split("\n");
+  const lines = content.split(/\r?\n/);
 
   let inCodeBlock = false;
   let inFrontmatter = false;

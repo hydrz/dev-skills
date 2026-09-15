@@ -5,6 +5,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { spawnTarget } from "../spawn.lib.mjs";
+
 import {
   buildAgyArgs,
   discoverCases,
@@ -121,10 +123,13 @@ function dryRunReport(cases, skills, options) {
 
 function runProcess(bin, args, options = {}) {
   return new Promise((resolve) => {
-    const child = spawn(bin, args, {
+    const useShell = Boolean(options.shell ?? process.platform === "win32");
+    const target = spawnTarget(bin, args, useShell);
+    const child = spawn(target.command, target.args, {
       cwd: options.cwd,
-      shell: false,
+      shell: useShell,
       stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
     });
 
     let stdout = "";
