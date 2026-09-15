@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.5.4
+
+### Patch Changes
+
+- [#49](https://github.com/hydrz/dev-skills/pull/49) [`d0430e3`](https://github.com/hydrz/dev-skills/commit/d0430e3b397eafc62c4163f3b7e0df3b222905b9) Thanks [@hydrz](https://github.com/hydrz)! - `improve-codebase-architecture` 的审查报告新增"已排除项"一节：强制列出探索阶段发现但未入选的候选，并点名被哪条标准挡下，证明报告是筛过一圈之后的结果。
+
 ## 0.5.3
 
 ### Patch Changes
