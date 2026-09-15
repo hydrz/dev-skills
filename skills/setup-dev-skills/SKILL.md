@@ -22,7 +22,7 @@ disable-model-invocation: true
 查看当前仓库，了解初始状态。以实际读取的内容为准，不做假设：
 
 - `git remote -v` 和 `.git/config`：托管在 GitHub、GitLab、Gitee 还是其他平台？是哪个仓库？
-- 根目录的 `AGENTS.md` 和 `CLAUDE.md`：是否存在？其中是否已有 `## Agent skills` 一节？
+- 根目录的 `AGENTS.md` 和 `CLAUDE.md`：是否存在？其中是否已有 `## Agent Skills` 一节？
 - 根目录的 `CONTEXT.md` 和 `CONTEXT-MAP.md`
 - `docs/adr/`，以及所有 `src/*/docs/adr/` 目录
 - `docs/agents/`：本 skill 之前的产出是否已经存在？
@@ -70,7 +70,7 @@ disable-model-invocation: true
 
 向用户展示以下内容的草稿：
 
-- 要加入 `CLAUDE.md` 或 `AGENTS.md`（二选一，规则见第 4 步）的 `## Agent skills` 块
+- 要加入 `CLAUDE.md` 或 `AGENTS.md`（二选一，规则见第 4 步）的 `## Agent Skills` 块
 - `docs/agents/issue-tracker.md`、`docs/agents/domain.md`、`docs/agents/feature-list.md` 和 `docs/agents/triage-labels.md` 的内容（最后一个仅在安装了 `triage` 时写入）
 
 写入前允许用户修改。
@@ -85,12 +85,12 @@ disable-model-invocation: true
 
 已有其中一个文件时，编辑已有的文件，不新建另一个。
 
-选中的文件中已有 `## Agent skills` 块时，就地更新块内容，不追加重复块。其他小节中用户编辑的内容保持原样。
+选中的文件中已有 `## Agent Skills` 块时，就地更新块内容，不追加重复块。其他小节中用户编辑的内容保持原样。
 
 块的内容：
 
 ```markdown
-## Agent skills
+## Agent Skills
 
 ### Issue 追踪器
 

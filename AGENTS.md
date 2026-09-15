@@ -1,6 +1,6 @@
 # Agent 指南
 
-## Agent skills
+## Agent Skills
 
 ### Issue 追踪器
 

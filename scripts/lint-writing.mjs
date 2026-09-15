@@ -25,7 +25,7 @@ const EXAMPLE_EXEMPT_FILES = new Set([
 export const WRITING_RULES = [
   {
     id: "half-width-punctuation",
-    // 匹配汉字后面直接跟英文逗号、分号、问号、叹号
+    // 匹配汉字后面直接跟英文逗号、分号、问号、叹号（明显属于输入法未切换的标点残余）
     regex: /[\u4e00-\u9fa5][,;!?]/,
     message: "中文汉字后紧随半角标点，应改用中文全角标点（如“，”、“；”、“！”、“？”）",
   },
@@ -34,12 +34,6 @@ export const WRITING_RULES = [
     // 匹配汉字后紧跟英文冒号且后面跟空格或行尾（如“注意: ”、“说明:”），避免影响类似“文件:行号”或 URL 的技术简记
     regex: /[\u4e00-\u9fa5]:(?:\s|$)/,
     message: "中文说明后紧随半角冒号，应改用中文全角冒号“：”",
-  },
-  {
-    id: "slash-as-dunhao",
-    // 匹配中文词汇之间用带空格的斜杠替代顿号（如“输入 / 输出”）
-    regex: /[\u4e00-\u9fa5]\s+\/\s+[\u4e00-\u9fa5]/,
-    message: "使用带空格的斜杠代替顿号，建议改用顿号“、”或“或/和”",
   },
   {
     id: "half-width-parentheses",

@@ -1,4 +1,4 @@
-本仓库是一套中文 agent skills。项目术语见 [CONTEXT.md](../CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](../docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
+本仓库是一套中文 Agent Skills。项目术语见 [CONTEXT.md](../CONTEXT.md)，中文写作规则见 [docs/chinese-writing.md](../docs/chinese-writing.md)，写任何 skill 或文档都遵循这两份文档。
 
 ## 目录
 
