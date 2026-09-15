@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.5.2
+
+### Patch Changes
+
+- [#42](https://github.com/hydrz/dev-skills/pull/42) [`6a0b551`](https://github.com/hydrz/dev-skills/commit/6a0b551bc36496ba2c427b2064a88e63c4a98144) Thanks [@hydrz](https://github.com/hydrz)! - 优化方案推敲与追问体验：`grilling` 增加选项字母编号与推荐理由，方便用户快速回复，完善超大工作建议用户运行 `/wayfinder` 的协同指引，并在结束时输出决策清单；`grill-with-docs` 明确追问过程中同步更新 `CONTEXT.md` 与 ADR 的协作流程；`grill-me` 明确仅在对话中讨论、不修改本地文件的行为边界。
+
 ## 0.5.1
 
 ### Patch Changes
