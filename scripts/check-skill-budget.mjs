@@ -4,9 +4,11 @@
 // 用法：node scripts/check-skill-budget.mjs [--report] [--base <git 引用>]
 
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { discoverRepositorySkills, parseSkillMetadata } from "./repository-metadata.lib.mjs";
 
 const defaultRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -23,17 +25,8 @@ export const HOST_BINDING_PATTERNS = [
 const countChars = (text) => [...text].length;
 
 export function parseSkill(text) {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
-  const frontmatter = match?.[1] ?? "";
-  const description =
-    frontmatter
-      .match(/^description:\s*(.+)$/m)?.[1]
-      ?.trim()
-      .replace(/^(["'])(.*)\1$/, "$2") ?? "";
-  return {
-    description,
-    modelInvoked: !/^disable-model-invocation:\s*true\s*$/m.test(frontmatter),
-  };
+  const { description, modelInvoked } = parseSkillMetadata(text);
+  return { description, modelInvoked };
 }
 
 function listFiles(dir) {
@@ -47,23 +40,18 @@ function listFiles(dir) {
 }
 
 function readSkills(root) {
-  const skillsDir = join(root, "skills");
-  const skills = [];
-  for (const name of readdirSync(skillsDir).sort()) {
-    const dir = join(skillsDir, name);
-    if (!statSync(dir).isDirectory()) continue;
-    let main;
-    try {
-      main = readFileSync(join(dir, "SKILL.md"), "utf8");
-    } catch {
-      continue;
-    }
-    const packageChars = listFiles(dir)
+  return discoverRepositorySkills(root).map(({ name, directory, main, metadata }) => {
+    const packageChars = listFiles(directory)
       .filter((path) => path.endsWith(".md"))
       .reduce((sum, path) => sum + countChars(readFileSync(path, "utf8")), 0);
-    skills.push({ name, ...parseSkill(main), mainChars: countChars(main), packageChars });
-  }
-  return skills;
+    return {
+      name,
+      description: metadata.description,
+      modelInvoked: metadata.modelInvoked,
+      mainChars: countChars(main),
+      packageChars,
+    };
+  });
 }
 
 export function checkDescriptions(skills) {

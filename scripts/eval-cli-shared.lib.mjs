@@ -62,6 +62,20 @@ export function validateCommonOptions(options) {
   return options;
 }
 
+export function commonAggregateOptions(options) {
+  return {
+    casePattern: options.casePattern,
+    tag: options.tag ?? null,
+    runs: options.runs,
+    ablation: options.ablation,
+    concurrency: options.concurrency,
+    model: options.model ?? null,
+    judgeModel: options.judgeModel ?? options.model ?? null,
+    threshold: options.threshold,
+    skipLlmGraders: options.skipLlmGraders,
+  };
+}
+
 // 固定并发度的任务池：结果按 items 的原始下标写回，保证产物里 case 顺序不受调度影响；
 // 终端进度行谁先完成谁先打印，允许交错。
 export async function runWithConcurrency(items, concurrency, worker) {
