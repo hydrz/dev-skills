@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.5.6
+
+### Patch Changes
+
+- 整理评测脚本与技能测试目录：将评测实现与测试平铺收敛到 `scripts/eval/`，将技能相关测试集中到 `scripts/skills-tests/`，并同步更新命令入口和引用路径。
+
 ## 0.5.5
 
 ### Patch Changes
