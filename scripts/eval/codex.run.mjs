@@ -12,8 +12,8 @@ import {
   commonAggregateOptions,
   parseOptionsFromSpec,
   validateCommonOptions,
-} from "../eval-cli-shared.lib.mjs";
-import { runEvalCase, runEvalSuite } from "../eval-suite-runner.lib.mjs";
+} from "./cli-shared.lib.mjs";
+import { runEvalCase, runEvalSuite } from "./suite-runner.lib.mjs";
 import {
   buildCodexArgs,
   classifyRunInfrastructure,
@@ -29,17 +29,17 @@ import {
   primarySkillForCase,
   requiredSkillsForCase,
   summarizeGraderResults,
-} from "./lib.mjs";
+} from "./codex.lib.mjs";
 import { spawnTarget } from "../spawn.lib.mjs";
 
 const codexDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(codexDirectory, "../..");
 const evalsDirectory = path.join(repositoryRoot, "evals");
 const skillsDirectory = path.join(repositoryRoot, "skills");
-const rubricSchema = path.join(codexDirectory, "rubric.schema.json");
+const rubricSchema = path.join(codexDirectory, "codex.rubric.schema.json");
 
 function usage() {
-  return `Usage: node scripts/eval-codex/run.mjs [options]
+  return `Usage: node scripts/eval/codex.run.mjs [options]
 
 Options:
   --case <glob>          Run matching case names (default: *)

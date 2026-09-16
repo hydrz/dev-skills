@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildEvalArgs } from "./eval-claude.mjs";
+import { buildEvalArgs } from "./claude.mjs";
 
 test("passes filters through and appends defaults", () => {
   assert.deepEqual(buildEvalArgs(["--case", "tdd-*"]), [

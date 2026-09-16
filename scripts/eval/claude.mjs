@@ -3,7 +3,7 @@
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-import { spawnTarget } from "./spawn.lib.mjs";
+import { spawnTarget } from "../spawn.lib.mjs";
 
 // 不带取值的 claude plugin eval 选项；其余以 - 开头的选项视为可以带取值
 const BOOLEAN_FLAGS = new Set([

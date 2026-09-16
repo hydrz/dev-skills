@@ -11,7 +11,7 @@ import {
   loadRepositoryMetadata,
   validateCodexMetadataModel,
   validateMetadataModel,
-} from "./repository-metadata.lib.mjs";
+} from "../repository-metadata.lib.mjs";
 
 function validModel() {
   const interfaceMetadata = {

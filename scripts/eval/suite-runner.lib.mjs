@@ -7,7 +7,7 @@ import {
   exitCodeFor,
   runWithConcurrency,
   summarizeResults,
-} from "./eval-cli-shared.lib.mjs";
+} from "./cli-shared.lib.mjs";
 
 export async function runEvalCase({
   evalCase,

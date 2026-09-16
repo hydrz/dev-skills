@@ -1,5 +1,5 @@
 // 引擎无关的 CLI 机制：参数解析骨架、--quick 展开、并发池、退出码判定、
-// aggregate-result.json 组装。eval-codex/run.mjs 和 eval-antigravity/run.mjs
+// aggregate-result.json 组装。codex.run.mjs 和 antigravity.run.mjs
 // 共用这里的逻辑，各自只保留"怎么调用自己的 CLI、怎么解析自己的输出格式"。
 
 // 按 { flag: { key, type, default? } } 形式的选项表解析 argv。

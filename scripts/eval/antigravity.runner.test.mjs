@@ -4,7 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { buildAgyArgs, initializeAgyWorkspace, parseAgyOutput, sandboxFor } from "./lib.mjs";
+import {
+  buildAgyArgs,
+  initializeAgyWorkspace,
+  parseAgyOutput,
+  sandboxFor,
+} from "./antigravity.lib.mjs";
 
 test("buildAgyArgs constructs default flags with cheapest flash model", () => {
   const args = buildAgyArgs({
@@ -153,7 +158,7 @@ test("initializeAgyWorkspace sets up .agents/skills.json for with arm", async ()
 });
 
 test("parseAgyStreamEvents extracts tool calls, text deltas and final result", async () => {
-  const { parseAgyStreamEvents } = await import("./lib.mjs");
+  const { parseAgyStreamEvents } = await import("./antigravity.lib.mjs");
   const ndjson = [
     JSON.stringify({ event: "init", conversation_id: "conv-1" }),
     JSON.stringify({
@@ -196,7 +201,7 @@ test("parseAgyStreamEvents extracts tool calls, text deltas and final result", a
 });
 
 test("evaluateAgyToolUsedGrader handles Skill invocation via view_file", async () => {
-  const { evaluateAgyToolUsedGrader } = await import("./lib.mjs");
+  const { evaluateAgyToolUsedGrader } = await import("./antigravity.lib.mjs");
   const grader = {
     name: "skill-fired",
     type: "tool_used",
@@ -228,7 +233,7 @@ test("evaluateAgyToolUsedGrader handles Skill invocation via view_file", async (
 });
 
 test("evaluateAgyToolUsedGrader handles negative assertion min: 0 max: 0", async () => {
-  const { evaluateAgyToolUsedGrader } = await import("./lib.mjs");
+  const { evaluateAgyToolUsedGrader } = await import("./antigravity.lib.mjs");
   const grader = {
     name: "no-grilling-skill",
     type: "tool_used",
@@ -251,7 +256,7 @@ test("evaluateAgyToolUsedGrader handles negative assertion min: 0 max: 0", async
 });
 
 test("summarizeGraderResults marks indicators as scored false in two-arm mode", async () => {
-  const { isGraderIndicator, summarizeGraderResults } = await import("./lib.mjs");
+  const { isGraderIndicator, summarizeGraderResults } = await import("./antigravity.lib.mjs");
   const skillGrader = {
     name: "skill-fired",
     type: "tool_used",
@@ -278,7 +283,7 @@ test("summarizeGraderResults marks indicators as scored false in two-arm mode", 
 });
 
 test("formatSummaryTable outputs standard table with delta and metrics", async () => {
-  const { formatSummaryTable } = await import("./lib.mjs");
+  const { formatSummaryTable } = await import("./antigravity.lib.mjs");
   const summary = {
     cases: {
       "demo-case": {
@@ -297,7 +302,7 @@ test("formatSummaryTable outputs standard table with delta and metrics", async (
 });
 
 test("generateHtmlReport generates standalone HTML document with KPI and cases", async () => {
-  const { generateHtmlReport } = await import("./lib.mjs");
+  const { generateHtmlReport } = await import("./antigravity.lib.mjs");
   const data = {
     timestamp: "2026-09-14T07:20:00.000Z",
     summary: {
