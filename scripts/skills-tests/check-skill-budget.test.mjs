@@ -8,7 +8,7 @@ import {
   checkSkillBudget,
   findHostBindings,
   parseSkill,
-} from "./check-skill-budget.mjs";
+} from "../check-skill-budget.mjs";
 
 test("distinguishes model-invoked and user-invoked skills", () => {
   const auto = parseSkill("---\nname: a\ndescription: 用于示例。\n---\n\n正文\n");

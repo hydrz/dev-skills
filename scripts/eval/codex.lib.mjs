@@ -6,14 +6,14 @@ import {
   parseMarkdownWithFrontmatter,
   primarySkillForCase,
   requiredSkillsForCase,
-} from "../eval-core.lib.mjs";
+} from "./core.lib.mjs";
 import {
   escapeHtml,
   formatSummaryTable,
   generateHtmlReport,
   isGraderIndicator,
-} from "../eval-report.lib.mjs";
-import { summarizeResults } from "../eval-cli-shared.lib.mjs";
+} from "./report.lib.mjs";
+import { summarizeResults } from "./cli-shared.lib.mjs";
 
 export {
   copyRequiredSkills,

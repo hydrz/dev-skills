@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { quoteForCmd, spawnTarget } from "./spawn.lib.mjs";
+import { quoteForCmd, spawnTarget } from "../spawn.lib.mjs";
 
 test("leaves plain arguments unquoted", () => {
   assert.equal(quoteForCmd("tdd-*"), "tdd-*");

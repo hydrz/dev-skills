@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { findSecretShapes, validateRepository, validateSkillText } from "./validate-repository.mjs";
+import {
+  findSecretShapes,
+  validateRepository,
+  validateSkillText,
+} from "../validate-repository.mjs";
 
 test("validates a complete skill", () => {
   const text = `---\nname: example\ndescription: 示例 skill。\n---\n\n# 示例\n`;

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { lintWritingAll, lintWritingText } from "./lint-writing.mjs";
+import { lintWritingAll, lintWritingText } from "../lint-writing.mjs";
 
 test("detects half-width punctuation after Chinese characters", () => {
   const bad = "开发任务,请先确认。";

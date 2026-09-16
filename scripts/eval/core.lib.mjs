@@ -1,7 +1,7 @@
 import { cp, mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { loadSkillCatalog } from "./repository-metadata.lib.mjs";
+import { loadSkillCatalog } from "../repository-metadata.lib.mjs";
 
 function parseScalar(rawValue) {
   const value = rawValue.trim();

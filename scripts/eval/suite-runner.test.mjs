@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { runEvalCase, runEvalSuite } from "./eval-suite-runner.lib.mjs";
+import { runEvalCase, runEvalSuite } from "./suite-runner.lib.mjs";
 
 const quietIo = { stdout: { write() {} }, stderr: { write() {} } };
 

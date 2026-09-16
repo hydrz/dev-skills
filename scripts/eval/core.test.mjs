@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseMarkdownWithFrontmatter, requiredSkillsForCase } from "./eval-core.lib.mjs";
+import { parseMarkdownWithFrontmatter, requiredSkillsForCase } from "./core.lib.mjs";
 
 test("评测核心独立解析用例并选择所需 skill", () => {
   const document = parseMarkdownWithFrontmatter(

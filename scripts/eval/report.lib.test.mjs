@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { caseTokenStats, runTokens } from "./eval-report.lib.mjs";
+import { caseTokenStats, runTokens } from "./report.lib.mjs";
 
 test("reads total tokens or sums input and output tokens", () => {
   assert.equal(runTokens({ usage: { total_tokens: 900 } }), 900);

@@ -24,7 +24,7 @@ import {
   requiredSkillsForCase,
   summarizeGraderResults,
   summarizeResults,
-} from "./lib.mjs";
+} from "./codex.lib.mjs";
 
 test("parses the existing prompt and grader frontmatter shapes", () => {
   const document = parseMarkdownWithFrontmatter(`---
@@ -292,7 +292,7 @@ test("CLI dry-run reports selected cases without invoking Codex", async () => {
 
   const result = spawnSync(
     process.execPath,
-    [path.resolve("scripts/eval-codex/run.mjs"), "--dry-run", "--tag", "grilling"],
+    [path.resolve("scripts/eval/codex.run.mjs"), "--dry-run", "--tag", "grilling"],
     { cwd: path.resolve("."), encoding: "utf8" },
   );
 

@@ -10,7 +10,7 @@ import {
   runWithConcurrency,
   summarizeResults,
   validateCommonOptions,
-} from "./eval-cli-shared.lib.mjs";
+} from "./cli-shared.lib.mjs";
 
 test("commonAggregateOptions keeps the shared CLI result contract", () => {
   assert.deepEqual(
