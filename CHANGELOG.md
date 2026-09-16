@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.5.5
+
+### Patch Changes
+
+- [#51](https://github.com/hydrz/dev-skills/pull/51) [`8a58016`](https://github.com/hydrz/dev-skills/commit/8a580161456782378db78cf4b5e5a0fae5d4a179) Thanks [@hydrz](https://github.com/hydrz)! - 统一评测执行与仓库元数据校验，补充安装资产同步检查和回归测试。
+
 ## 0.5.4
 
 ### Patch Changes
