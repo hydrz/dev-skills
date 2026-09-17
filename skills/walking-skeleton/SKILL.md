@@ -1,6 +1,6 @@
 ---
 name: walking-skeleton
-description: 搭建贯穿前端到数据库的端到端最小可运行系统雏形，作为后续正式开发的基座。
+description: 搭建贯穿前端到数据库的端到端最小可运行系统雏形，作为后续正式开发的基座；区别于验证完即丢弃的 prototype。
 disable-model-invocation: true
 ---
 

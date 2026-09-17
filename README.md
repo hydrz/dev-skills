@@ -154,7 +154,7 @@ agy plugin install https://github.com/hydrz/dev-skills
 适合希望把 skill 复制到项目内自行修改，或使用 Cursor、Windsurf、Zed、OpenCode 等支持 [Agent Skills](https://github.com/vercel-labs/skills) 标准宿主环境的开发者：
 
 ```bash
-# 查看仓库所有可用技能（共 34 项）
+# 查看仓库所有可用技能（共 38 项）
 npx skills add hydrz/dev-skills --list
 
 # 交互式添加全部或选定技能

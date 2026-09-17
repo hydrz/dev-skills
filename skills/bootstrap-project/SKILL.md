@@ -1,6 +1,6 @@
 ---
 name: bootstrap-project
-description: 全新项目从零起步时，按决策清单完成技术栈选型、目录分层与工具链配置。
+description: 全新项目从零起步时，按决策清单完成技术栈选型、目录分层与工具链配置；区别于配置工程约定的 setup-dev-skills。
 disable-model-invocation: true
 ---
 
