@@ -11,7 +11,9 @@
 只有用户显式输入名称才会运行。
 
 - **[`/ask-dev-skills`](./ask-dev-skills/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
+- **[`/bootstrap-project`](./bootstrap-project/SKILL.md)｜项目起步与地基**：从零起步，按决策清单完成技术栈选型、目录分层与工具链配置。
 - **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。
+- **[`/walking-skeleton`](./walking-skeleton/SKILL.md)｜端到端可运行骨架**：搭建贯穿前端到数据库的最小系统雏形，保留并在其上继续开发。
 - **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，大型工作先按业务模块和发布批次拆分，不再追加访谈。
 - **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，确保覆盖每个功能项的每个状态。
@@ -33,6 +35,8 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范、需求规格和上线风险三个维度分别检查改动。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
 - **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
+- **[`api-contract`](./api-contract/SKILL.md)｜接口契约**：设计服务间通信协议、输入输出校验与统一错误结构。
+- **[`data-modeling`](./data-modeling/SKILL.md)｜数据建模**：设计数据库表结构、确立实体关系与迁移策略。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
 - **[`codebase-design`](./codebase-design/SKILL.md)｜模块设计**：设计简单接口、清晰边界和更易测试的模块，并按业务复杂度决定业务模块的内部结构。
 - **[`prototype`](./prototype/SKILL.md)｜一次性原型**：用最小原型回答一个设计问题。

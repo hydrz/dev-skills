@@ -18,9 +18,12 @@
     "subagents"
   ],
   "skills": [
+    "./skills/api-contract",
     "./skills/ask-dev-skills",
+    "./skills/bootstrap-project",
     "./skills/code-review",
     "./skills/codebase-design",
+    "./skills/data-modeling",
     "./skills/diagnosing-bugs",
     "./skills/domain-modeling",
     "./skills/finishing-a-branch",
@@ -47,6 +50,7 @@
     "./skills/triage",
     "./skills/verifying-completion",
     "./skills/wait-what",
+    "./skills/walking-skeleton",
     "./skills/wayfinder",
     "./skills/wizard",
     "./skills/workflow-designer",

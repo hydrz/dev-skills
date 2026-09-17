@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: 用于领域建模（domain modeling）、维护 `CONTEXT.md`，以及创建或更新 ADR。
+description: 用于业务领域概念与术语建模（与管理数据库表结构的 data-modeling 相对）、维护 `CONTEXT.md` 及 ADR。
 ---
 
 # 领域建模

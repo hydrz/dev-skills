@@ -20,9 +20,18 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 
 ## 技能全景速览
 
-涵盖从环境初始化到最终交付的 34 项核心能力，按使用时机划分为 6 大模块。多数人从核心主干（The Main Flow）开始。
+涵盖从项目起步到最终交付的 38 项核心能力，按使用时机划分为 7 大模块。多数人从核心主干（The Main Flow）开始。
 
 > **说明**：带 `/` 前缀的为**仅用户触发**（需在对话中显式输入命令）；不带 `/` 的为**可自动触发**（由 Agent 在合适场景主动调用）。
+
+### 0. 起步与地基（Bootstrapping）
+
+全新项目从零起步、确立技术基线与骨架。
+
+| 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                        | 核心定位与职责                                                             |
+| :---------------------------------------------------------- | :------------------------------------------------------------------------- |
+| [`/bootstrap-project`](./skills/bootstrap-project/SKILL.md) | **起步与地基**：从零起步，按决策清单完成技术栈选型、目录分层与工具链配置。 |
+| [`/walking-skeleton`](./skills/walking-skeleton/SKILL.md)   | **端到端骨架**：搭建贯穿前端到持久化的最小可运行雏形，保留作为后续基座。   |
 
 ### 1. 入门与导航（Getting Started）
 
@@ -90,7 +99,9 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 
 | 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                               | 核心定位与职责                                                         |
 | :----------------------------------------------------------------- | :--------------------------------------------------------------------- |
+| [`api-contract`](./skills/api-contract/SKILL.md)                   | **接口契约**：设计服务间通信协议、输入输出校验与统一错误结构。         |
 | [`codebase-design`](./skills/codebase-design/SKILL.md)             | **模块设计**：遵循深模块与清晰边界设计理念，提供模块化设计的原则指导。 |
+| [`data-modeling`](./skills/data-modeling/SKILL.md)                 | **数据建模**：设计数据库表结构、确立实体关系与迁移策略。               |
 | [`domain-modeling`](./skills/domain-modeling/SKILL.md)             | **领域建模**：维护项目通用语言与 ADR。                                 |
 | [`grilling`](./skills/grilling/SKILL.md)                           | **方案追问方法**：按依赖关系逐轮追问的通用问答方法论。                 |
 | [`tdd`](./skills/tdd/SKILL.md)                                     | **测试驱动开发**：红-绿-重构循环测试驱动开发标准。                     |
@@ -143,7 +154,7 @@ agy plugin install https://github.com/hydrz/dev-skills
 适合希望把 skill 复制到项目内自行修改，或使用 Cursor、Windsurf、Zed、OpenCode 等支持 [Agent Skills](https://github.com/vercel-labs/skills) 标准宿主环境的开发者：
 
 ```bash
-# 查看仓库所有可用技能（共 34 项）
+# 查看仓库所有可用技能（共 38 项）
 npx skills add hydrz/dev-skills --list
 
 # 交互式添加全部或选定技能
