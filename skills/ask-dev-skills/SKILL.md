@@ -23,6 +23,16 @@ disable-model-invocation: true
 
 ## 主流程
 
+### 从零起步
+
+全新仓库起步时的推荐序列为：
+
+`/bootstrap-project → /setup-dev-skills → /walking-skeleton → 现有交付主干`
+
+各步骤不强制衔接：纯工具库、算法包或无外部通信/数据库的 CLI 项目可以跳过 `/walking-skeleton`，直接进入主流程。
+
+### 交付主干
+
 1. `/grill-with-docs` 追问完善想法，把术语和决策写入 `CONTEXT.md` 和 ADR；没有工作目录时用 `/grill-me`。
 2. 有问题需要可运行的答案时，用 `/handoff` 开新会话做 `prototype`，再用 `/handoff` 把结论带回。
 3. 需要多个会话时：`/to-spec` 写规格（跨多个业务模块时先产出规格拆分表），`/to-tickets` 拆成端到端最小闭环任务，然后二选一：
