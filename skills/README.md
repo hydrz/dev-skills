@@ -13,6 +13,7 @@
 - **[`/ask-dev-skills`](./ask-dev-skills/SKILL.md)｜工作流导航**：不确定下一步该用哪个 skill 时运行。
 - **[`/bootstrap-project`](./bootstrap-project/SKILL.md)｜项目起步与地基**：从零起步，按决策清单完成技术栈选型、目录分层与工具链配置。
 - **[`/setup-dev-skills`](./setup-dev-skills/SKILL.md)｜初始化项目约定**：首次在仓库中使用工程 skill 前，配置 issue 追踪器、分诊标签、领域文档布局和功能清单约定。
+- **[`/walking-skeleton`](./walking-skeleton/SKILL.md)｜端到端可运行骨架**：搭建贯穿前端到数据库的最小系统雏形，保留并在其上继续开发。
 - **[`/grill-with-docs`](./grill-with-docs/SKILL.md)｜带记录的方案追问**：在仓库中逐轮澄清方案，同时更新 `CONTEXT.md` 和 ADR。
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成可实施规格，大型工作先按业务模块和发布批次拆分，不再追加访谈。
 - **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，确保覆盖每个功能项的每个状态。

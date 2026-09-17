@@ -36,6 +36,7 @@ disable-model-invocation: true
 
 - 从零起步、还没有代码：`/bootstrap-project`
 - 首次使用工程流程，还没配置 issue 追踪器和文档布局：`/setup-dev-skills`
+- 搭建贯穿全链路的最小可运行雏形并保留继续开发：`/walking-skeleton`
 - 有一个想法，想做出来：主流程，从 `/grill-with-docs` 开始
 - 范围大、方向不清，一个会话讨论不完；或缺少功能清单：`/wayfinder`，路径明确后交给 `/to-spec`
 - 待处理的外部 bug 报告和需求越来越多：`/triage`，产出的 issue 由 `/implement` 领取
@@ -70,6 +71,7 @@ disable-model-invocation: true
 - **`/triage` 与 `/to-tickets`**：分诊只处理不是你创建的 issue；`/to-tickets` 产出的任务无需再分诊。
 - **`/improve-codebase-architecture` 与 `codebase-design`**：前者寻找加深模块的候选项；后者为选中的候选项做设计。
 - **`prototype` 与 `research`**：前者写一次性代码回答设计问题；后者阅读一手资料回答事实问题。
+- **`prototype` 与 `/walking-skeleton`**：前者写一次性探针回答局部设计问题，验证完丢弃；后者搭建端到端可运行系统雏形，验证后保留并在其上继续开发。
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
 - **`data-modeling` 与 `domain-modeling`**：前者设计物理数据库表结构与迁移策略；后者管理业务领域概念、通用语言与架构决策记录。

@@ -31,6 +31,7 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 | 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                        | 核心定位与职责                                                             |
 | :---------------------------------------------------------- | :------------------------------------------------------------------------- |
 | [`/bootstrap-project`](./skills/bootstrap-project/SKILL.md) | **起步与地基**：从零起步，按决策清单完成技术栈选型、目录分层与工具链配置。 |
+| [`/walking-skeleton`](./skills/walking-skeleton/SKILL.md)   | **端到端骨架**：搭建贯穿前端到持久化的最小可运行雏形，保留作为后续基座。   |
 
 ### 1. 入门与导航（Getting Started）
 
