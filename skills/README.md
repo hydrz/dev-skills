@@ -34,6 +34,7 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范、需求规格和上线风险三个维度分别检查改动。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
 - **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
+- **[`data-modeling`](./data-modeling/SKILL.md)｜数据建模**：设计数据库表结构、确立实体关系与迁移策略。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
 - **[`codebase-design`](./codebase-design/SKILL.md)｜模块设计**：设计简单接口、清晰边界和更易测试的模块，并按业务复杂度决定业务模块的内部结构。
 - **[`prototype`](./prototype/SKILL.md)｜一次性原型**：用最小原型回答一个设计问题。

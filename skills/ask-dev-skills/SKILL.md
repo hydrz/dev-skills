@@ -45,6 +45,7 @@ disable-model-invocation: true
 - 实现完成，要合并、开 PR 或丢弃分支：`finishing-a-branch`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
+- 设计数据库表结构、确立实体关系与迁移策略：`data-modeling`
 - 澄清术语、更新 `CONTEXT.md` 或记录 ADR：`domain-modeling`
 - TypeScript 仓库要把模块边界配置成静态检查：`/setup-ts-deep-modules`
 - 想在提交前获得快速质量反馈：`/setup-pre-commit`
@@ -70,6 +71,7 @@ disable-model-invocation: true
 - **`prototype` 与 `research`**：前者写一次性代码回答设计问题；后者阅读一手资料回答事实问题。
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
+- **`data-modeling` 与 `domain-modeling`**：前者设计物理数据库表结构与迁移策略；后者管理业务领域概念、通用语言与架构决策记录。
 
 ## 输出格式
 
