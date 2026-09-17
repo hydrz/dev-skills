@@ -18,6 +18,7 @@
     "subagents"
   ],
   "skills": [
+    "./skills/api-contract",
     "./skills/ask-dev-skills",
     "./skills/bootstrap-project",
     "./skills/code-review",

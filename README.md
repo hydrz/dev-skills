@@ -98,6 +98,7 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 
 | 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                               | 核心定位与职责                                                         |
 | :----------------------------------------------------------------- | :--------------------------------------------------------------------- |
+| [`api-contract`](./skills/api-contract/SKILL.md)                   | **接口契约**：设计服务间通信协议、输入输出校验与统一错误结构。         |
 | [`codebase-design`](./skills/codebase-design/SKILL.md)             | **模块设计**：遵循深模块与清晰边界设计理念，提供模块化设计的原则指导。 |
 | [`data-modeling`](./skills/data-modeling/SKILL.md)                 | **数据建模**：设计数据库表结构、确立实体关系与迁移策略。               |
 | [`domain-modeling`](./skills/domain-modeling/SKILL.md)             | **领域建模**：维护项目通用语言与 ADR。                                 |

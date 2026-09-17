@@ -45,6 +45,7 @@ disable-model-invocation: true
 - 实现完成，要合并、开 PR 或丢弃分支：`finishing-a-branch`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
+- 设计接口契约、通信协议选型与统一错误结构：`api-contract`
 - 设计数据库表结构、确立实体关系与迁移策略：`data-modeling`
 - 澄清术语、更新 `CONTEXT.md` 或记录 ADR：`domain-modeling`
 - TypeScript 仓库要把模块边界配置成静态检查：`/setup-ts-deep-modules`
