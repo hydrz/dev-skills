@@ -34,6 +34,7 @@ disable-model-invocation: true
 
 ## 按情况选入口
 
+- 从零起步、还没有代码：`/bootstrap-project`
 - 首次使用工程流程，还没配置 issue 追踪器和文档布局：`/setup-dev-skills`
 - 有一个想法，想做出来：主流程，从 `/grill-with-docs` 开始
 - 范围大、方向不清，一个会话讨论不完；或缺少功能清单：`/wayfinder`，路径明确后交给 `/to-spec`

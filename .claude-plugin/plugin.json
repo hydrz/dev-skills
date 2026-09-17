@@ -19,6 +19,7 @@
   ],
   "skills": [
     "./skills/ask-dev-skills",
+    "./skills/bootstrap-project",
     "./skills/code-review",
     "./skills/codebase-design",
     "./skills/diagnosing-bugs",
