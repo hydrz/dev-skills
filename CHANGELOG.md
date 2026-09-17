@@ -1,5 +1,17 @@
 # dev-skills
 
+## 0.6.0
+
+### Minor Changes
+
+- 新增“起步与地基”类技能，补齐从零到一阶段的工程指导能力：
+  
+  - 新增 `bootstrap-project`：覆盖技术栈选型、目录分层与工具链配置的决策清单（保持技术栈无关），并在 README 建立“0. 起步与地基”分类。
+  - 新增 `data-modeling`：覆盖实体关系（ER）设计、ORM 选型、零停机迁移（Expand & Contract）与种子数据规划，并与 `domain-modeling` 双向消歧。
+  - 新增 `api-contract`：覆盖通信协议选型（REST/RPC/GraphQL）、输入输出严格校验防泄漏与统一错误模型 Envelope。
+  - 新增 `walking-skeleton`：覆盖端到端可运行系统雏形搭建与冒烟测试验证（保留在主干持续演进，与 `prototype` 互指）。
+  - 补全 `ask-dev-skills` 的从零起步完整路径，更新 README 技能全景速览（扩展至 38 项技能、7 大模块）。
+
 ## 0.5.6
 
 ### Patch Changes
