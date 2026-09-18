@@ -54,6 +54,7 @@ disable-model-invocation: true
 - 正处于 merge 或 rebase 冲突中：`resolving-merge-conflicts`
 - 要评审改动；收到了评审意见：`code-review`；`receiving-code-review`
 - 实现完成，要合并、开 PR 或丢弃分支：`finishing-a-branch`
+- 准备创建 PR，撰写结构化摘要与证据：`/pr`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
 - 设计接口契约、通信协议选型与统一错误结构：`api-contract`
@@ -61,6 +62,7 @@ disable-model-invocation: true
 - 澄清术语、更新 `CONTEXT.md` 或记录 ADR：`domain-modeling`
 - TypeScript 仓库要把模块边界配置成静态检查：`/setup-ts-deep-modules`
 - 想在提交前获得快速质量反馈：`/setup-pre-commit`
+- 防范 AI 误执行破坏性 Git 命令（强推、硬重置、强删分支等）：`/git-guardrails`
 - 一次工作结束，想复盘 agent 的绕路和遗漏：`/retro`
 - 需要在仓库中留下带引用的技术调研报告：`research`，报告再带进 `/grill-with-docs`
 - 缺的信息在别人那里：`/to-questionnaire`
@@ -69,7 +71,7 @@ disable-model-invocation: true
 - 没看懂刚才的消息：`/wait-what`
 - 分多次会话学习一个概念：`/teach`
 - 反复发生的团队操作或审批流程要整理成规格：`/workflow-designer`
-- 撰写或审校成篇中文内容：`writing-chinese`；内容是 agent 指令时先用 `writing-for-agents`
+- 构思、撰写或审校成篇中文内容：`writing-chinese`；内容是 agent 指令时先用 `writing-for-agents`
 - 编写或测试 skill、`AGENTS.md`、`CLAUDE.md`：`writing-for-agents`
 - 只想被追问一个计划，不附加任何流程：`grilling`
 
@@ -84,7 +86,8 @@ disable-model-invocation: true
 - **`prototype` 与 `/walking-skeleton`**：前者写一次性代码回答局部设计问题，分支不合并进主干；后者搭建端到端可运行系统雏形，验证后保留并在其上继续开发。
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
-- **`data-modeling` 与 `domain-modeling`**：前者设计物理数据库表结构与迁移策略；后者管理业务领域概念、通用语言与架构决策记录。
+- **`/pr` 与 `finishing-a-branch`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责分支收尾流程（测试验证、分支合并、推送创建 PR、清理工作树），并在选项 2 中引导调用 `/pr`。
+- **`/git-guardrails` 与 `/setup-pre-commit`**：前者拦截不可逆高危 Git 操作（破坏性命令守卫）；后者在提交前运行代码格式化、lint 与轻量质量测试。
 
 ## 输出格式
 
