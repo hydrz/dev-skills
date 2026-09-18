@@ -1,5 +1,16 @@
 # dev-skills
 
+## 0.7.0
+
+### Minor Changes
+
+- [#76](https://github.com/hydrz/dev-skills/pull/76) [`547c5bf`](https://github.com/hydrz/dev-skills/commit/547c5bf10cbea5e48b6dd65bc17bd02d97ce269c) Thanks [@hydrz](https://github.com/hydrz)! - 吸收与融合上游技能优秀实践 ([#70](https://github.com/hydrz/dev-skills/issues/70))：
+  - 新增 `/pr` 技能（[#71](https://github.com/hydrz/dev-skills/issues/71)）：结构化撰写 PR 描述（伪代码/调用树、Before/After 鲜明对比与单向门/爆炸半径风险评估），并与 `finishing-a-branch` 闭环联动。
+  - 增强 `writing-chinese` 技能（[#72](https://github.com/hydrz/dev-skills/issues/72)）：引入行文构思与地道中文认知推进规范，确立“认知铺垫（先铺垫后引用）”、“推进单元与行文步调”及“按需取材与裁剪（素材是候选池，不是宣讲脚本）”，全面恢复 `vs` 对比语义。
+  - 新增 `/git-guardrails` 技能（[#73](https://github.com/hydrz/dev-skills/issues/73)）：提供宿主中立的本地 Git 防破坏拦截向导，支持原生 Git Hooks 与 Claude Code 等多宿主防御，附带 10 项专项回归测试。
+  - 优化 `implement-spec` 技能（[#74](https://github.com/hydrz/dev-skills/issues/74)）：审查物料生成解耦，优先使用纯原生 Git 管道生成 diff，消除 Node.js 脚本硬依赖。
+  - 全库多端同步与终验（[#75](https://github.com/hydrz/dev-skills/issues/75)）：同步元数据清单，全量测试套件、写作规范与格式门禁 100% 变绿通过。
+
 ## 0.6.5
 
 ### Patch Changes
