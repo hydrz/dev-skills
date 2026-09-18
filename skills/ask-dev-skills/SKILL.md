@@ -69,7 +69,7 @@ disable-model-invocation: true
 - 没看懂刚才的消息：`/wait-what`
 - 分多次会话学习一个概念：`/teach`
 - 反复发生的团队操作或审批流程要整理成规格：`/workflow-designer`
-- 撰写或审校成篇中文内容：`writing-chinese`；内容是 agent 指令时先用 `writing-for-agents`
+- 构思、撰写或审校成篇中文内容：`writing-chinese`；内容是 agent 指令时先用 `writing-for-agents`
 - 编写或测试 skill、`AGENTS.md`、`CLAUDE.md`：`writing-for-agents`
 - 只想被追问一个计划，不附加任何流程：`grilling`
 

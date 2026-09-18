@@ -65,5 +65,5 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 agent 会在合适场景主动使用，用户也可以显式调用。
 
 - **[`grilling`](./grilling/SKILL.md)｜方案追问方法**：按问题之间的依赖关系逐轮澄清决策，并在实施前获得明确确认。
-- **[`writing-chinese`](./writing-chinese/SKILL.md)｜中文写作与审校**：撰写、改写、翻译或审校成篇中文内容，使表达清楚自然并保持原意。
+- **[`writing-chinese`](./writing-chinese/SKILL.md)｜中文写作与审校**：构思、撰写、改写、翻译或审校成篇中文内容，建立清晰的认知阶梯并保持原意。
 - **[`writing-for-agents`](./writing-for-agents/SKILL.md)｜agent 文档写作**：编写和测试 skill、`AGENTS.md`、`CLAUDE.md` 及其他供 agent 使用的文档。
