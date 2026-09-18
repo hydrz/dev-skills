@@ -16,4 +16,4 @@ disable-model-invocation: true
 
 5. **核对与提交。** 使用 `verifying-completion` skill 核对验收标准。把工作提交到当前分支，提交信息说明做了什么、为什么这样做。
 
-6. **收尾。** 如果这是当前分支上的最后一项任务，提示用户使用 `finishing-a-branch` skill。
+6. **收尾。** 如果这是当前分支上的最后一项任务，提示用户使用 `finish-work` skill。

@@ -107,7 +107,7 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 | [`tdd`](./skills/tdd/SKILL.md)                                     | **测试驱动开发**：红-绿-重构循环测试驱动开发标准。                     |
 | [`verifying-completion`](./skills/verifying-completion/SKILL.md)   | **完成验证**：在声称完成前运行检查并在当前状态下阅读完整测试产出。     |
 | [`receiving-code-review`](./skills/receiving-code-review/SKILL.md) | **处理评审意见**：先核实意见再修改代码，杜绝盲目修改。                 |
-| [`finishing-a-branch`](./skills/finishing-a-branch/SKILL.md)       | **分支收尾**：完成后标准收尾流程，提供合并、PR、清理工作树选项。       |
+| [`finish-work`](./skills/finish-work/SKILL.md)                     | **交付收尾**：完成后标准收尾流程，提供本地直合、提交评审或评审后收口。 |
 | [`writing-chinese`](./skills/writing-chinese/SKILL.md)             | **中文写作与审校**：保障产出中文内容自然、地道、清晰的技术写作指南。   |
 | [`writing-for-agents`](./skills/writing-for-agents/SKILL.md)       | **Agent 文档写作**：高质量 Agent 规则与文档编写规范。                  |
 
@@ -203,7 +203,7 @@ npx skills use hydrz/dev-skills@grilling
 ### 典型使用场景
 
 - **需求还没有想清楚**：运行 `/grill-with-docs` 逐轮澄清并压力测试方案；如果规模大到一个会话无法理清，使用 [`/wayfinder`](./skills/wayfinder/SKILL.md) 建立功能清单与决策地图；若仅需纯对话推演且不向本地写入文件，使用 [`/grill-me`](./skills/grill-me/SKILL.md)。
-- **已有明确任务，需要实现**：单项或少量任务用 `/implement`；整份规格需多个子代理并行完成用 `/implement-spec`。实现过程会自动联动 `tdd`、`code-review`、`verifying-completion` 与 `finishing-a-branch`。
+- **已有明确任务，需要实现**：单项或少量任务用 `/implement`；整份规格需多个子代理并行完成用 `/implement-spec`。实现过程会自动联动 `tdd`、`code-review`、`verifying-completion` 与 `finish-work`。
 - **收到不完整的 bug 或需求**：问题已经可以复现时使用 `diagnosing-bugs` 定位根因；外部 issue 或 PR 信息不足时运行 [`/triage`](./skills/triage/SKILL.md) 分类、核实并补齐执行条件。
 
 ## 设计原则

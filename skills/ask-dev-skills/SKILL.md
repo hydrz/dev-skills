@@ -37,10 +37,10 @@ disable-model-invocation: true
 2. 有问题需要可运行的答案时，用 `/handoff` 开新会话做 `prototype`，再用 `/handoff` 把结论带回。
 3. 需要多个会话时：`/to-spec` 整理规格并商定测试接缝，`/to-tickets` 拆成带前置依赖的端到端最小闭环任务并核对确认，然后二选一：
    - 由用户跟进：每项任务运行一次 `/implement`，任务之间 `/clear`。
-   - 交给 agent：`/implement-spec` 并行派发子代理，逐项评审，按整份规格一个 PR 或每项任务一个 PR 交付。
+   - 交给 agent：`/implement-spec` 并行派发子代理并在磁盘记录进度，统一评审交付。
 4. 一个会话能完成时，直接 `/implement`。
 
-实现时都使用 `tdd`、`code-review`、`verifying-completion`，最后用 `finishing-a-branch` 收尾。步骤 1 到 3 保持在同一个上下文窗口中。
+实现时都使用 `tdd`、`code-review`、`verifying-completion`，最后用 `finish-work` 收尾。步骤 1 到 3 保持在同一个上下文窗口中。
 
 ## 按情况选入口
 
@@ -53,7 +53,7 @@ disable-model-invocation: true
 - 代码出错、测试失败、偶发问题、性能退化：`diagnosing-bugs`
 - 正处于 merge 或 rebase 冲突中：`resolving-merge-conflicts`
 - 要评审改动；收到了评审意见：`code-review`；`receiving-code-review`
-- 实现完成，要合并、开 PR 或丢弃分支：`finishing-a-branch`
+- 实现完成，要合并主干、提 PR 审查或做发版就绪收尾：`/finish-work`
 - 准备创建 PR，撰写结构化摘要与证据：`/pr`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
@@ -86,7 +86,7 @@ disable-model-invocation: true
 - **`prototype` 与 `/walking-skeleton`**：前者写一次性代码回答局部设计问题，分支不合并进主干；后者搭建端到端可运行系统雏形，验证后保留并在其上继续开发。
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
-- **`/pr` 与 `finishing-a-branch`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责分支收尾流程（测试验证、分支合并、推送创建 PR、清理工作树），并在选项 2 中引导调用 `/pr`。
+- **`/pr` vs `/finish-work`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责全链路交付收尾流程（门禁复核、场景自适应合并、现场清理与发布就绪核验），并在场景 2 中联动 `/pr`。
 - **`/git-guardrails` 与 `/setup-pre-commit`**：前者拦截不可逆高危 Git 操作（破坏性命令守卫）；后者在提交前运行代码格式化、lint 与轻量质量测试。
 
 ## 输出格式

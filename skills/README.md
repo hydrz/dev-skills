@@ -18,7 +18,7 @@
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成规格并发布到 issue 追踪器，商定测试接缝，不再追加访谈。
 - **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，并在发布前与用户核对确认。
 - **[`/implement`](./implement/SKILL.md)｜当前会话实现**：在当前会话实现一项或少量已明确的任务。
-- **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，按整份规格一个 PR 或每项任务一个 PR 交付。
+- **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，交付整份规格的 PR 或在本地完成。
 - **[`/pr`](./pr/SKILL.md)｜结构化 PR 描述**：撰写包含伪代码或调用树摘要、Before/After 证据对比与合并风险评估的 PR 描述。
 - **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立功能清单、划分发布批次、补齐设计依据。
 - **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
@@ -26,6 +26,7 @@
 - **[`/setup-ts-deep-modules`](./setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查。
 - **[`/setup-pre-commit`](./setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存改动配置快速、可验证的 pre-commit 检查。
 - **[`/git-guardrails`](./git-guardrails/SKILL.md)｜Git 安全守卫**：配置宿主中立的本地防御，拦截强推、硬重置等破坏性 Git 命令。
+- **[`/finish-work`](./finish-work/SKILL.md)｜交付收尾**：实现与验证完成后，提供本地直合、提交评审或评审后收口，安全清理现场并做好发布就绪准备。
 
 ### 可自动触发
 
@@ -36,7 +37,6 @@ agent 会在合适场景主动使用，用户也可以显式调用。
 - **[`verifying-completion`](./verifying-completion/SKILL.md)｜完成验证**：在声称完成前运行对应检查并读取完整结果。
 - **[`code-review`](./code-review/SKILL.md)｜代码评审**：从仓库规范、需求规格和上线风险三个维度分别检查改动。
 - **[`receiving-code-review`](./receiving-code-review/SKILL.md)｜处理评审意见**：先核实意见再修改代码。
-- **[`finishing-a-branch`](./finishing-a-branch/SKILL.md)｜分支收尾**：验证完成后，让用户选择合并、创建 PR 或保留分支。
 - **[`api-contract`](./api-contract/SKILL.md)｜接口契约**：设计服务间通信协议、输入输出校验与统一错误结构。
 - **[`data-modeling`](./data-modeling/SKILL.md)｜数据建模**：设计数据库表结构、确立实体关系与迁移策略。
 - **[`domain-modeling`](./domain-modeling/SKILL.md)｜领域建模**：维护项目通用语言和 ADR。
