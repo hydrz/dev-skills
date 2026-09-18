@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.6.2
+
+### Patch Changes
+
+- [#62](https://github.com/hydrz/dev-skills/pull/62) [`9dad551`](https://github.com/hydrz/dev-skills/commit/9dad551ae909593eb209baa507734a4b277a12fe) Thanks [@hydrz](https://github.com/hydrz)! - 对齐 grill-me、grill-with-docs 与 grilling 到 Matt Pocock 原版规范，还原设计树与待确认项（frontier）机制，统一分轮提问与推荐格式，并精简评测用例。
+
 ## 0.6.1
 
 ### Patch Changes
