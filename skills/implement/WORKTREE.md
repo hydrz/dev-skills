@@ -3,7 +3,7 @@
 `implement` 和 `implement-spec` 需要隔离的工作区时，按本文准备工作树（worktree）。
 
 - 是否新建由调用方决定：`implement` 先征得用户同意；`implement-spec` 为每个实现者创建，不逐次询问。
-- 清理由 `finishing-a-branch` 第 6 步和 `implement-spec` 的收尾负责。本文的目录约定与它们一致。
+- 清理由 `finish-work` 和 `implement-spec` 的收尾负责。本文的目录约定与它们一致。
 
 ## 1. 检测当前是否已经隔离
 
@@ -53,7 +53,7 @@ fi
 2. `MAIN_ROOT` 下已有 `.worktrees/` 或 `worktrees/` 时，使用它；两者都有时用 `.worktrees/`。
 3. 都没有时，使用 `MAIN_ROOT/.worktrees/`。
 
-`finishing-a-branch` 只清理 `.worktrees/` 和 `worktrees/` 下的工作树。使用用户指定的其他目录时，告诉用户这些工作树需要手动清理。
+`finish-work` 只清理 `.worktrees/` 和 `worktrees/` 下的工作树。使用用户指定的其他目录时，告诉用户这些工作树需要手动清理。
 
 **3. 确认目录已被 git 忽略。** 位于仓库内的目录必须先确认，否则整个工作树会作为未跟踪文件出现在主仓库中，容易被一起提交。检查要创建的完整路径：
 
