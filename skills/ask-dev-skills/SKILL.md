@@ -54,6 +54,7 @@ disable-model-invocation: true
 - 正处于 merge 或 rebase 冲突中：`resolving-merge-conflicts`
 - 要评审改动；收到了评审意见：`code-review`；`receiving-code-review`
 - 实现完成，要合并、开 PR 或丢弃分支：`finishing-a-branch`
+- 准备创建 PR，撰写结构化摘要与证据：`/pr`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
 - 设计接口契约、通信协议选型与统一错误结构：`api-contract`
@@ -85,6 +86,7 @@ disable-model-invocation: true
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
 - **`data-modeling` 与 `domain-modeling`**：前者设计物理数据库表结构与迁移策略；后者管理业务领域概念、通用语言与架构决策记录。
+- **`/pr` 与 `finishing-a-branch`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责分支收尾流程（测试验证、分支合并、推送创建 PR、清理工作树），并在选项 2 中引导调用 `/pr`。
 
 ## 输出格式
 
