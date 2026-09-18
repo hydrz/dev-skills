@@ -37,7 +37,7 @@ disable-model-invocation: true
 2. 有问题需要可运行的答案时，用 `/handoff` 开新会话做 `prototype`，再用 `/handoff` 把结论带回。
 3. 需要多个会话时：`/to-spec` 整理规格并商定测试接缝，`/to-tickets` 拆成带前置依赖的端到端最小闭环任务并核对确认，然后二选一：
    - 由用户跟进：每项任务运行一次 `/implement`，任务之间 `/clear`。
-   - 交给 agent：`/implement-spec` 并行派发子代理，逐项评审，按整份规格一个 PR 或每项任务一个 PR 交付。
+   - 交给 agent：`/implement-spec` 并行派发子代理并在磁盘记录进度，统一评审交付。
 4. 一个会话能完成时，直接 `/implement`。
 
 实现时都使用 `tdd`、`code-review`、`verifying-completion`，最后用 `finish-work` 收尾。步骤 1 到 3 保持在同一个上下文窗口中。

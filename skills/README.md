@@ -18,7 +18,7 @@
 - **[`/to-spec`](./to-spec/SKILL.md)｜整理规格**：把已经完成的讨论整理成规格并发布到 issue 追踪器，商定测试接缝，不再追加访谈。
 - **[`/to-tickets`](./to-tickets/SKILL.md)｜拆分开发任务**：把规格拆成带前置依赖的端到端最小闭环任务，并在发布前与用户核对确认。
 - **[`/implement`](./implement/SKILL.md)｜当前会话实现**：在当前会话实现一项或少量已明确的任务。
-- **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，按整份规格一个 PR 或每项任务一个 PR 交付。
+- **[`/implement-spec`](./implement-spec/SKILL.md)｜整体规格并行交付**：由多个子代理并行完成整份规格，交付整份规格的 PR 或在本地完成。
 - **[`/pr`](./pr/SKILL.md)｜结构化 PR 描述**：撰写包含伪代码或调用树摘要、Before/After 证据对比与合并风险评估的 PR 描述。
 - **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立功能清单、划分发布批次、补齐设计依据。
 - **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
