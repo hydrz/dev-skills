@@ -25,6 +25,7 @@
 - **[`/improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化报告，找出值得进一步设计的重构机会。
 - **[`/setup-ts-deep-modules`](./setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查。
 - **[`/setup-pre-commit`](./setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存改动配置快速、可验证的 pre-commit 检查。
+- **[`/git-guardrails`](./git-guardrails/SKILL.md)｜Git 安全守卫**：配置宿主中立的本地防御，拦截强推、硬重置等破坏性 Git 命令。
 
 ### 可自动触发
 
