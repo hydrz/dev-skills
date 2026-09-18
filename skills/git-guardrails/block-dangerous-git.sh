@@ -35,16 +35,18 @@ else
   fi
 fi
 
-# 3. 高危破坏性命令匹配规则（支持完整命令与常见变体）
+# 3. 高危破坏性命令匹配规则（带严格的词界与命令起始边界，避免误拦合法分支名与提交说明）
 DANGEROUS_PATTERNS=(
-  'git[[:space:]]+push[[:space:]]+.*(--force|-f([[:space:]]|$)|--force-with-lease)'
-  'git[[:space:]]+reset[[:space:]]+.*--hard'
-  'git[[:space:]]+clean[[:space:]]+.*-(f|.*f.*d|.*d.*f|.*x.*f|.*f.*x)'
-  'git[[:space:]]+branch[[:space:]]+.*-D'
-  'git[[:space:]]+(checkout|restore)[[:space:]]+(\.([[:space:]]|$)|:\/|--[[:space:]]+\.)'
-  'push[[:space:]]+.*(--force|-f([[:space:]]|$)|--force-with-lease)'
-  'reset[[:space:]]+.*--hard'
-  'clean[[:space:]]+.*-(f|.*f.*d|.*d.*f)'
+  '(^|[;&|][[:space:]]*)git[[:space:]]+push([[:space:]]+.*)?[[:space:]]+(--force|-f|--force-with-lease)([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)git[[:space:]]+reset([[:space:]]+.*)?[[:space:]]+--hard([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)git[[:space:]]+clean([[:space:]]+.*)?[[:space:]]+(-[a-zA-Z]*f[a-zA-Z]*|--force)([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)git[[:space:]]+branch([[:space:]]+.*)?[[:space:]]+-D([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)git[[:space:]]+(checkout|restore)([[:space:]]+.*)?[[:space:]]+(\.([[:space:]]|$)|:\/|--[[:space:]]+\.)'
+  '(^|[;&|][[:space:]]*)push([[:space:]]+.*)?[[:space:]]+(--force|-f|--force-with-lease)([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)reset([[:space:]]+.*)?[[:space:]]+--hard([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)clean([[:space:]]+.*)?[[:space:]]+(-[a-zA-Z]*f[a-zA-Z]*|--force)([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)branch([[:space:]]+.*)?[[:space:]]+-D([[:space:]]|$)'
+  '(^|[;&|][[:space:]]*)(checkout|restore)([[:space:]]+.*)?[[:space:]]+(\.([[:space:]]|$)|:\/|--[[:space:]]+\.)'
 )
 
 # 4. 逐项匹配并拦截

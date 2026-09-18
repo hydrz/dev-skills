@@ -148,7 +148,7 @@ source <绝对路径>/git-guard-shell.sh
    ```bash
    <脚本路径> git clean -fd
    ```
-   预期结果：终端打印 `BLOCKED` 拦截信息，退出码为 2。
+   预期结果：终端打印 `[Git 安全守卫拦截]` 拦截信息，退出码为 2。
 2. **验证合法操作不受影响**：
    ```bash
    <脚本路径> git status
