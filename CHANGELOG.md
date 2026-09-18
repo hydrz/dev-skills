@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.6.1
+
+### Patch Changes
+
+- [#60](https://github.com/hydrz/dev-skills/pull/60) [`29f6c7f`](https://github.com/hydrz/dev-skills/commit/29f6c7fe087ed091427cf98b397d298428bb0066) Thanks [@hydrz](https://github.com/hydrz)! - 重构 `prototype` skill 及其关联定义，彻底对齐 Matt Pocock 原版设计意图
+
 ## 0.6.0
 
 ### Minor Changes
