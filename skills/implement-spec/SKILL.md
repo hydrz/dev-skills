@@ -139,15 +139,44 @@ issue 追踪器配置应该已经提供给你；如果没有，告诉用户运�
 
 ### 3. 评审
 
-用本 skill 目录下的 [review-package.mjs](review-package.mjs) 生成评审材料：
+生成评审材料并写入进度记录目录下的独立文件（按提交范围命名，例如 `review-<BASE7>..<HEAD7>.diff`）。把文件路径交给评审者，**你自己不读取材料内容**，让 diff 留在你的上下文之外，避免占用协调者上下文并确保评审独立客观。
+
+BASE 用派发前记下的提交，不用 `HEAD~1`：多提交的任务会只剩最后一个提交。生成前必须进行安全校验：
+
+1. 检查 BASE 是否为 HEAD 的祖先：`git merge-base --is-ancestor <BASE> <HEAD>`。若非祖先，说明分支偏离，diff 会混入无关改动。
+2. 检查提交数是否大于 0：`git rev-list --count <BASE>..<HEAD>`。若为 0，说明范围内没有提交，核对 BASE 与 HEAD。
+
+**方式 A：Git 原生管道（推荐，跨平台通用）**
+
+无需依赖任何外部语言运行时，在任意技术栈代码库中均可使用原生 Git 命令组装评审材料：
+
+```bash
+OUT="<进度记录目录>/review-$(git rev-parse --short=7 <BASE>)..$(git rev-parse --short=7 <HEAD>).diff"
+{
+  printf '# 评审材料：%s..%s\n\n## 提交\n\n' "$(git rev-parse --short=7 <BASE>)" "$(git rev-parse --short=7 <HEAD>)"
+  git log --oneline --no-decorate <BASE>..<HEAD>
+  printf '\n## 改动文件\n\n'
+  git diff --stat <BASE>..<HEAD>
+  printf '\n## diff\n\n'
+  git diff --no-color --no-ext-diff -U10 <BASE>..<HEAD>
+} > "$OUT"
+```
+
+在不支持子 shell 块重定向的终端（如 Windows PowerShell）中，可依次顺序追加（`>> "$OUT"`），或直接使用 `git format-patch --stdout <BASE>..<HEAD> > "$OUT"` 导出标准补丁材料。
+
+**方式 B：Node.js 快捷脚本（可选）**
+
+环境已具备 Node.js 运行时时，可选用本 skill 目录下的 [review-package.mjs](review-package.mjs) 一键完成校验与打包：
 
 ```bash
 node <本 skill 目录>/review-package.mjs <BASE> <任务分支头部> <进度记录目录>
 ```
 
-它把提交列表、`git diff --stat` 和 `git diff -U10` 写入一个按提交范围命名的文件，并输出文件路径。BASE 用派发前记下的提交，不用 `HEAD~1`：多提交的任务会只剩最后一个提交。脚本以退出码 2 结束时，说明 BASE 不是头部的祖先、范围内没有提交或参数有误，按输出核对 BASE 后重新生成。把输出的路径交给评审者，你自己不读取材料内容，让 diff 留在你的上下文之外。无法运行 Node 时，用这三条 git 命令把输出写入进度记录目录下一个名称唯一的文件。
+脚本自动校验祖先关系与空提交，输出生成的文件路径。若以退出码 2 结束，按输出提示核对 BASE 后重新生成。
 
-然后派发评审者，提示按 [REVIEWER-PROMPT.md](REVIEWER-PROMPT.md) 填写：任务指针、全局约束原文、报告文件路径、评审材料路径。
+**派发评审者**
+
+生成材料后派发评审者，提示按 [REVIEWER-PROMPT.md](REVIEWER-PROMPT.md) 填写：任务指针、全局约束原文、报告文件路径、评审材料路径。
 
 评审者返回两个结论：**任务符合度**（✅、❌ 或 ⚠️）和**质量**（通过或需修复）。两个结论都必须有。实现者的自查不能替代评审。
 
