@@ -46,14 +46,14 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 
 从需求澄清到上线交付的端到端主流程。
 
-| 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                    | 核心定位与职责                                                                       |
-| :------------------------------------------------------ | :----------------------------------------------------------------------------------- |
-| [`/grill-with-docs`](./skills/grill-with-docs/SKILL.md) | **带记录的方案追问**：在仓库中逐轮澄清方案，记录关键决策并写入 `CONTEXT.md` 与 ADR。 |
-| [`/to-spec`](./skills/to-spec/SKILL.md)                 | **整理规格**：将讨论成果转化为可实施规格并划分发布批次，不留未决歧义，不再追加访谈。 |
-| [`/to-tickets`](./skills/to-tickets/SKILL.md)           | **拆分开发任务**：将规格拆解为带前置依赖的端到端最小闭环任务，确保覆盖每个状态。     |
-| [`/implement`](./skills/implement/SKILL.md)             | **当前会话实现**：在当前会话中通过测试先行实现单项或少量明确任务。                   |
-| [`/implement-spec`](./skills/implement-spec/SKILL.md)   | **整体规格并行交付**：由多个子代理并行完成整份规格，并统一交付 PR。                  |
-| [`code-review`](./skills/code-review/SKILL.md)          | **代码评审**：从仓库规范、需求规格和上线风险三个维度对 diff 展开严格审查。           |
+| 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                    | 核心定位与职责                                                                           |
+| :------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
+| [`/grill-with-docs`](./skills/grill-with-docs/SKILL.md) | **带记录的方案追问**：在仓库中逐轮澄清方案，记录关键决策并写入 `CONTEXT.md` 与 ADR。     |
+| [`/to-spec`](./skills/to-spec/SKILL.md)                 | **整理规格**：将讨论成果整理成规格并发布到 issue 追踪器，商定测试接缝，不再追加访谈。    |
+| [`/to-tickets`](./skills/to-tickets/SKILL.md)           | **拆分开发任务**：将规格拆解为带前置依赖的端到端最小闭环任务，并在发布前与用户核对确认。 |
+| [`/implement`](./skills/implement/SKILL.md)             | **当前会话实现**：在当前会话中通过测试先行实现单项或少量明确任务。                       |
+| [`/implement-spec`](./skills/implement-spec/SKILL.md)   | **整体规格并行交付**：由多个子代理并行完成整份规格，并统一交付 PR。                      |
+| [`code-review`](./skills/code-review/SKILL.md)          | **代码评审**：从仓库规范、需求规格和上线风险三个维度对 diff 展开严格审查。               |
 
 ### 3. 需求定义与探索（Shaping）
 
@@ -192,13 +192,13 @@ npx skills use hydrz/dev-skills@grilling
                                                 ↘ /implement-spec
 ```
 
-| 环节 &emsp;&emsp; | 对应命令 &emsp;&emsp;&emsp;&emsp;                       | 核心职责                                                               |
-| :---------------- | :------------------------------------------------------ | :--------------------------------------------------------------------- |
-| **1. 方案追问**   | [`/grill-with-docs`](./skills/grill-with-docs/SKILL.md) | 在仓库中逐轮澄清方案，记录关键决策并写入 `CONTEXT.md` 与 ADR。         |
-| **2. 整理规格**   | [`/to-spec`](./skills/to-spec/SKILL.md)                 | 将讨论成果转化为可实施规格并划分发布批次，不留未决歧义，不再追加访谈。 |
-| **3. 拆分任务**   | [`/to-tickets`](./skills/to-tickets/SKILL.md)           | 将规格拆解为带前置依赖的端到端最小闭环任务，确保覆盖每个状态。         |
-| **4. 单会话实现** | [`/implement`](./skills/implement/SKILL.md)             | 在当前会话中通过测试先行实现单项或少量明确任务。                       |
-| **4. 并行交付**   | [`/implement-spec`](./skills/implement-spec/SKILL.md)   | 由多个子代理并行完成整份规格，并统一交付 PR。                          |
+| 环节 &emsp;&emsp; | 对应命令 &emsp;&emsp;&emsp;&emsp;                       | 核心职责                                                                |
+| :---------------- | :------------------------------------------------------ | :---------------------------------------------------------------------- |
+| **1. 方案追问**   | [`/grill-with-docs`](./skills/grill-with-docs/SKILL.md) | 在仓库中逐轮澄清方案，记录关键决策并写入 `CONTEXT.md` 与 ADR。          |
+| **2. 整理规格**   | [`/to-spec`](./skills/to-spec/SKILL.md)                 | 将讨论成果整理成规格并发布到 issue 追踪器，商定测试接缝，不再追加访谈。 |
+| **3. 拆分任务**   | [`/to-tickets`](./skills/to-tickets/SKILL.md)           | 将规格拆解为带前置依赖的端到端最小闭环任务，并在发布前与用户核对确认。  |
+| **4. 单会话实现** | [`/implement`](./skills/implement/SKILL.md)             | 在当前会话中通过测试先行实现单项或少量明确任务。                        |
+| **4. 并行交付**   | [`/implement-spec`](./skills/implement-spec/SKILL.md)   | 由多个子代理并行完成整份规格，并统一交付 PR。                           |
 
 ### 典型使用场景
 
