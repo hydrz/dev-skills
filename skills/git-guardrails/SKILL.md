@@ -62,13 +62,20 @@ AI 编程助手（Claude Code、Antigravity、Codex、Cursor、Windsurf 等）�
 
 ### 3. 安装 Git 原生 Hook（pre-push）
 
-将模板脚本 [pre-push-guard.sh](pre-push-guard.sh) 部署至目标位置：
+**先检查目标位置是否已有内容**，不覆盖已有 hook（例如 husky、lefthook 或其他工具管理的 `pre-push`）。用 `git rev-parse --git-common-dir` 解析 hooks 目录，而不是硬编码 `.git/hooks`——在 linked worktree 中 `.git` 是指向公共 gitdir 的文件而非目录，硬编码路径会导致检查失效：
+
+```bash
+HOOKS_DIR="$(git rev-parse --git-common-dir)/hooks"
+test -s "$HOOKS_DIR/pre-push" && echo "已存在 pre-push，需要合并"
+```
+
+已存在且非本向导生成时，把 [pre-push-guard.sh](pre-push-guard.sh) 的拦截逻辑追加到现有脚本末尾（或让现有脚本在自身逻辑通过后 `exec` 调用本脚本），不要直接覆盖；并告诉用户合并方式。确认为空或不存在时，再部署模板脚本：
 
 - **项目级安装**：
   ```bash
-  mkdir -p .git/hooks
-  cp <skill目录>/pre-push-guard.sh .git/hooks/pre-push
-  chmod +x .git/hooks/pre-push
+  mkdir -p "$HOOKS_DIR"
+  cp <skill目录>/pre-push-guard.sh "$HOOKS_DIR/pre-push"
+  chmod +x "$HOOKS_DIR/pre-push"
   ```
   如果仓库希望将 hooks 纳入版本控制与团队共享：
   ```bash
@@ -85,7 +92,7 @@ AI 编程助手（Claude Code、Antigravity、Codex、Cursor、Windsurf 等）�
   git config --global core.hooksPath ~/.config/git/hooks
   ```
 
-**完成条件：** `pre-push` 钩子已就位且具备可执行权限。
+**完成条件：** `pre-push` 钩子已就位且具备可执行权限，已有 hook 的原有逻辑没有被覆盖丢失。
 
 ### 4. 安装宿主与 Shell 拦截脚本
 
@@ -137,9 +144,9 @@ source <绝对路径>/git-guard-shell.sh
 
 ### 5. 验证防护效果
 
-带领用户执行轻量、无破坏的静态与模拟验证：
+按 `CONTEXT.md` 的"变红"方法，带领用户执行轻量、无破坏的静态与模拟验证：
 
-1. **验证宿主/本地拦截**：
+1. **验证宿主/本地拦截（变红）**：
    在终端中模拟触发高危命令，检查是否输出阻断信息且退出码非 0：
    ```bash
    echo '{"tool_input":{"command":"git reset --hard"}}' | <脚本路径>
