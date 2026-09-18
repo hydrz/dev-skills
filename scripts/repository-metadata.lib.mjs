@@ -69,7 +69,6 @@ export function loadRepositoryMetadata(root) {
     ...codexMetadata.paths,
     claudePlugin: join(root, ".claude-plugin", "plugin.json"),
     agentsIndex: join(root, ".agents", "skills.json"),
-    readme: join(root, "skills", "README.md"),
     router: join(root, "skills", "ask-dev-skills", "SKILL.md"),
   };
   const installAssets = INSTALL_ASSET_PAIRS.map(([source, target]) => {
@@ -93,7 +92,6 @@ export function loadRepositoryMetadata(root) {
     skills: discoverRepositorySkills(root),
     claudePlugin: readJson(paths.claudePlugin),
     agentsIndex: readJson(paths.agentsIndex),
-    readme: readFileSync(paths.readme, "utf8"),
     router: readFileSync(paths.router, "utf8"),
     installAssets,
   };
@@ -161,9 +159,6 @@ export function validateMetadataModel(model) {
   }
 
   for (const skill of model.skills) {
-    if (!model.readme.includes(`./${skill.name}/SKILL.md`)) {
-      errors.push(`\`skills/README.md\` 缺少 skill 条目：\`${skill.name}\``);
-    }
     if (skill.name !== "ask-dev-skills" && !model.router.includes(skill.name)) {
       errors.push(`\`skills/ask-dev-skills/SKILL.md\` 路由未覆盖：\`${skill.name}\``);
     }
