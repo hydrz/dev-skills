@@ -69,15 +69,15 @@ Skills 是为 Coding Agent 设计的轻量、精准的工作流指令，让 Agen
 
 保持代码库健康、定位疑难缺陷、化解合并冲突并守住质量门禁。
 
-| 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                                                | 核心定位与职责                                                                 |
-| :---------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
-| [`/improve-codebase-architecture`](./skills/improve-codebase-architecture/SKILL.md) | **架构审查**：扫描代码库并生成可视化重构报告，找出值得改进的高耦合模块。       |
-| [`diagnosing-bugs`](./skills/diagnosing-bugs/SKILL.md)                              | **系统化诊断**：从编写失败复现用例开始，系统化定位疑难 bug 根因。              |
-| [`resolving-merge-conflicts`](./skills/resolving-merge-conflicts/SKILL.md)          | **解决合并冲突**：根据双方改动意图，稳步处理 merge 与 rebase 冲突。            |
-| [`/triage`](./skills/triage/SKILL.md)                                               | **外部 issue 分流**：分类、核实并补齐外部 issue 与 PR，使其达到可执行状态。    |
-| [`wizard`](./skills/wizard/SKILL.md)                                                | **生成设置向导**：针对必须由人工完成的外部配置与鉴权，生成交互式向导脚本。     |
-| [`/setup-ts-deep-modules`](./skills/setup-ts-deep-modules/SKILL.md)                 | **TypeScript 模块边界**：将公开接口与依赖方向配置为可执行的静态检查规则。      |
-| [`/setup-pre-commit`](./skills/setup-pre-commit/SKILL.md)                           | **提交前质量门**：沿用仓库现有工具，为暂存区改动配置快速、可验证的预提交检查。 |
+| 技能 / 命令 &emsp;&emsp;&emsp;&emsp;                                                | 核心定位与职责                                                                   |
+| :---------------------------------------------------------------------------------- | :------------------------------------------------------------------------------- |
+| [`/improve-codebase-architecture`](./skills/improve-codebase-architecture/SKILL.md) | **架构审查**：扫描代码库并生成可视化重构报告，找出值得改进的高耦合模块。         |
+| [`diagnosing-bugs`](./skills/diagnosing-bugs/SKILL.md)                              | **系统化诊断**：从编写失败复现用例开始，系统化定位疑难 bug 根因。                |
+| [`resolving-merge-conflicts`](./skills/resolving-merge-conflicts/SKILL.md)          | **解决合并冲突**：根据双方改动意图，稳步处理 merge 与 rebase 冲突。              |
+| [`/triage`](./skills/triage/SKILL.md)                                               | **外部 issue 分流**：分类、核实并补齐外部 issue 与 PR，使其达到可执行状态。      |
+| [`wizard`](./skills/wizard/SKILL.md)                                                | **生成设置向导**：针对必须由人工完成的外部配置与鉴权，生成交互式向导脚本。       |
+| [`/setup-deep-modules`](./skills/setup-deep-modules/SKILL.md)                       | **模块边界**：按语言生态选工具，将公开接口与依赖方向配置为可执行的静态检查规则。 |
+| [`/setup-pre-commit`](./skills/setup-pre-commit/SKILL.md)                           | **提交前质量门**：沿用仓库现有工具，为暂存区改动配置快速、可验证的预提交检查。   |
 
 ### 5. 效能与协作（Productivity）
 

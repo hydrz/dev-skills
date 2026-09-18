@@ -23,10 +23,10 @@
 - **[`/wayfinder`](./wayfinder/SKILL.md)｜大型工作决策规划**：把单个会话无法理清的大型工作拆成可逐步解决的决策问题，并建立功能清单、划分发布批次、补齐设计依据。
 - **[`/triage`](./triage/SKILL.md)｜外部 issue 分流**：分类、核实并补齐外部 issue 或 PR，使其达到可执行状态。
 - **[`/improve-codebase-architecture`](./improve-codebase-architecture/SKILL.md)｜架构审查**：扫描代码库并生成可视化报告，找出值得进一步设计的重构机会。
-- **[`/setup-ts-deep-modules`](./setup-ts-deep-modules/SKILL.md)｜TypeScript 模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查。
+- **[`/setup-deep-modules`](./setup-deep-modules/SKILL.md)｜模块边界**：把已经确定的公开接口、内部实现和依赖方向配置成可执行的静态检查，按语言生态选工具。
 - **[`/setup-pre-commit`](./setup-pre-commit/SKILL.md)｜提交前质量门**：沿用仓库现有工具，为暂存改动配置快速、可验证的 pre-commit 检查。
 - **[`/git-guardrails`](./git-guardrails/SKILL.md)｜Git 安全守卫**：配置宿主中立的本地防御，拦截强推、硬重置等破坏性 Git 命令。
-- **[`/finish-work`](./finish-work/SKILL.md)｜交付收尾**：实现与验证完成后，提供本地直合、提交评审或评审后收口，安全清理现场并做好发布就绪准备。
+- **[`/finish-work`](./finish-work/SKILL.md)｜交付收尾**：实现与验证完成后，呈现本地直合、提交评审或保持现状等选项并等待确认，安全清理现场。
 
 ### 可自动触发
 

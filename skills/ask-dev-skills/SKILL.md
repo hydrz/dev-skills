@@ -53,14 +53,14 @@ disable-model-invocation: true
 - 代码出错、测试失败、偶发问题、性能退化：`diagnosing-bugs`
 - 正处于 merge 或 rebase 冲突中：`resolving-merge-conflicts`
 - 要评审改动；收到了评审意见：`code-review`；`receiving-code-review`
-- 实现完成，要合并主干、提 PR 审查或做发版就绪收尾：`/finish-work`
+- 实现完成，要合并主干、提 PR 审查或收尾清理：`/finish-work`
 - 准备创建 PR，撰写结构化摘要与证据：`/pr`
 - 有空时想让代码库更适合 agent 工作：`/improve-codebase-architecture`
 - 设计模块接口、测试接缝，或判断是否需要 DDD：`codebase-design`
 - 设计接口契约、通信协议选型与统一错误结构：`api-contract`
 - 设计数据库表结构、确立实体关系与迁移策略：`data-modeling`
 - 澄清术语、更新 `CONTEXT.md` 或记录 ADR：`domain-modeling`
-- TypeScript 仓库要把模块边界配置成静态检查：`/setup-ts-deep-modules`
+- 要把已确定的模块边界配置成静态检查：`/setup-deep-modules`
 - 想在提交前获得快速质量反馈：`/setup-pre-commit`
 - 防范 AI 误执行破坏性 Git 命令（强推、硬重置、强删分支等）：`/git-guardrails`
 - 一次工作结束，想复盘 agent 的绕路和遗漏：`/retro`
@@ -86,7 +86,7 @@ disable-model-invocation: true
 - **`prototype` 与 `/walking-skeleton`**：前者写一次性代码回答局部设计问题，分支不合并进主干；后者搭建端到端可运行系统雏形，验证后保留并在其上继续开发。
 - **`/to-questionnaire` 与 `/grill-me`**：前者为别人写问卷；后者追问你自己。
 - **`/wait-what` 与 `/grill-with-docs`**：前者事后补救没看懂的内容；后者通过尽早约定通用语言事前预防。
-- **`/pr` vs `/finish-work`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责全链路交付收尾流程（门禁复核、场景自适应合并、现场清理与发布就绪核验），并在场景 2 中联动 `/pr`。
+- **`/pr` vs `/finish-work`**：前者专注于撰写结构化 PR 描述（摘要、证据、合并风险）；后者负责交付收尾流程（门禁复核、呈现集成选项并等待确认、现场清理），并在"推送并创建 PR"选项中联动 `/pr`。
 - **`/git-guardrails` 与 `/setup-pre-commit`**：前者拦截不可逆高危 Git 操作（破坏性命令守卫）；后者在提交前运行代码格式化、lint 与轻量质量测试。
 
 ## 输出格式
