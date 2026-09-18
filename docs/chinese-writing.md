@@ -1,6 +1,6 @@
 # 本仓库中文写作约定
 
-通用的中文撰写、改写、翻译和审校方法见 [`writing-chinese`](../skills/writing-chinese/SKILL.md)。本文件只记录 dev-skills 仓库特有的读者、术语和格式约定。
+通用的中文构思、撰写、改写、翻译和审校方法见 [`writing-chinese`](../skills/writing-chinese/SKILL.md)。本文件只记录 dev-skills 仓库特有的读者、术语和格式约定。
 
 编写 skill、`AGENTS.md` 或其他 agent 指令时，同时遵循 [`writing-for-agents`](../skills/writing-for-agents/SKILL.md)：先保证触发条件和行为语义正确，再审校中文表达。
 
