@@ -1,5 +1,11 @@
 # dev-skills
 
+## 0.6.5
+
+### Patch Changes
+
+- [#68](https://github.com/hydrz/dev-skills/pull/68) [`89b6d37`](https://github.com/hydrz/dev-skills/commit/89b6d373feee0ebe2882361bbad552d30116ae91) Thanks [@hydrz](https://github.com/hydrz)! - 全面对齐敏捷原型流规范：重构功能清单（feature-list）规范与模板，彻底移除旧版“规格拆分表”与全状态矩阵强制回填残留；优化完成验证（verifying-completion）证据标准，以任务验收标准和测试断言为准，移除死板的全状态强制截图门禁；微调测试驱动开发（tdd）端到端测试定义并更新领域术语表。
+
 ## 0.6.4
 
 ### Patch Changes
