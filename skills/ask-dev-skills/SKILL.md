@@ -35,7 +35,7 @@ disable-model-invocation: true
 
 1. `/grill-with-docs` 追问完善想法，把术语和决策写入 `CONTEXT.md` 和 ADR；没有工作目录时用 `/grill-me`。
 2. 有问题需要可运行的答案时，用 `/handoff` 开新会话做 `prototype`，再用 `/handoff` 把结论带回。
-3. 需要多个会话时：`/to-spec` 写规格（跨多个业务模块时先产出规格拆分表），`/to-tickets` 拆成端到端最小闭环任务，然后二选一：
+3. 需要多个会话时：`/to-spec` 整理规格并商定测试接缝，`/to-tickets` 拆成带前置依赖的端到端最小闭环任务并核对确认，然后二选一：
    - 由用户跟进：每项任务运行一次 `/implement`，任务之间 `/clear`。
    - 交给 agent：`/implement-spec` 并行派发子代理，逐项评审，按整份规格一个 PR 或每项任务一个 PR 交付。
 4. 一个会话能完成时，直接 `/implement`。
@@ -48,7 +48,7 @@ disable-model-invocation: true
 - 首次使用工程流程，还没配置 issue 追踪器和文档布局：`/setup-dev-skills`
 - 搭建贯穿全链路的最小可运行雏形并保留继续开发：`/walking-skeleton`
 - 有一个想法，想做出来：主流程，从 `/grill-with-docs` 开始
-- 范围大、方向不清，一个会话讨论不完；或缺少功能清单：`/wayfinder`，路径明确后交给 `/to-spec`
+- 范围大、方向不清，一个会话讨论不完：`/wayfinder`，路径明确后交给 `/to-spec`
 - 待处理的外部 bug 报告和需求越来越多：`/triage`，产出的 issue 由 `/implement` 领取
 - 代码出错、测试失败、偶发问题、性能退化：`diagnosing-bugs`
 - 正处于 merge 或 rebase 冲突中：`resolving-merge-conflicts`
