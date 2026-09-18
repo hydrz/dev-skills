@@ -45,7 +45,6 @@ function validModel() {
     },
     packageJson: { name: "dev-skills", version: "1.0.0" },
     agentsIndex: { entries: [{ path: "skills" }] },
-    readme: "./alpha/SKILL.md\n./beta/SKILL.md",
     router: "alpha\nbeta",
     installAssets: [{ source: "template", target: "installed", equal: true }],
   };
@@ -155,7 +154,6 @@ test("缺失的安装资产会形成可应用的同步更新", async () => {
     "skills/ask-dev-skills/SKILL.md",
     "---\nname: ask-dev-skills\ndescription: 路由。\n---\n\n# 路由\n",
   );
-  await write("skills/README.md", "./ask-dev-skills/SKILL.md\n");
   for (const [source, target] of INSTALL_ASSET_PAIRS) {
     await write(source, `${source}\n`);
     if (!target.endsWith("check-feature-coverage.mjs")) await write(target, `${source}\n`);
